@@ -1,0 +1,56 @@
+\documentclass[english]{mlutalk}
+% \documentclass[english,handout]{mlutalk}
+
+\title{Grimjack at Touché 2021}
+\subtitle{Advanced IR, Winter Semester 2021/22}
+\author{Johannes Huck \and Jan Heinrich Reimer}
+\institute{Martin Luther University Halle-Wittenberg}
+\date{\today}
+\titlegraphic{\includegraphics[width=3cm]{figures/mlu-halle}}
+
+\addbibresource{../literature/literature.bib}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{biblatex}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphics,graphicx}
+
+\newcommand{\TF}{\mbox{TF}\xspace}
+\newcommand{\TFIDF}{\mbox{TF/IDF}\xspace}
+\newcommand{\todocite}{{\smaller\color{red}[CITE]}\xspace}
+\newcommand{\todo}[1]{{\smaller\color{red}[#1]}}
+
+\lstset{%
+  basicstyle=\ttfamily,
+  breaklines=true
+}
+
+\begin{document}
+
+\titleframe
+
+\begin{frame}{Sample}  
+  \begin{itemize}
+    \item Foo
+    \item Bar
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \item Foo
+    \item Bar
+  \end{itemize}
+  \thankyou
+\end{frame}
+
+\appendix
+\section{\appendixname}
+
+\bibliographyframe
+
+\end{document}
