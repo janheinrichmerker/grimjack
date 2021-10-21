@@ -8,7 +8,8 @@
 
 Named after the fencer [Grimjack](https://en.wikipedia.org/wiki/Grimjack).
 
-Participation in the Touché task 2 shared task.
+Participation in the [Touché 2022](https://webis.de/events/touche-22/) shared task 2, 
+as part of the [Advanced Information Retrieval](https://gitlab.informatik.uni-halle.de/aqvbw/Information-Retrieval/) lecture.
 
 ## Usage
 
