@@ -51,6 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-github-release.outputs.upload_url }}
-          asset_path: paper/emnlp2021.pdf
-          asset_name: emnlp2021.pdf
+          asset_path: paper/TODO.pdf
+          asset_name: TODO.pdf
           asset_content_type: application/pdf
