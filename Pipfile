@@ -7,6 +7,14 @@ name = "pypi"
 numpy = "*"
 pyserini = "*"
 dload = "*"
+pytest = "*"
+jupyter = "*"
+nltk = "*"
+autopep8 = "*"
+pylint = "*"
+pytest-cov = "*"
+rope = "*"
+flake8 = "*"
 
 [dev-packages]
 
