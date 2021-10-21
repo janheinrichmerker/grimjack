@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "05c9b017fb54faaa27659bc5d1cf20424d14eb3398e0071e0709a8bf3097ae6e"
+            "sha256": "886589a390e11ccd97baf95e3aea57c891b66affbbcc82933b573aa729076408"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -83,6 +83,13 @@
             ],
             "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==0.29.24"
+        },
+        "dload": {
+            "hashes": [
+                "sha256:40113d7a77ad782b40ea2713f8fe17cbdfe49dbd63db6061eb80ca91c1000e9e"
+            ],
+            "index": "pypi",
+            "version": "==0.6"
         },
         "filelock": {
             "hashes": [
