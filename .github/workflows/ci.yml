@@ -14,11 +14,11 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           working_directory: paper
-          root_file: TODO.tex
+          root_file: sample-1col.tex
       - name: "📤 Upload paper"
         uses: actions/upload-artifact@v2
         with:
-          path: paper/TODO.pdf
+          path: paper/sample-1col.pdf
           name: Paper
   test-python:
     name: "🧪 Test Python code"

@@ -295,6 +295,9 @@ TSWLatexianTemp*
 # glossaries
 *.glstex
 
+*.xmpdata
+*.abs
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -19,11 +19,11 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           working_directory: paper
-          root_file: paper.tex
+          root_file: sample-1col.tex
       - name: "📤 Upload paper"
         uses: actions/upload-artifact@v2
         with:
-          path: paper/TODO.pdf
+          path: paper/sample-1col.pdf
           name: Paper
   release:
     name: "🚀 Release"
@@ -51,6 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-github-release.outputs.upload_url }}
-          asset_path: paper/TODO.pdf
-          asset_name: TODO.pdf
+          asset_path: paper/sample-1col.pdf
+          asset_name: sample-1col.pdf
           asset_content_type: application/pdf
