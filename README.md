@@ -22,12 +22,27 @@ Then install dependencies (may take a while):
 pipenv install
 ```
 
-### Run a TODO
+### Run the search pipeline
 
-TODO
+To test the search pipeline, run the `grimjack.run` CLI like this:
 
 ```shell script
-pipenv run python TODO
+pipenv run python -m grimjack.run search "abortion"
+```
+
+#### Options
+
+The search pipeline can be configured with the options listed in the help command.
+The help command also lists all subcommands.
+
+```shell script
+pipenv run python -m grimjack.run --help
+```
+
+Each subcommand's extra options can be listed like this:
+
+```shell script
+pipenv run python -m grimjack.run search --help
 ```
 
 ### Testing
