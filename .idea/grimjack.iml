@@ -7,7 +7,14 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.idea/ZeppelinRemoteNotebooks" />
+      <excludeFolder url="file://$MODULE_DIR$/data/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/data/documents" />
+      <excludeFolder url="file://$MODULE_DIR$/data/index" />
+      <excludeFolder url="file://$MODULE_DIR$/data/out" />
+      <excludeFolder url="file://$MODULE_DIR$/data/topics" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Python 3.7 (benchmark) interpreter library" level="application" />
