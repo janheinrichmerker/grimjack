@@ -82,13 +82,20 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Argument extraction~\cite{AlhamzehBEM2021}}
+\begin{frame}[allowframebreaks]{Argument extraction~\cite{AlhamzehBEM2021}}
   \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figures/distilbert-based-arg-retrieval-processing.pdf}
+    \includegraphics[width=0.7\linewidth]{figures/distilbert-based-arg-retrieval-processing.pdf}
     \caption{Transfer learning model~\cite{AlhamzehBEM2021}}
-    \label{processing}
+    \label{model}
   \end{figure}
+
+  \begin{itemize}
+    \item Train binary classifier for sentences: \\ argument vs. non-argument
+    \item Corpora: Student Essays~\cite{HabernalG2017}, User-generated Web Discourse~\cite{StabG2014}
+    \item Standard binary classification using \texttt{[CLS]} token
+    \item Label mapping for Student Essays corpus unclear
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Conclusion}
