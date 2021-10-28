@@ -36,13 +36,13 @@
 \begin{frame}{DistilBERT-based Arg. Retrieval~\cite{AlhamzehBEM2021}}
   \begin{itemize}
     \item Touché 2021 participation
-    \item Approaches
+    \item Contributions
     \begin{itemize}
       \item Query expansion
       \item Argument extraction
       \item Scoring/sorting
     \end{itemize}
-    \item Custom argument identification \\ Not using TARGER~\cite{ChernodubOHBHBP2019}
+    \item Custom argument identification (without TARGER~\cite{ChernodubOHBHBP2019})
     \begin{itemize}
       \item Transfer learning
       \item Based on DistilBERT~\cite{SanhDCW2019}
@@ -53,14 +53,20 @@
 \begin{frame}[allowframebreaks]{Search pipeline}
   \begin{figure}
     \centering
-    \includegraphics[width=0.8\linewidth]{figures/distilbert-based-arg-retrieval-architecture.pdf}
+    \includegraphics[width=0.75\linewidth]{figures/distilbert-based-arg-retrieval-architecture.pdf}
     \caption{Search pipeline architecture~\cite{AlhamzehBEM2021}}
     \label{architecture}
   \end{figure}
 
-  \begin{itemize}
-    \item TODO
-  \end{itemize}
+  \begin{enumerate}
+    \item Query expansion: split into 3~new queries
+    \item Retrieval using ChatNoir API~\cite{BevendorffSHP2018,PotthastHSGMTW2012}
+    \item Aggregate/combine results of the 3~queries
+    \item Extract arguments using DistilBERT~\cite{SanhDCW2019}
+    \item Compute/fetch 7~scores per document: \\ retrieval scores, page/spam ranks, query similarity, hit count from the 3~queries
+    \item Normalize and combine scores
+    \item Sort documents
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Query expansion}
@@ -76,7 +82,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Transfer learning model~\cite{AlhamzehBEM2021}}
+\begin{frame}{Argument extraction~\cite{AlhamzehBEM2021}}
   \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figures/distilbert-based-arg-retrieval-processing.pdf}
