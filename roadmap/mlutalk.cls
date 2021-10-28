@@ -21,7 +21,7 @@
 \usetikzlibrary{arrows,shapes,fit,fadings}
 \tikzset{line/.style={draw,-latex'}}
 \RequirePackage{pgfplots}
-\pgfplotsset{compat=1.16}
+\pgfplotsset{compat=1.15}
 \RequirePackage{hyperref}
 
 % Page layout:
