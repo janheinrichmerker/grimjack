@@ -11,6 +11,8 @@ from pyserini.search import SimpleSearcher
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, INDEX_DIR
 
+from grimjack.query_preprocessing import replace_comparative_words
+
 
 class Stemmer(Enum):
     PORTER = "porter"

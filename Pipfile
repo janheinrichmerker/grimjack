@@ -15,6 +15,7 @@ pylint = "*"
 pytest-cov = "*"
 rope = "*"
 flake8 = "*"
+gensim = "*"
 
 [dev-packages]
 
