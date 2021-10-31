@@ -97,7 +97,7 @@ class Pipeline:
         Will index documents if needed.
         """
         index_dir = INDEX_DIR / self._index_suffix
-        self._index_if_needed(self.documents_dir, index_dir, "topics")
+        self._index_if_needed(self.documents_dir, index_dir, "documents")
         return index_dir
 
     def _index_if_needed(self, input_dir: Path, index_dir: Path, name: str):
@@ -130,11 +130,14 @@ class Pipeline:
         )
         run(index_command)
 
-    def search(self, query: str, num_hits: int):
-        searcher = SimpleSearcher(str(self.index_dir.absolute()))
-        hits = searcher.search(query, num_hits)
-        for i, hit in enumerate(hits):
-            document = loads(hit.raw)
-            content = " ".join(document["contents"].split())
-            print(f"{i + 1:2} {hits[i].docid:4} {hits[i].score:.5f}\n"
-                  f"\t{content}\n\n\n")
+    def search(self, query: str, num_hits: int, topics_file: str):
+        if topics_file is not None:
+            self.topics_dir
+        else: 
+            searcher = SimpleSearcher(str(self.index_dir.absolute()))
+            hits = searcher.search(query, num_hits)
+            for i, hit in enumerate(hits):
+                document = loads(hit.raw)
+                content = " ".join(document["contents"].split())
+                print(f"{i + 1:2} {hits[i].docid:4} {hits[i].score:.5f}\n"
+                    f"\t{content}\n\n\n")

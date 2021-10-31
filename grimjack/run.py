@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from grimjack.constants import DEFAULT_DOCUMENTS_ZIP_URL, \
-    DEFAULT_TOPICS_ZIP_URL
+    DEFAULT_TOPICS_ZIP_URL, TOPICS_DIR
 from grimjack.pipeline import Pipeline, Stemmer
 
 
@@ -69,6 +69,12 @@ def _prepare_parser_search(parser: ArgumentParser):
         type=int,
         default=5,
     )
+    parser.add_argument(
+        "--search-topics", "-st",
+        dest="topics_file",
+        type=Path,
+        required=False,
+    )
 
 
 def main():
@@ -94,7 +100,8 @@ def main():
     if args.command == "search":
         query: str = args.query
         num_hits: int = args.num_hits
-        pipeline.search(query, num_hits)
+        topics_file: Path = args.topics_file
+        pipeline.search(query, num_hits, topics_file)
     else:
         parser.print_help()
 
