@@ -86,7 +86,7 @@ def _prepare_parser_search(parser: ArgumentParser):
         "--synonyms", "-syn",
         dest="synonyms",
         type=str,
-        default="gensim"
+        default="gensim_wiki_100"
     )
     parser.add_argument(
         "--amount_query", "--qc",
