@@ -28,7 +28,13 @@ NOUN_PLURAL = "NNS"
 PROPER_NOUN = "NNP"
 PROPER_NOUN_PLURAL = "NNPS"
 
-LIST_OF_COMPARATIVE_TAGS = [ADVERB_COMPARATIVE, \
-ADVERB_SUPERLATIVE, ADJECTIVE, ADJECTIVE_COMPARATIVE, \
-ADJECTIVE_SUPERLATIVE, NOUN, NOUN_PLURAL, PROPER_NOUN, \
-    PROPER_NOUN_PLURAL]
+LIST_OF_COMPARATIVE_TAGS = [ADVERB_COMPARATIVE,
+                            ADVERB_SUPERLATIVE,
+                            ADJECTIVE,
+                            ADJECTIVE_COMPARATIVE,
+                            ADJECTIVE_SUPERLATIVE,
+                            NOUN, NOUN_PLURAL,
+                            PROPER_NOUN,
+                            PROPER_NOUN_PLURAL]
+
+NLTK_DEPENDENCIES = ['punkt', 'averaged_perceptron_tagger']

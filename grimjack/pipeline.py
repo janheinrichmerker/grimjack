@@ -4,14 +4,15 @@ from hashlib import md5
 from json import loads
 from pathlib import Path
 from subprocess import run
-from typing import Optional
+from typing import Optional, Union
 
 from dload import save_unzip
 from pyserini.search import SimpleSearcher
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, INDEX_DIR
+from pyserini.pyclass import autoclass
 
-from grimjack.query_preprocessing import replace_comparative_words
+JQuery = autoclass('org.apache.lucene.search.Query')
 
 
 class Stemmer(Enum):
@@ -132,14 +133,15 @@ class Pipeline:
         )
         run(index_command)
 
-    def search(self, query: str, num_hits: int, topics_file: str):
+    def search(self, query: Union[str, JQuery],
+               num_hits: int, topics_file: str):
         if topics_file is not None:
-            self.topics_dir
-        else: 
+            self.topics_dir  # Implement topic file parsing
+        else:
             searcher = SimpleSearcher(str(self.index_dir.absolute()))
             hits = searcher.search(query, num_hits)
             for i, hit in enumerate(hits):
                 document = loads(hit.raw)
                 content = " ".join(document["contents"].split())
                 print(f"{i + 1:2} {hits[i].docid:4} {hits[i].score:.5f}\n"
-                    f"\t{content}\n\n\n")
+                      f"\t{content}\n\n\n")

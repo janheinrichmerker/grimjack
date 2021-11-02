@@ -3,8 +3,9 @@ from pathlib import Path
 from typing import Optional
 
 from grimjack.constants import DEFAULT_DOCUMENTS_ZIP_URL, \
-    DEFAULT_TOPICS_ZIP_URL, TOPICS_DIR
+    DEFAULT_TOPICS_ZIP_URL
 from grimjack.pipeline import Pipeline, Stemmer
+from grimjack.query_preprocessing import Query_Processor
 
 
 def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -75,6 +76,24 @@ def _prepare_parser_search(parser: ArgumentParser):
         type=Path,
         required=False,
     )
+    parser.add_argument(
+        "--preprocess", "-p",
+        dest="preprocess",
+        type=bool,
+        default=False
+    )
+    parser.add_argument(
+        "--synonyms", "-syn",
+        dest="synonyms",
+        type=str,
+        default="gensim"
+    )
+    parser.add_argument(
+        "--amount_query", "--qc",
+        dest="num_queries",
+        type=int,
+        default=3
+    )
 
 
 def main():
@@ -101,7 +120,21 @@ def main():
         query: str = args.query
         num_hits: int = args.num_hits
         topics_file: Path = args.topics_file
-        pipeline.search(query, num_hits, topics_file)
+
+        if args.preprocess:
+            algorithm: str = args.synonyms
+            num_queries: int = args.num_queries
+
+            query_preprocessor = Query_Processor(
+                algorithm=algorithm,
+                query=query,
+                num_queries=num_queries,
+            )
+
+            q = query_preprocessor.build_query()
+            pipeline.search(q, num_hits, topics_file)
+        else:
+            pipeline.search(query, num_hits, topics_file)
     else:
         parser.print_help()
 
