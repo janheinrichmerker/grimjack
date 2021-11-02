@@ -1,7 +1,8 @@
 import nltk
+import requests
 from dataclasses import dataclass
 from grimjack.constants import LIST_OF_COMPARATIVE_TAGS, \
-    NLTK_DEPENDENCIES
+    NLTK_DEPENDENCIES, T0_API, PATH_TO_API
 from pyserini.search import querybuilder
 from pyserini.pyclass import autoclass
 import gensim.downloader
@@ -28,12 +29,21 @@ class Query_Processor:
         elif algorithm == "gensim_wiki_100":
             self.glove_vectors = \
                  gensim.downloader.load('glove-wiki-gigaword-100')
+        elif algorithm == "t0":
+            self.api = open(PATH_TO_API).read()[:-1]
         for i in range(len(NLTK_DEPENDENCIES)):
             nltk.download(NLTK_DEPENDENCIES[i])
 
     def POS_Tags(self) -> list:
         tokens = nltk.word_tokenize(self.query)
         return nltk.pos_tag(tokens)
+
+    def synonym_from_API(self, token: str, url: str) -> list:
+        headers = {"Authorization": f"Bearer {self.api}"}
+        payload = {"inputs": f"synonyms of {token}"}
+        response = requests.post(url, headers=headers, json=payload)
+        output = response.json()
+        return output[0]['generated_text'].split(',')
 
     def synonym(self, token: str) -> str:
         if self.algorithm.startswith("gensim"):
@@ -42,7 +52,11 @@ class Query_Processor:
             except KeyError:
                 return token
         elif self.algorithm == 't0':
-            pass  # T0 is huge, maybe we can precompute?
+            computed = self.synonym_from_API(token, T0_API)
+            for i in range(len(computed)):
+                if computed[i] != token:
+                    return computed[i]
+        return token
 
     def replace_comparative_words(self) -> list:
         query_list = [self.query]

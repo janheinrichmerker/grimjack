@@ -38,3 +38,5 @@ LIST_OF_COMPARATIVE_TAGS = [ADVERB_COMPARATIVE,
                             PROPER_NOUN_PLURAL]
 
 NLTK_DEPENDENCIES = ['punkt', 'averaged_perceptron_tagger']
+T0_API = "https://api-inference.huggingface.co/models/bigscience/T0pp"
+PATH_TO_API = DATA_DIR / "API" / "huggingface_api.txt"

@@ -89,7 +89,7 @@ def _prepare_parser_search(parser: ArgumentParser):
         default="gensim_wiki_100"
     )
     parser.add_argument(
-        "--amount_query", "--qc",
+        "--amount_query", "-qc",
         dest="num_queries",
         type=int,
         default=3
