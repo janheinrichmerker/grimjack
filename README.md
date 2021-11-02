@@ -29,7 +29,10 @@ To test the search pipeline, run the `grimjack.run` CLI like this:
 ```shell script
 pipenv run python -m grimjack.run search "abortion"
 ```
-
+To preprocess the query run:
+```shell script
+pipenv run python -m grimjack.run search --preprocess True "Which is better, a laptop or a desktop?"
+```
 #### Options
 
 The search pipeline can be configured with the options listed in the help command.
