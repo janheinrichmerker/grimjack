@@ -6,22 +6,22 @@ from grimjack.model import RankedDocument
 
 
 class DocumentsStore(ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def documents_dir(self) -> Path:
         pass
 
 
 class TopicsStore(ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def topics_file(self) -> Path:
         pass
 
 
 class Index(ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def index_dir(self) -> Path:
         pass
 
