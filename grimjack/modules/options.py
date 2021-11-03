@@ -2,11 +2,11 @@ from enum import Enum
 
 
 class Stemmer(Enum):
-    PORTER = "porter"
-    KROVETZ = "krovetz"
+    PORTER = 1
+    KROVETZ = 2
 
 
 class QueryExpansion(Enum):
-    TWITTER_25_COMPARATIVE_SYNONYMS = "twitter-25-comparative-synonyms"
-    WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS = "wiki-gigaword-100-comparative-synonyms"
-    T0_COMPARATIVE_SYNONYMS = "t0-comparative-synonyms"
+    TWITTER_25_COMPARATIVE_SYNONYMS = 1
+    WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS = 2
+    T0_COMPARATIVE_SYNONYMS = 3
