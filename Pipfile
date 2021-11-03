@@ -16,6 +16,8 @@ pytest-cov = "*"
 rope = "*"
 flake8 = "*"
 gensim = "*"
+more-itertools = "*"
+requests = "*"
 
 [dev-packages]
 
