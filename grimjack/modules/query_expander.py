@@ -8,7 +8,6 @@ from nltk import word_tokenize, pos_tag
 from nltk.downloader import Downloader
 from requests import post
 
-from grimjack.constants import LIST_OF_COMPARATIVE_TAGS
 from grimjack.modules import QueryExpander
 from grimjack.modules.options import QueryExpansion
 
@@ -17,6 +16,28 @@ class OriginalQueryExpander(QueryExpander):
 
     def expand_query(self, query: str) -> Collection[str]:
         return {query}
+
+
+_ADVERB_COMPARATIVE = "RBR"
+_ADVERB_SUPERLATIVE = "RBS"
+_ADJECTIVE = "JJ"
+_ADJECTIVE_COMPARATIVE = "JJR"
+_ADJECTIVE_SUPERLATIVE = "JJS"
+_NOUN = "NN"
+_NOUN_PLURAL = "NNS"
+_PROPER_NOUN = "NNP"
+_PROPER_NOUN_PLURAL = "NNPS"
+
+_COMPARATIVE_TAGS = [
+    _ADVERB_COMPARATIVE,
+    _ADVERB_SUPERLATIVE,
+    _ADJECTIVE,
+    _ADJECTIVE_COMPARATIVE,
+    _ADJECTIVE_SUPERLATIVE,
+    _NOUN, _NOUN_PLURAL,
+    _PROPER_NOUN,
+    _PROPER_NOUN_PLURAL
+]
 
 
 class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
@@ -39,7 +60,7 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
         queries.extend(
             query.replace(token, self.best_synonym(token))
             for token, pos in pos_tokens
-            if pos in LIST_OF_COMPARATIVE_TAGS
+            if pos in _COMPARATIVE_TAGS
         )
         return queries
 
