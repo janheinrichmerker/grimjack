@@ -35,11 +35,13 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
         tokens = word_tokenize(query)
         pos_tokens = pos_tag(tokens)
 
-        return [
+        queries = [query]
+        queries.extend(
             query.replace(token, self.best_synonym(token))
             for token, pos in pos_tokens
             if pos in LIST_OF_COMPARATIVE_TAGS
-        ]
+        )
+        return queries
 
     @abstractmethod
     def synonyms(self, token: str) -> List[str]:
