@@ -70,20 +70,6 @@ class GensimComparativeSynonymsQueryExpander(
         return [term for term, _ in similarities]
 
 
-class Twitter25ComparativeSynonymsQueryExpander(
-    GensimComparativeSynonymsQueryExpander
-):
-    def __init__(self):
-        super().__init__("glove-twitter-25")
-
-
-class WikiGigaword100ComparativeSynonymsQueryExpander(
-    GensimComparativeSynonymsQueryExpander
-):
-    def __init__(self):
-        super().__init__("glove-wiki-gigaword-100")
-
-
 @dataclass
 class HuggingfaceComparativeSynonymsQueryExpander(
     ComparativeSynonymsQueryExpander
@@ -104,13 +90,6 @@ class HuggingfaceComparativeSynonymsQueryExpander(
         return [synonym for synonym in synonyms if synonym != token]
 
 
-class T0ComparativeSynonymsQueryExpander(
-    HuggingfaceComparativeSynonymsQueryExpander
-):
-    def __init__(self):
-        super().__init__("bigscience/T0pp", "TODO")
-
-
 class SimpleQueryExpander(QueryExpander):
     _query_expander: QueryExpander
 
@@ -118,12 +97,15 @@ class SimpleQueryExpander(QueryExpander):
         if query_expansion is None:
             self._query_expander = OriginalQueryExpander()
         elif query_expansion == QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS:
-            self._query_expander = OriginalQueryExpander()
+            self._query_expander = GensimComparativeSynonymsQueryExpander(
+                "glove-twitter-25")
         elif (query_expansion ==
               QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS):
-            self._query_expander = OriginalQueryExpander()
+            self._query_expander = GensimComparativeSynonymsQueryExpander(
+                "glove-wiki-gigaword-100")
         elif query_expansion == QueryExpansion.T0_COMPARATIVE_SYNONYMS:
-            self._query_expander = T0ComparativeSynonymsQueryExpander()
+            self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
+                "bigscience/T0pp", "TODO")
 
     def expand_query(self, query: str) -> Collection[str]:
         return self._query_expander.expand_query(query)
