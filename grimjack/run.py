@@ -3,9 +3,24 @@ from pathlib import Path
 from typing import Optional
 
 from grimjack.constants import DEFAULT_DOCUMENTS_ZIP_URL, \
-    DEFAULT_TOPICS_ZIP_URL
-from grimjack.pipeline import Pipeline, Stemmer
-from grimjack.query_preprocessing import Query_Processor
+    DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_FILE_PATH
+from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
+
+_STEMMERS = {
+    "porter": Stemmer.PORTER,
+    "p": Stemmer.PORTER,
+    "krovetz": Stemmer.KROVETZ,
+    "k": Stemmer.KROVETZ,
+}
+
+_QUERY_EXPANSIONS = {
+    "twitter-25-comparative-synonyms": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
+    "twitter-25": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
+    "wiki-gigaword-100-comparative-synonyms": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
+    "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
+    "t0-comparative-synonyms": QueryExpansion.T0_COMPARATIVE_SYNONYMS,
+    "t0": QueryExpansion.T0_COMPARATIVE_SYNONYMS,
+}
 
 
 def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -20,6 +35,12 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="topics_zip_url",
         type=str,
         default=DEFAULT_TOPICS_ZIP_URL,
+    )
+    parser.add_argument(
+        "--topics-file-path", "--topics-path",
+        dest="topics_file_path",
+        type=str,
+        default=DEFAULT_TOPICS_FILE_PATH,
     )
     parser.add_argument(
         "--stopwords",
@@ -37,7 +58,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         "--stemmer",
         dest="stemmer",
         type=str,
-        choices=["porter", "krovetz"],
+        choices=_STEMMERS.keys(),
         default="porter",
     )
     parser.add_argument(
@@ -52,9 +73,23 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         type=str,
         default="en",
     )
+    parser.add_argument(
+        "--query-expansion",
+        dest="query_expansion",
+        type=str,
+        choices=_QUERY_EXPANSIONS.keys(),
+        default=None,
+    )
+    parser.add_argument(
+        "--no-query-expansion",
+        dest="query_expansion",
+        action="store_const",
+        const=None
+    )
 
     subparsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_search(subparsers.add_parser("search"))
+    _prepare_parser_search_topics(subparsers.add_parser("search-topics"))
 
     return parser
 
@@ -70,30 +105,33 @@ def _prepare_parser_search(parser: ArgumentParser):
         type=int,
         default=5,
     )
+
+
+def _prepare_parser_search_topics(parser: ArgumentParser):
     parser.add_argument(
-        "--search-topics", "-st",
-        dest="topics_file",
-        type=Path,
-        required=False,
-    )
-    parser.add_argument(
-        "--preprocess", "-p",
-        dest="preprocess",
-        type=bool,
-        default=False
-    )
-    parser.add_argument(
-        "--synonyms", "-syn",
-        dest="synonyms",
-        type=str,
-        default="gensim_wiki_100"
-    )
-    parser.add_argument(
-        "--amount_query", "-qc",
-        dest="num_queries",
+        "--num-hits", "-k",
+        dest="num_hits",
         type=int,
-        default=3
+        default=5,
     )
+
+
+def _parse_stemmer(stemmer: str) -> Optional[Stemmer]:
+    if stemmer is None:
+        return None
+    elif stemmer in _STEMMERS.keys():
+        return _STEMMERS[stemmer]
+    else:
+        raise Exception(f"Unknown stemmer: {stemmer}")
+
+
+def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
+    if query_expansion is None:
+        return None
+    elif query_expansion in _QUERY_EXPANSIONS.keys():
+        return _QUERY_EXPANSIONS[query_expansion]
+    else:
+        raise Exception(f"Unknown query expansion: {query_expansion}")
 
 
 def main():
@@ -103,38 +141,30 @@ def main():
 
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
+    topics_file_path: str = args.topics_file_path
     stopwords_file: Optional[Path] = args.stopwords_file
-    stemmer: Optional[Stemmer] = Stemmer(args.stemmer) \
-        if args.stemmer is not None else None
+    stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
-
+    query_expansion: Optional[QueryExpansion] = _parse_query_expansion(
+        args.query_expansion
+    )
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
+        topics_file_path=topics_file_path,
         stopwords_file=stopwords_file,
         stemmer=stemmer,
         language=language,
+        query_expansion=query_expansion,
     )
 
     if args.command == "search":
         query: str = args.query
         num_hits: int = args.num_hits
-        topics_file: Path = args.topics_file
-
-        if args.preprocess:
-            algorithm: str = args.synonyms
-            num_queries: int = args.num_queries
-
-            query_preprocessor = Query_Processor(
-                algorithm=algorithm,
-                query=query,
-                num_queries=num_queries,
-            )
-
-            q = query_preprocessor.build_query()
-            pipeline.search(q, num_hits, topics_file)
-        else:
-            pipeline.search(query, num_hits, topics_file)
+        pipeline.print_search(query, num_hits)
+    elif args.command == "search-topics":
+        num_hits: int = args.num_hits
+        pipeline.print_search_topics(num_hits)
     else:
         parser.print_help()
 
