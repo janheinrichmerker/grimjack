@@ -460,3 +460,4 @@ Thumbs.db
 __latexindent_temp.tex
 paper/*.pdf
 talk/talk.pdf
+.huggingface.txt
