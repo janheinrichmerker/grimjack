@@ -17,6 +17,28 @@ class AnseriniIndex(Index):
     language: str
 
     @property
+    def _stemmer_suffix(self):
+        if self.stemmer is None:
+            return "no-stemmer"
+        elif self.stemmer == Stemmer.PORTER:
+            return "porter"
+        elif self.stemmer == Stemmer.KROVETZ:
+            return "krovetz"
+        else:
+            raise Exception(f"Unknown stemmer: {self.stemmer}")
+
+    @property
+    def _stemmer_name(self):
+        if self.stemmer is None:
+            return "none"
+        elif self.stemmer == Stemmer.PORTER:
+            return "porter"
+        elif self.stemmer == Stemmer.KROVETZ:
+            return "krovetz"
+        else:
+            raise Exception(f"Unknown stemmer: {self.stemmer}")
+
+    @property
     def _index_suffix(self):
         """
         Unique suffix representing the index settings
@@ -28,9 +50,7 @@ class AnseriniIndex(Index):
         stopwords_suffix = f"stopwords-{stopwords_hash}" \
             if stopwords_hash is not None \
             else "no-stopwords"
-        stemmer_suffix = self.stemmer.value \
-            if self.stemmer is not None \
-            else 'no-stemmer'
+        stemmer_suffix = self._stemmer_suffix
         documents_hash = self.documents_store.documents_dir.parts[-1]
         return f"{documents_hash}-{stopwords_suffix}-" \
                f"{stemmer_suffix}-{self.language}"
@@ -68,8 +88,7 @@ class AnseriniIndex(Index):
             "-storePositions",
             "-storeDocvectors",
             "-storeRaw",
-            "-stemmer",
-            self.stemmer.value if self.stemmer is not None else "none",
+            "-stemmer", self._stemmer_name,
             "-language", self.language,
         ]
         index_command.extend(
