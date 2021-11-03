@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from json import loads
 from typing import Collection, List
 
 from more_itertools import first
@@ -13,14 +14,21 @@ from grimjack.modules import Searcher, Index, QueryExpander
 
 
 def _parse_document(hit: JResult, rank: int) -> RankedDocument:
-    fields = {
-        field.name(): field.stringValue()
-        for field in hit.lucene_document.getFields()
-    }
+    # Load JSON from Anserini.
+    json_document = loads(hit.raw)
+    # Check if document ID matches.
+    assert (json_document["id"] == hit.docid)
+    # Load document content.
+    content = json_document["contents"]
+
+    # Delete ID and content fields so that only custom fields are left.
+    del json_document["id"]
+    del json_document["contents"]
+
     return RankedDocument(
         id=hit.docid,
-        content=hit.contents,
-        fields=fields,
+        content=content,
+        fields=json_document,
         score=hit.score,
         rank=rank
     )
