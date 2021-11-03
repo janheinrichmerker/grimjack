@@ -116,7 +116,11 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 class SimpleQueryExpander(QueryExpander):
     _query_expander: QueryExpander
 
-    def __init__(self, query_expansion: Optional[QueryExpansion]):
+    def __init__(
+            self,
+            query_expansion: Optional[QueryExpansion],
+            hugging_face_api_token: Optional[str],
+    ):
         if query_expansion is None:
             self._query_expander = OriginalQueryExpander()
         elif query_expansion == QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS:
@@ -128,7 +132,7 @@ class SimpleQueryExpander(QueryExpander):
                 "glove-wiki-gigaword-100")
         elif query_expansion == QueryExpansion.T0_COMPARATIVE_SYNONYMS:
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
-                "bigscience/T0pp", "TODO")
+                "bigscience/T0pp", hugging_face_api_token)
 
     def expand_query(self, query: str) -> Collection[str]:
         return self._query_expander.expand_query(query)

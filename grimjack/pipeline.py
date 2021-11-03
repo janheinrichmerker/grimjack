@@ -26,6 +26,7 @@ class Pipeline:
             stemmer: Optional[Stemmer],
             language: str,
             query_expansion: Optional[QueryExpansion],
+            hugging_face_api_token: Optional[str],
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = SimpleTopicsStore(topics_zip_url, topics_file_path)
@@ -35,7 +36,10 @@ class Pipeline:
             stemmer,
             language
         )
-        self.query_expander = SimpleQueryExpander(query_expansion)
+        self.query_expander = SimpleQueryExpander(
+            query_expansion,
+            hugging_face_api_token
+        )
         self.searcher = AnseriniSearcher(self.index, self.query_expander)
 
     def print_search(self, query: str, num_hits: int):

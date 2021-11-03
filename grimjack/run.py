@@ -1,9 +1,10 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from grimjack.constants import DEFAULT_DOCUMENTS_ZIP_URL, \
-    DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_FILE_PATH
+    DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_FILE_PATH, \
+    DEFAULT_HUGGINGFACE_API_TOKEN_PATH
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -86,6 +87,18 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         action="store_const",
         const=None
     )
+    parser.add_argument(
+        "--huggingface-api-token-file",
+        dest="huggingface_api_token",
+        type=Path,
+        default=DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
+    )
+    parser.add_argument(
+        "--huggingface-api-token",
+        dest="huggingface_api_token",
+        type=str,
+        default=None,
+    )
 
     subparsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_search(subparsers.add_parser("search"))
@@ -134,6 +147,16 @@ def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
         raise Exception(f"Unknown query expansion: {query_expansion}")
 
 
+def _parse_huggingface_api_token(
+        token_or_path: Union[Path, str]
+) -> Optional[str]:
+    if isinstance(token_or_path, Path):
+        with token_or_path.open("r") as file:
+            token_or_path = file.readline().rstrip()
+    token_or_path = token_or_path.strip()
+    return token_or_path if token_or_path else None
+
+
 def main():
     parser: ArgumentParser = ArgumentParser()
     _prepare_parser(parser)
@@ -148,6 +171,9 @@ def main():
     query_expansion: Optional[QueryExpansion] = _parse_query_expansion(
         args.query_expansion
     )
+    hugging_face_api_token = _parse_huggingface_api_token(
+        args.huggingface_api_token
+    )
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -156,6 +182,7 @@ def main():
         stemmer=stemmer,
         language=language,
         query_expansion=query_expansion,
+        hugging_face_api_token=hugging_face_api_token,
     )
 
     if args.command == "search":

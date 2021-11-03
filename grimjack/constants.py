@@ -18,5 +18,4 @@ DEFAULT_TOPICS_ZIP_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
 DEFAULT_TOPICS_FILE_PATH = "topics-task2.xml"
-
-PATH_TO_API = DATA_DIR / "API" / "huggingface_api.txt"
+DEFAULT_HUGGINGFACE_API_TOKEN_PATH = PROJECT_DIR / ".huggingface.txt"
