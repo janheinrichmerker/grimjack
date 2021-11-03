@@ -17,6 +17,8 @@ DEFAULT_DOCUMENTS_ZIP_URL = (
 DEFAULT_TOPICS_ZIP_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
+DEFAULT_TOPICS_FILE_PATH = "topics-task2.xml"
+
 # Constants for POS-Tags
 ADVERB_COMPARATIVE = "RBR"
 ADVERB_SUPERLATIVE = "RBS"
@@ -28,14 +30,16 @@ NOUN_PLURAL = "NNS"
 PROPER_NOUN = "NNP"
 PROPER_NOUN_PLURAL = "NNPS"
 
-LIST_OF_COMPARATIVE_TAGS = [ADVERB_COMPARATIVE,
-                            ADVERB_SUPERLATIVE,
-                            ADJECTIVE,
-                            ADJECTIVE_COMPARATIVE,
-                            ADJECTIVE_SUPERLATIVE,
-                            NOUN, NOUN_PLURAL,
-                            PROPER_NOUN,
-                            PROPER_NOUN_PLURAL]
+LIST_OF_COMPARATIVE_TAGS = [
+    ADVERB_COMPARATIVE,
+    ADVERB_SUPERLATIVE,
+    ADJECTIVE,
+    ADJECTIVE_COMPARATIVE,
+    ADJECTIVE_SUPERLATIVE,
+    NOUN, NOUN_PLURAL,
+    PROPER_NOUN,
+    PROPER_NOUN_PLURAL
+]
 
 NLTK_DEPENDENCIES = ['punkt', 'averaged_perceptron_tagger']
 T0_API = "https://api-inference.huggingface.co/models/bigscience/T0pp"
