@@ -5,7 +5,7 @@ from pathlib import Path
 from dload import save_unzip
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR
-from grimjack.pipeline import DocumentsStore, TopicsStore
+from grimjack.modules import DocumentsStore, TopicsStore
 
 
 def _hash_url(url: str) -> str:

@@ -9,7 +9,8 @@ from nltk.downloader import Downloader
 from requests import post
 
 from grimjack.constants import LIST_OF_COMPARATIVE_TAGS
-from grimjack.pipeline import QueryExpansion, QueryExpander
+from grimjack.modules import QueryExpander
+from grimjack.modules.options import QueryExpansion
 
 
 class OriginalQueryExpander(QueryExpander):

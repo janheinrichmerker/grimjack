@@ -9,7 +9,7 @@ from pyserini.search.querybuilder import get_boolean_query_builder, \
 from grimjack.model.jvm import JBagOfWordsQueryGenerator, JIndexArgs, \
     JIndexCollection, JResult
 from grimjack.model import RankedDocument
-from grimjack.pipeline import Searcher, Index, QueryExpander
+from grimjack.modules import Searcher, Index, QueryExpander
 
 
 def _parse_document(hit: JResult, rank: int) -> RankedDocument:

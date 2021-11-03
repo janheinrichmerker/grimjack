@@ -5,7 +5,8 @@ from subprocess import run
 from typing import Optional
 
 from grimjack.constants import INDEX_DIR
-from grimjack.pipeline import Index, Stemmer, DocumentsStore
+from grimjack.modules import Index, DocumentsStore
+from grimjack.modules.options import Stemmer
 
 
 @dataclass
