@@ -104,12 +104,20 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 
     def synonyms(self, token: str) -> List[str]:
         headers = {"Authorization": f"Bearer {self.api_key}"}
-        payload = {"inputs": f"synonyms of {token}"}
+        input_text = f"What are synonyms of the word \"{token}\"?"
+        payload = {"inputs": input_text}
         response = post(self.api_url, headers=headers, json=payload)
-        if response.status_code % 100 != 2:
-            raise Exception(f"HTTP Error: {response.reason}")
+        if response.status_code // 100 != 2:
+            raise Exception(
+                f"HTTP Error {response.status_code}: {response.reason}\n"
+                f"Please check if you are authenticated."
+            )
         response_json = response.json()
-        synonyms = response_json[0]["generated_text"].split(",")
+        print(response_json)
+        output_text: str = response_json[0]["generated_text"]
+        if input_text == output_text:
+            return []
+        synonyms = output_text.split(",")
         return [synonym for synonym in synonyms if synonym != token]
 
 
