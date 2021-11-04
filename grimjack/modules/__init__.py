@@ -36,3 +36,13 @@ class Searcher(ABC):
     @abstractmethod
     def search(self, query: str, num_hits: int) -> List[RankedDocument]:
         pass
+
+
+class Reranker(ABC):
+    @abstractmethod
+    def rerank(
+            self,
+            query: str,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        pass
