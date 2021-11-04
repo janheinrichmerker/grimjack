@@ -4,11 +4,17 @@ from typing import Collection, List
 
 from more_itertools import first
 from pyserini.search import JQuery, SimpleSearcher
-from pyserini.search.querybuilder import get_boolean_query_builder, \
+from pyserini.search.querybuilder import (
+    get_boolean_query_builder,
     JBooleanClauseOccur
+)
 
-from grimjack.model.jvm import JBagOfWordsQueryGenerator, JIndexArgs, \
-    JIndexCollection, JResult
+from grimjack.model.jvm import (
+    JBagOfWordsQueryGenerator,
+    JIndexArgs,
+    JIndexCollection,
+    JResult
+)
 from grimjack.model import RankedDocument
 from grimjack.modules import Searcher, Index, QueryExpander
 

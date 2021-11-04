@@ -2,9 +2,12 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Optional, Union
 
-from grimjack.constants import DEFAULT_DOCUMENTS_ZIP_URL, \
-    DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_FILE_PATH, \
+from grimjack.constants import (
+    DEFAULT_DOCUMENTS_ZIP_URL,
+    DEFAULT_TOPICS_ZIP_URL,
+    DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH
+)
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -15,9 +18,11 @@ _STEMMERS = {
 }
 
 _QUERY_EXPANSIONS = {
-    "twitter-25-comparative-synonyms": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
+    "twitter-25-comparative-synonyms":
+        QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
     "twitter-25": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
-    "wiki-gigaword-100-comparative-synonyms": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
+    "wiki-gigaword-100-comparative-synonyms":
+        QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
     "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
     "t0pp-comparative-synonyms": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
     "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,

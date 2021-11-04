@@ -6,15 +6,15 @@ from grimjack.model import RankedDocument
 
 
 class ArgumentLabel(Enum):
-    C_B = "C-B"
-    C_I = "C-I"
-    MC_B = "MC-B"
-    MC_I = "MC-I"
-    P_B = "P-B"
-    P_I = "P-I"
-    MP_B = "MP-B"
-    MP_I = "MP-I"
-    O = "O"
+    ARGUMENT_C_B = "C-B"
+    ARGUMENT_C_I = "C-I"
+    ARGUMENT_MC_B = "MC-B"
+    ARGUMENT_MC_I = "MC-I"
+    ARGUMENT_P_B = "P-B"
+    ARGUMENT_P_I = "P-I"
+    ARGUMENT_MP_B = "MP-B"
+    ARGUMENT_MP_I = "MP-I"
+    ARGUMENT_O = "O"
 
 
 @dataclass
