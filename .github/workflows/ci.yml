@@ -21,7 +21,7 @@ jobs:
           path: paper/sample-1col.pdf
           name: Paper
   build-latex-talk:
-    name: "🏗️ Build LaTeX paper"
+    name: "🏗️ Build LaTeX talk"
     runs-on: ubuntu-20.04
     steps:
       - name: "📥 Check-out"
