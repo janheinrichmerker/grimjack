@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from gzip import GzipFile
 from hashlib import md5
 from pathlib import Path
+from urllib.request import urlopen
 
 from dload import save_unzip
 
@@ -24,7 +26,17 @@ def _download_if_needed(url: str, download_dir: Path, name: str):
         return  # Already downloaded.
     print(
         f"Downloading and unzipping {name} from {url} to {download_dir}.")
-    save_unzip(url, str(download_dir), delete_after=True)
+    if url.endswith(".zip"):
+        save_unzip(url, str(download_dir), delete_after=True)
+    elif url.endswith(".gz"):
+        download_dir.mkdir()
+        output_file = download_dir / url.split("/")[-1].removesuffix(".gz")
+        with urlopen(url) as response:
+            with GzipFile(fileobj=response) as uncompressed:
+                with output_file.open("wb") as file:
+                    file.write(uncompressed.read())
+    else:
+        ValueError("Unknown download data format.")
 
 
 @dataclass
