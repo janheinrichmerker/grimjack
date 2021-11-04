@@ -13,14 +13,3 @@ class Document:
 class RankedDocument(Document):
     score: float
     rank: int
-
-
-@dataclass
-class TargerDocument(Document):
-    pass  # TODO
-
-
-@dataclass
-class Query:
-    pass  # TODO
-
