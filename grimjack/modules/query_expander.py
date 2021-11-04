@@ -113,7 +113,6 @@ class HuggingfaceComparativeSynonymsQueryExpander(
                 f"Please check if you are authenticated."
             )
         response_json = response.json()
-        print(response_json)
         output_text: str = response_json[0]["generated_text"]
         if input_text == output_text:
             return []
