@@ -51,8 +51,8 @@ class Pipeline:
         results = self.searcher.search(query, num_hits)
         for result in results:
             print(
-                f"Rank {result.rank:2}: {result.id} "
-                f"(Score: {result.score:.5f})\n"
+                f"Rank {result.rank:3}: {result.id} "
+                f"(Score: {result.score:.3f})\n"
                 f"\t{result.content}\n\n\n"
             )
 
