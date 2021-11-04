@@ -8,7 +8,14 @@ TOPICS_DIR = DATA_DIR / "topics"
 CACHE_DIR = PROJECT_DIR / "cache"
 TARGER_CACHE_DIR = CACHE_DIR / "targer"
 
-_BASE_DIRS = [DATA_DIR, DOCUMENTS_DIR, TOPICS_DIR, INDEX_DIR, CACHE_DIR, TARGER_CACHE_DIR]
+_BASE_DIRS = [
+    DATA_DIR,
+    DOCUMENTS_DIR,
+    TOPICS_DIR,
+    INDEX_DIR,
+    CACHE_DIR,
+    TARGER_CACHE_DIR,
+]
 for path in _BASE_DIRS:
     path.mkdir(parents=True, exist_ok=True)
 
