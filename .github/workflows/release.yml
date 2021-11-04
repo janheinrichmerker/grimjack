@@ -31,12 +31,12 @@ jobs:
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
-      - name: "🏗️ Compile paper"
+      - name: "🏗️ Compile talk"
         uses: xu-cheng/latex-action@v2
         with:
           working_directory: talk
           root_file: talk.tex
-      - name: "📤 Upload paper"
+      - name: "📤 Upload talk"
         uses: actions/upload-artifact@v2
         with:
           path: talk/talk.pdf
@@ -70,4 +70,13 @@ jobs:
           upload_url: ${{ steps.create-github-release.outputs.upload_url }}
           asset_path: paper/sample-1col.pdf
           asset_name: sample-1col.pdf
+          asset_content_type: application/pdf
+      - name: "📤 Upload talk"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-github-release.outputs.upload_url }}
+          asset_path: talk/talk.pdf
+          asset_name: talk.pdf
           asset_content_type: application/pdf

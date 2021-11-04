@@ -26,12 +26,12 @@ jobs:
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
-      - name: "🏗️ Compile paper"
+      - name: "🏗️ Compile talk"
         uses: xu-cheng/latex-action@v2
         with:
           working_directory: talk
           root_file: talk.tex
-      - name: "📤 Upload paper"
+      - name: "📤 Upload talk"
         uses: actions/upload-artifact@v2
         with:
           path: talk/talk.pdf
