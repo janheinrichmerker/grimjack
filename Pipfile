@@ -18,6 +18,7 @@ flake8 = "*"
 gensim = "*"
 more-itertools = "*"
 requests = "*"
+untangle = "*"
 
 [dev-packages]
 
