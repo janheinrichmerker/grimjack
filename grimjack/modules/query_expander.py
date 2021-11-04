@@ -138,7 +138,7 @@ class SimpleQueryExpander(QueryExpander):
               QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS):
             self._query_expander = GensimComparativeSynonymsQueryExpander(
                 "glove-wiki-gigaword-100")
-        elif query_expansion == QueryExpansion.T0_COMPARATIVE_SYNONYMS:
+        elif query_expansion == QueryExpansion.T0PP_COMPARATIVE_SYNONYMS:
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
                 "bigscience/T0pp", hugging_face_api_token)
 

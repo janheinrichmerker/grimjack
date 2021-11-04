@@ -19,8 +19,8 @@ _QUERY_EXPANSIONS = {
     "twitter-25": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
     "wiki-gigaword-100-comparative-synonyms": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
     "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
-    "t0-comparative-synonyms": QueryExpansion.T0_COMPARATIVE_SYNONYMS,
-    "t0": QueryExpansion.T0_COMPARATIVE_SYNONYMS,
+    "t0pp-comparative-synonyms": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
+    "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
 }
 
 
