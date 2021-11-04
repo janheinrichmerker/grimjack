@@ -15,7 +15,7 @@
       <excludeFolder url="file://$MODULE_DIR$/data/out" />
       <excludeFolder url="file://$MODULE_DIR$/data/topics" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Pipenv (grimjack)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Python 3.7 (benchmark) interpreter library" level="application" />
   </component>
