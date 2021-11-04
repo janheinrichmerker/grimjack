@@ -20,4 +20,6 @@ DEFAULT_TOPICS_ZIP_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
 DEFAULT_TOPICS_FILE_PATH = "topics-task2.xml"
+DEFAULT_TARGER_API_URL = "https://demo.webis.de/targer-api/"
+DEFAULT_HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/"
 DEFAULT_HUGGINGFACE_API_TOKEN_PATH = PROJECT_DIR / ".huggingface.txt"
