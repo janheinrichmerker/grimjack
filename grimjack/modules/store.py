@@ -2,11 +2,14 @@ from dataclasses import dataclass
 from gzip import GzipFile
 from hashlib import md5
 from pathlib import Path
+from typing import List
 from urllib.request import urlopen
 
 from dload import save_unzip
+from untangle import parse
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR
+from grimjack.model import Topic
 from grimjack.modules import DocumentsStore, TopicsStore
 
 
@@ -62,8 +65,21 @@ class SimpleDocumentsStore(DocumentsStore):
         return download_dir
 
 
+def _parse_topic(xml) -> Topic:
+    return Topic(
+        int(xml.number.cdata),
+        str(xml.title.cdata),
+        str(xml.description.cdata),
+        str(xml.narrative.cdata),
+    )
+
+
+def _parse_topics(xml) -> List[Topic]:
+    return [_parse_topic(child) for child in xml.topics.topic]
+
+
 @dataclass
-class SimpleTopicsStore(TopicsStore):
+class TrecTopicsStore(TopicsStore):
     topics_zip_url: str
     topics_file_path: str
 
@@ -91,3 +107,8 @@ class SimpleTopicsStore(TopicsStore):
         Will download topics if needed.
         """
         return self.topics_dir / self.topics_file_path
+
+    @property
+    def topics(self) -> List[Topic]:
+        xml = parse(str(self.topics_file.absolute()))
+        return _parse_topics(xml)

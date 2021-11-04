@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Collection, List
 
-from grimjack.model import RankedDocument
+from grimjack.model import RankedDocument, Topic
 
 
 class DocumentsStore(ABC):
@@ -16,6 +16,11 @@ class TopicsStore(ABC):
     @property
     @abstractmethod
     def topics_file(self) -> Path:
+        pass
+
+    @property
+    @abstractmethod
+    def topics(self) -> List[Topic]:
         pass
 
 

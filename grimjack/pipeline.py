@@ -11,7 +11,7 @@ from grimjack.modules import (
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import Stemmer, QueryExpansion
 from grimjack.modules.searcher import AnseriniSearcher
-from grimjack.modules.store import SimpleDocumentsStore, SimpleTopicsStore
+from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
 from grimjack.modules.query_expander import SimpleQueryExpander
 
 
@@ -34,7 +34,7 @@ class Pipeline:
             hugging_face_api_token: Optional[str],
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
-        self.topics_store = SimpleTopicsStore(topics_zip_url, topics_file_path)
+        self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
         self.index = AnseriniIndex(
             self.documents_store,
             stopwords_file,
