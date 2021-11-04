@@ -69,7 +69,11 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
         pass
 
     def best_synonym(self, token: str) -> str:
-        return self.synonyms(token)[0]
+        synonyms = self.synonyms(token)
+        if len(synonyms) == 0:
+            return token
+        else:
+            return synonyms[0]
 
 
 @dataclass
@@ -142,4 +146,5 @@ class SimpleQueryExpander(QueryExpander):
                 "bigscience/T0pp", hugging_face_api_token)
 
     def expand_query(self, query: str) -> Collection[str]:
-        return self._query_expander.expand_query(query)
+        queries = self._query_expander.expand_query(query)
+        return list(dict.fromkeys(queries))
