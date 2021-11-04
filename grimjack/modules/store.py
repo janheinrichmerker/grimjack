@@ -19,7 +19,7 @@ def _hash_url(url: str) -> str:
 
 def _download_if_needed(url: str, download_dir: Path, name: str):
     """
-    Download and extract a ZIP folder
+    Download and extract a ZIP or GZIP folder
     if it doesn't already exist in the download directory.
     """
     if download_dir.exists():
