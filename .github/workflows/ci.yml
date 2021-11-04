@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  build-latex:
+  build-latex-paper:
     name: "🏗️ Build LaTeX paper"
     runs-on: ubuntu-20.04
     steps:
@@ -20,6 +20,22 @@ jobs:
         with:
           path: paper/sample-1col.pdf
           name: Paper
+  build-latex-talk:
+    name: "🏗️ Build LaTeX paper"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🏗️ Compile paper"
+        uses: xu-cheng/latex-action@v2
+        with:
+          working_directory: talk
+          root_file: talk.tex
+      - name: "📤 Upload paper"
+        uses: actions/upload-artifact@v2
+        with:
+          path: talk/talk.pdf
+          name: Talk
   test-python:
     name: "🧪 Test Python code"
     runs-on: ubuntu-20.04
@@ -55,7 +71,7 @@ jobs:
         with:
           fail_ci_if_error: true
   build-docker:
-    name: "🚀 Push Docker image"
+    name: "🚀 Build Docker image"
     runs-on: ubuntu-20.04
     steps:
       - name: "📥 Check-out"
@@ -71,12 +87,6 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: "🧰 Set up Docker Buildx"
         uses: docker/setup-buildx-action@v1
-#      - name: "🔑 Login to GitHub Packages"
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.actor }}
-#          password: ${{ github.token }}
       - name: "🚀 Build & push Docker image to GitHub Packages"
         uses: docker/build-push-action@v2
         with:

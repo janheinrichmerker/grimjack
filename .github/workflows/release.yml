@@ -9,8 +9,8 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-*"
 
 jobs:
-  build-latex:
-    name: "🏗️ LaTeX build"
+  build-latex-paper:
+    name: "🏗️ Build LaTeX paper"
     runs-on: ubuntu-20.04
     steps:
       - name: "📥 Check-out"
@@ -25,11 +25,28 @@ jobs:
         with:
           path: paper/sample-1col.pdf
           name: Paper
+  build-latex-talk:
+    name: "🏗️ Build LaTeX paper"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🏗️ Compile paper"
+        uses: xu-cheng/latex-action@v2
+        with:
+          working_directory: talk
+          root_file: talk.tex
+      - name: "📤 Upload paper"
+        uses: actions/upload-artifact@v2
+        with:
+          path: talk/talk.pdf
+          name: Talk
   release:
     name: "🚀 Release"
     runs-on: ubuntu-20.04
     needs:
-      - build-latex
+      - build-latex-paper
+      - build-latex-talk
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
