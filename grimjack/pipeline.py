@@ -57,8 +57,8 @@ class Pipeline:
             )
 
     def print_search_topics(self, num_hits: int):
-        queries = []  # TODO: Parse queries from self.topics_file.
+        queries = [topic.title for topic in self.topics_store.topics]
         for query in queries:
             print(f"Query: {query}\n")
             self.print_search(query, num_hits)
-            print()
+            print("\n\n")
