@@ -24,10 +24,10 @@ pipenv install
 
 ### Run the search pipeline
 
-To test the search pipeline, run the `grimjack.run` CLI like this:
+To test the search pipeline, run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack.run search "Which is better, a laptop or a desktop?"
+pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
 ```
 
 #### Options
@@ -36,13 +36,13 @@ The search pipeline can be configured with the options listed in the help comman
 The help command also lists all subcommands.
 
 ```shell script
-pipenv run python -m grimjack.run --help
+pipenv run python -m grimjack --help
 ```
 
 Each subcommand's extra options can be listed like this:
 
 ```shell script
-pipenv run python -m grimjack.run search --help
+pipenv run python -m grimjack search --help
 ```
 
 #### Examples
@@ -50,7 +50,7 @@ pipenv run python -m grimjack.run search --help
 Search for the top 3 results with query expansion using synonyms from the T0pp language model and no stemming for the index. 
 
 ```shell script
-pipenv run python -m grimjack.run --no-stemmer --query-expansion t0pp search -k 3 "Which is better, a laptop or a desktop?"
+pipenv run python -m grimjack --no-stemmer --query-expansion t0pp search -k 3 "Which is better, a laptop or a desktop?"
 ```
 
 ### Testing
