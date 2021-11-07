@@ -44,6 +44,7 @@ def _parse_document(hit: JResult, rank: int) -> RankedDocument:
 class AnseriniSearcher(Searcher):
     index: Index
     query_expander: QueryExpander
+    retrieval_model: str
 
     _bow_query_generator = JBagOfWordsQueryGenerator()
 
@@ -64,8 +65,17 @@ class AnseriniSearcher(Searcher):
             builder.add(anserini_query, JBooleanClauseOccur.should.value)
         return builder.build()
 
+    def set_searcher(self, model: str, searcher: SimpleSearcher):
+        if model == "qld":
+            searcher.set_qld()
+        elif model == "bm25":
+            searcher.set_bm25()
+        else:
+            raise Exception('Unknown retrieval model')
+
     def search(self, query: str, num_hits: int) -> List[RankedDocument]:
         searcher = SimpleSearcher(str(self.index.index_dir.absolute()))
+        self.set_searcher(self.retrieval_model, searcher)
 
         queries = self.query_expander.expand_query(query)
         anserini_query = self._build_boolean_query(queries)

@@ -28,6 +28,7 @@ class Pipeline:
             topics_zip_url: str,
             topics_file_path: str,
             stopwords_file: Optional[Path],
+            retrieval_model: str,
             stemmer: Optional[Stemmer],
             language: str,
             query_expansion: Optional[QueryExpansion],
@@ -35,6 +36,7 @@ class Pipeline:
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
+        self.retrieval_model = retrieval_model
         self.index = AnseriniIndex(
             self.documents_store,
             stopwords_file,
@@ -45,7 +47,10 @@ class Pipeline:
             query_expansion,
             hugging_face_api_token
         )
-        self.searcher = AnseriniSearcher(self.index, self.query_expander)
+        self.searcher = AnseriniSearcher(
+            self.index,
+            self.query_expander,
+            self.retrieval_model)
 
     def print_search(self, query: str, num_hits: int):
         results = self.searcher.search(query, num_hits)

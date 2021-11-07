@@ -49,6 +49,12 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=DEFAULT_TOPICS_FILE_PATH,
     )
     parser.add_argument(
+        "--retrieval-model", "-model",
+        dest="retrieval_model",
+        type=str,
+        default="bm25"
+    )
+    parser.add_argument(
         "--stopwords",
         dest="stopwords_file",
         type=Path,
@@ -170,6 +176,7 @@ def main():
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
     topics_file_path: str = args.topics_file_path
+    retrieval_model: str = args.retrieval_model
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
@@ -184,6 +191,7 @@ def main():
         topics_zip_url=topics_zip_url,
         topics_file_path=topics_file_path,
         stopwords_file=stopwords_file,
+        retrieval_model=retrieval_model,
         stemmer=stemmer,
         language=language,
         query_expansion=query_expansion,
