@@ -37,11 +37,12 @@
   \begin{itemize}
     \item Published in: Exploring the Limits of Transfer Learning with a Unified
     Text-to-Text Transformer
-    \item Publsihed by Google AI in 2019/2020
+    \item Published by Google AI in 2019/2020
     \item Goal: Is it possible to create one architecture to tackle different types of NLP task? 
     \item T5 stands for: \textbf{T}ext-\textbf{t}o-\textbf{T}ext \textbf{T}ransfer \textbf{T}ransformer
   \end{itemize}
 \end{frame}
+
 
 \begin{frame}{Examples of T5 tasks}
   \begin{figure}
@@ -52,7 +53,7 @@
 
 \begin{frame}{Architecture of T5}
     \begin{itemize}
-      \item Follows the transformer architecture as proposed by Vaswani et. al~\cite{VaswaniSPUJGKP2017}
+      \item Follows the transformer architecture by Vaswani et. al~\cite{VaswaniSPUJGKP2017}
       \item An input sequence of tokens is mapped to
       a sequence of embeddings, which is then passed into the encoder
       \item The encoder consists of a stack of blocks
@@ -65,6 +66,13 @@
       \item Adding each subcomponent’s input to its output
       \item Applying dropout
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Architecture of T5}
+    \begin{figure}
+        \center
+        \includegraphics[scale=0.8]{figures/t5_architecture.png}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Architecture of T5}
@@ -85,7 +93,13 @@
     \item T5 is pretrained in a parallel way using Cloud TPU pods
     \item T5 leveraged the Common Crawl dataset generated with web text
     \item Colossal Clean Crawled Corpus (C4) will be used
-    \item Training will be unsupervised
+    \begin{itemize}
+      \item Removed pages with less than 5 sentences 
+      \item Removed any page containing a naughty word 
+      \item Removed any lines with Javascript in it
+      \item Removed any pages that contained "\{"
+      \item Removed duplicate pages
+    \end{itemize}
     \item C4 is roughly 750 GB with clean and natural text
     \item Realeased as part of the TensorFlow Datsets
   \end{itemize}
@@ -122,7 +136,16 @@
       \item Does multitask prompted training improve generalization to unseen tasks?
       \item Does training on a wider range of prompts improve robustness to prompt wording?
       \item All datasets are given to the model in natural language prompted form to enable zero-shot experimentation
+      \item Goal: Induce a model to better generalize to unseen tasks without requiring massive scale and being more robust to the
+      wording choices of the prompts
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Examples of zero-shot experimentation}
+    \begin{figure}
+        \center
+        \includegraphics[scale=0.45]{figures/t0_examples.png}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Examples of prompts}
@@ -130,6 +153,13 @@
       \center
       \includegraphics[scale=0.5]{figures/prompts.png}
     \end{figure}
+\end{frame}
+
+\begin{frame}{Datasets and tasks used to train}
+  \begin{figure}
+    \center
+    \includegraphics[scale=0.5]{figures/t0_datasets.png}
+  \end{figure}
 \end{frame}
 
 \begin{frame}{Conclusion}
