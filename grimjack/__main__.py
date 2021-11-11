@@ -8,6 +8,7 @@ from grimjack.constants import (
     DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH
 )
+from grimjack.modules.options import RetrievalModel
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -26,6 +27,14 @@ _QUERY_EXPANSIONS = {
     "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
     "t0pp-comparative-synonyms": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
     "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
+}
+
+_RETRIEVAL_MODELS = {
+    "bm25": RetrievalModel.BM25,
+    "query-likelihood-dirichlet": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "query-likelihood": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "dirichlet": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "qld": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
 }
 
 
@@ -47,12 +56,6 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="topics_file_path",
         type=str,
         default=DEFAULT_TOPICS_FILE_PATH,
-    )
-    parser.add_argument(
-        "--retrieval-model", "-model",
-        dest="retrieval_model",
-        type=str,
-        default="bm25"
     )
     parser.add_argument(
         "--stopwords",
@@ -97,6 +100,13 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="query_expansion",
         action="store_const",
         const=None
+    )
+    parser.add_argument(
+        "--retrieval-model", "--model", "-m",
+        dest="retrieval_model",
+        type=str,
+        choices=_STEMMERS.keys(),
+        default=None,
     )
     parser.add_argument(
         "--huggingface-api-token-file",
@@ -158,6 +168,15 @@ def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
         raise Exception(f"Unknown query expansion: {query_expansion}")
 
 
+def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
+    if retrieval_model is None:
+        return None
+    elif retrieval_model in _RETRIEVAL_MODELS.keys():
+        return _RETRIEVAL_MODELS[retrieval_model]
+    else:
+        raise Exception(f"Unknown query expansion: {retrieval_model}")
+
+
 def _parse_huggingface_api_token(
         token_or_path: Union[Path, str]
 ) -> Optional[str]:
@@ -176,12 +195,14 @@ def main():
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
     topics_file_path: str = args.topics_file_path
-    retrieval_model: str = args.retrieval_model
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
     query_expansion: Optional[QueryExpansion] = _parse_query_expansion(
         args.query_expansion
+    )
+    retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
+        args.retrieval_model
     )
     hugging_face_api_token = _parse_huggingface_api_token(
         args.huggingface_api_token
@@ -191,10 +212,10 @@ def main():
         topics_zip_url=topics_zip_url,
         topics_file_path=topics_file_path,
         stopwords_file=stopwords_file,
-        retrieval_model=retrieval_model,
         stemmer=stemmer,
         language=language,
         query_expansion=query_expansion,
+        retrieval_model=retrieval_model,
         hugging_face_api_token=hugging_face_api_token,
     )
 

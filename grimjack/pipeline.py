@@ -9,7 +9,7 @@ from grimjack.modules import (
     Searcher,
 )
 from grimjack.modules.index import AnseriniIndex
-from grimjack.modules.options import Stemmer, QueryExpansion
+from grimjack.modules.options import Stemmer, QueryExpansion, RetrievalModel
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
 from grimjack.modules.query_expander import SimpleQueryExpander
@@ -28,29 +28,29 @@ class Pipeline:
             topics_zip_url: str,
             topics_file_path: str,
             stopwords_file: Optional[Path],
-            retrieval_model: str,
             stemmer: Optional[Stemmer],
             language: str,
             query_expansion: Optional[QueryExpansion],
+            retrieval_model: Optional[RetrievalModel],
             hugging_face_api_token: Optional[str],
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
-        self.retrieval_model = retrieval_model
         self.index = AnseriniIndex(
             self.documents_store,
             stopwords_file,
             stemmer,
-            language
+            language,
         )
         self.query_expander = SimpleQueryExpander(
             query_expansion,
-            hugging_face_api_token
+            hugging_face_api_token,
         )
         self.searcher = AnseriniSearcher(
             self.index,
             self.query_expander,
-            self.retrieval_model)
+            retrieval_model,
+        )
 
     def print_search(self, query: str, num_hits: int):
         results = self.searcher.search(query, num_hits)

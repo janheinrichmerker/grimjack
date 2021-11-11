@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from json import loads
-from typing import Collection, List
+from typing import Collection, List, Optional
 
 from more_itertools import first
 from pyserini.search import JQuery, SimpleSearcher
@@ -17,6 +17,7 @@ from grimjack.model.jvm import (
 )
 from grimjack.model import RankedDocument
 from grimjack.modules import Searcher, Index, QueryExpander
+from grimjack.modules.options import RetrievalModel
 
 
 def _parse_document(hit: JResult, rank: int) -> RankedDocument:
@@ -44,7 +45,7 @@ def _parse_document(hit: JResult, rank: int) -> RankedDocument:
 class AnseriniSearcher(Searcher):
     index: Index
     query_expander: QueryExpander
-    retrieval_model: str
+    retrieval_model: Optional[RetrievalModel]
 
     _bow_query_generator = JBagOfWordsQueryGenerator()
 
@@ -65,17 +66,19 @@ class AnseriniSearcher(Searcher):
             builder.add(anserini_query, JBooleanClauseOccur.should.value)
         return builder.build()
 
-    def set_searcher(self, model: str, searcher: SimpleSearcher):
-        if model == "qld":
-            searcher.set_qld()
-        elif model == "bm25":
+    def _setup_retrieval_model(self, searcher: SimpleSearcher):
+        if self.retrieval_model is None:
+            return
+        elif self.retrieval_model == RetrievalModel.BM25:
             searcher.set_bm25()
+        elif self.retrieval_model == RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET:
+            searcher.set_qld()
         else:
-            raise Exception('Unknown retrieval model')
+            raise Exception(f"Unknown retrieval model: {self.retrieval_model}")
 
     def search(self, query: str, num_hits: int) -> List[RankedDocument]:
         searcher = SimpleSearcher(str(self.index.index_dir.absolute()))
-        self.set_searcher(self.retrieval_model, searcher)
+        self._setup_retrieval_model(searcher)
 
         queries = self.query_expander.expand_query(query)
         anserini_query = self._build_boolean_query(queries)
