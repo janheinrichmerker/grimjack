@@ -121,14 +121,15 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None,
     )
 
-    subparsers = parser.add_subparsers(title="subcommands", dest="command")
-    _prepare_parser_search(subparsers.add_parser("search"))
-    _prepare_parser_search_topics(subparsers.add_parser("search-topics"))
+    parsers = parser.add_subparsers(title="subcommands", dest="command")
+    _prepare_parser_print_search(parsers.add_parser("search"))
+    _prepare_parser_print_search_all(parsers.add_parser("search-all"))
+    _prepare_parser_run_search_all(parsers.add_parser("run-all"))
 
     return parser
 
 
-def _prepare_parser_search(parser: ArgumentParser):
+def _prepare_parser_print_search(parser: ArgumentParser):
     parser.add_argument(
         dest="query",
         type=str,
@@ -141,12 +142,25 @@ def _prepare_parser_search(parser: ArgumentParser):
     )
 
 
-def _prepare_parser_search_topics(parser: ArgumentParser):
+def _prepare_parser_print_search_all(parser: ArgumentParser):
     parser.add_argument(
         "--num-hits", "-k",
         dest="num_hits",
         type=int,
         default=5,
+    )
+
+
+def _prepare_parser_run_search_all(parser: ArgumentParser):
+    parser.add_argument(
+        dest="output_file",
+        type=Path,
+    )
+    parser.add_argument(
+        "--num-hits", "-k",
+        dest="num_hits",
+        type=int,
+        default=1000,
     )
 
 
@@ -223,12 +237,16 @@ def main():
         query: str = args.query
         num_hits: int = args.num_hits
         pipeline.print_search(query, num_hits)
-    elif args.command == "search-topics":
+    elif args.command == "search-all":
         num_hits: int = args.num_hits
-        pipeline.print_search_topics(num_hits)
+        pipeline.print_search_all(num_hits)
+    elif args.command == "run-all":
+        output_file: Path = args.output_file
+        num_hits: int = args.num_hits
+        pipeline.run_search_all(output_file, num_hits)
     else:
         parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

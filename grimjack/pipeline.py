@@ -56,18 +56,17 @@ class Pipeline:
 
     def print_search(self, query: str, num_hits: int):
         results = self.searcher.search(query, num_hits)
-        for result in results:
+        for document in results:
             print(
-                f"Rank {result.rank:3}: {result.id} "
-                f"(Score: {result.score:.3f})\n"
-                f"\t{result.content}\n\n\n"
+                f"Rank {document.rank:3}: {document.id} "
+                f"(Score: {document.score:.3f})\n"
+                f"\t{document.content}\n\n\n"
             )
 
-    def print_search_topics(self, num_hits: int):
-        queries = [topic.title for topic in self.topics_store.topics]
-        for query in queries:
-            print(f"Query: {query}\n")
-            self.print_search(query, num_hits)
+    def print_search_all(self, num_hits: int):
+        for topic in self.topics_store.topics:
+            print(f"Query {topic.id}: {topic.title}\n")
+            self.print_search(topic.title, num_hits)
             print("\n\n")
 
     def run_search_all(self, path: Path, num_hits: int):
