@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 numpy = "*"
-pyserini = "*"
+pyserini = "<=0.13.0"
 dload = "*"
 pytest = "*"
 jupyter = "*"
@@ -18,7 +18,8 @@ flake8 = "*"
 gensim = "*"
 more-itertools = "*"
 requests = "*"
-untangle = "*"
+tqdm = "*"
+
 
 [dev-packages]
 
