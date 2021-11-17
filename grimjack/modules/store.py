@@ -4,9 +4,10 @@ from hashlib import md5
 from pathlib import Path
 from typing import List
 from urllib.request import urlopen
+from xml.etree import ElementTree
+from xml.etree.ElementTree import parse, ElementTree, Element
 
 from dload import save_unzip
-from untangle import parse
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR
 from grimjack.model import Topic
@@ -65,17 +66,19 @@ class SimpleDocumentsStore(DocumentsStore):
         return download_dir
 
 
-def _parse_topic(xml) -> Topic:
+def _parse_topic(xml: Element) -> Topic:
     return Topic(
-        int(xml.number.cdata),
-        str(xml.title.cdata),
-        str(xml.description.cdata),
-        str(xml.narrative.cdata),
+        int(xml.findtext("number")),
+        xml.findtext("title"),
+        xml.findtext("description"),
+        xml.findtext("narrative"),
     )
 
 
-def _parse_topics(xml) -> List[Topic]:
-    return [_parse_topic(child) for child in xml.topics.topic]
+def _parse_topics(tree: ElementTree) -> List[Topic]:
+    root = tree.getroot()
+    assert root.tag == "topics"
+    return [_parse_topic(child) for child in root]
 
 
 @dataclass
@@ -110,5 +113,5 @@ class TrecTopicsStore(TopicsStore):
 
     @property
     def topics(self) -> List[Topic]:
-        xml = parse(str(self.topics_file.absolute()))
+        xml: ElementTree = parse(self.topics_file)
         return _parse_topics(xml)
