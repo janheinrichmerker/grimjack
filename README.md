@@ -8,14 +8,16 @@
 
 Named after the fencer [Grimjack](https://en.wikipedia.org/wiki/Grimjack).
 
-Participation in the [Touché 2022](https://webis.de/events/touche-22/) shared task 2, 
-as part of the [Advanced Information Retrieval](https://gitlab.informatik.uni-halle.de/aqvbw/Information-Retrieval/) lecture.
+Participation in the [Touché 2022](https://webis.de/events/touche-22/) shared task 2, as part of the 
+[Advanced Information Retrieval](https://gitlab.informatik.uni-halle.de/aqvbw/Information-Retrieval/) lecture.
 
 ## Usage
 
 ### Installation
 
-First, install [Python 3](https://python.org/downloads/), [pipx](https://pipxproject.github.io/pipx/installation/#install-pipx), and [Pipenv](https://pipenv.pypa.io/en/latest/install/#isolated-installation-of-pipenv-with-pipx).
+First, install [Python 3](https://python.org/downloads/), 
+[pipx](https://pipxproject.github.io/pipx/installation/#install-pipx), and 
+[Pipenv](https://pipenv.pypa.io/en/latest/install/#isolated-installation-of-pipenv-with-pipx).
 Then install dependencies (may take a while):
 
 ```shell script
@@ -29,6 +31,17 @@ To test the search pipeline, run the `grimjack` CLI like this:
 ```shell script
 pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
 ```
+
+### Generate a run file for all topics
+
+To search all topics and generate a run file, run the `grimjack` CLI like this:
+
+```shell script
+pipenv run python -m grimjack run-all data/run.txt
+```
+
+This will save a run file at `data/run.txt` with the format described in
+the [shared task description](https://webis.de/events/touche-22/shared-task-2.html#submission).
 
 #### Options
 
@@ -47,7 +60,8 @@ pipenv run python -m grimjack search --help
 
 #### Examples
 
-Search for the top 3 results with query expansion using synonyms from the T0pp language model and no stemming for the index. 
+Search for the top 3 results with query expansion using synonyms from the T0pp language model 
+and no stemming for the index.
 
 ```shell script
 pipenv run python -m grimjack --no-stemmer --query-expansion t0pp search -k 3 "Which is better, a laptop or a desktop?"
