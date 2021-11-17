@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
+from tqdm import tqdm
+
 from grimjack.modules import (
     DocumentsStore,
     TopicsStore,
@@ -67,3 +69,18 @@ class Pipeline:
             print(f"Query: {query}\n")
             self.print_search(query, num_hits)
             print("\n\n")
+
+    def run_search_all(self, path: Path, num_hits: int):
+        with path.open("w") as file:
+            topics = tqdm(
+                self.topics_store.topics,
+                desc="Searching",
+                unit="queries",
+            )
+            for topic in topics:
+                results = self.searcher.search(topic.title, num_hits)
+                file.writelines(
+                    f"{topic.id} Q0 {document.id} {document.rank} "
+                    f"{document.score} {path.stem}\n"
+                    for document in results
+                )
