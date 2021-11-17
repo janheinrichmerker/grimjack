@@ -4,7 +4,6 @@ from hashlib import md5
 from pathlib import Path
 from typing import List
 from urllib.request import urlopen
-from xml.etree import ElementTree
 from xml.etree.ElementTree import parse, ElementTree, Element
 
 from dload import save_unzip
