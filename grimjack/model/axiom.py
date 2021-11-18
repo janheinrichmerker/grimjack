@@ -1,9 +1,12 @@
+from abc import ABC, abstractmethod
 from typing import Iterable
 
 from grimjack.model import RankedDocument
 
 
-class Axiom:
+class Axiom(ABC):
+
+    @abstractmethod
     def preference(
             self,
             query: str,
