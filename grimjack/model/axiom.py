@@ -82,3 +82,22 @@ class RandomAxiom(Axiom):
             document2: RankedDocument
     ) -> float:
         return randint(-1, 1)
+
+
+class DocumentIdAxiom(Axiom):
+    """
+    For testing purposes only.
+    """
+
+    def preference(
+            self,
+            query: str,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ) -> float:
+        if document1.id < document2.id:
+            return 1
+        elif document1.id > document2.id:
+            return -1
+        else:
+            return 0
