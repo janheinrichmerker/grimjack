@@ -34,7 +34,7 @@ class AxiomaticReranker(Reranker):
         vertices_right = []
 
         # Select random pivot.
-        pivot = vertices[randint(0, len(vertices))]
+        pivot = vertices[randint(0, len(vertices) - 1)]
 
         for vertex in vertices:
             if vertex == pivot:
@@ -54,4 +54,15 @@ class AxiomaticReranker(Reranker):
     ) -> List[RankedDocument]:
         ranking = ranking.copy()
         ranking = self.kwiksort(query, ranking)
+        length = len(ranking)
+        ranking = [
+            RankedDocument(
+                id=document.id,
+                content=document.content,
+                fields=document.fields,
+                score=length - i,
+                rank=i + 1,
+            )
+            for i, document in enumerate(ranking)
+        ]
         return ranking
