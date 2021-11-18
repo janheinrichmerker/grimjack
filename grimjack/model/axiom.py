@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from random import randint
 from typing import Iterable
 
@@ -17,6 +18,8 @@ class Axiom(ABC):
         pass
 
 
+
+@dataclass
 class WeightedAxiom(Axiom):
     axiom: Axiom
     weight: float
@@ -30,6 +33,7 @@ class WeightedAxiom(Axiom):
         return self.weight * self.axiom.preference(query, document1, document2)
 
 
+@dataclass
 class AggregatedAxiom(Axiom):
     axioms: Iterable[Axiom]
 
@@ -45,9 +49,14 @@ class AggregatedAxiom(Axiom):
         )
 
 
+@dataclass
 class CachedAxiom(Axiom):
     axiom: Axiom
-    _cache: dict[tuple[str, str], float]
+    _cache: dict[tuple[str, str], float] = field(
+        default_factory=lambda: {},
+        init=False,
+        repr=False
+    )
 
     def preference(
             self,
