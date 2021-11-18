@@ -45,6 +45,9 @@ class AxiomaticReranker(Reranker):
             else:
                 vertices_right.append(vertex)
 
+        vertices_left = self.kwiksort(query, vertices_left)
+        vertices_right = self.kwiksort(query, vertices_right)
+
         return [*vertices_left, pivot, *vertices_right]
 
     def rerank(
