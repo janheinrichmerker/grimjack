@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from random import randint
 from typing import Iterable
 
 from grimjack.model import RankedDocument
@@ -62,3 +63,13 @@ class CachedAxiom(Axiom):
             preference = self.axiom.preference(query, document1, document2)
             self._cache[document1.id, document2.id] = preference
             return preference
+
+
+class RandomAxiom(Axiom):
+    def preference(
+            self,
+            query: str,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ) -> float:
+        return randint(-1, 1)
