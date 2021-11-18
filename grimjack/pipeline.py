@@ -3,15 +3,15 @@ from typing import Optional
 
 from tqdm import tqdm
 
+from grimjack.model.axiom import RandomAxiom
 from grimjack.modules import (
-    DocumentsStore,
-    TopicsStore,
-    Index,
-    QueryExpander,
-    Searcher,
+    DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
 )
 from grimjack.modules.index import AnseriniIndex
-from grimjack.modules.options import Stemmer, QueryExpansion, RetrievalModel
+from grimjack.modules.options import (
+    Stemmer, QueryExpansion, RetrievalModel, RerankerType
+)
+from grimjack.modules.reranker import OriginalReranker, AxiomaticReranker
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
 from grimjack.modules.query_expander import SimpleQueryExpander
@@ -23,6 +23,7 @@ class Pipeline:
     index: Index
     query_expander: QueryExpander
     searcher: Searcher
+    reranker: Reranker
 
     def __init__(
             self,
@@ -54,6 +55,14 @@ class Pipeline:
             self.query_expander,
             retrieval_model,
         )
+        if reranker is None:
+            self.reranker = OriginalReranker()
+        elif reranker == RerankerType.AXIOMATIC:
+            self.reranker = AxiomaticReranker(
+                RandomAxiom()
+            )
+        else:
+            raise ValueError(f"Unknown reranker: {reranker}")
 
     def print_search(self, query: str, num_hits: int):
         results = self.searcher.search(query, num_hits)
