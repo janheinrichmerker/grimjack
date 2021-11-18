@@ -17,6 +17,14 @@ class Axiom(ABC):
     ) -> float:
         pass
 
+    def cached(self) -> "Axiom":
+        return CachedAxiom(self)
+
+    def weighted(self, weight: float) -> "Axiom":
+        return WeightedAxiom(self, weight)
+
+    def aggregate(self, *others: "Axiom") -> "Axiom":
+        return AggregatedAxiom([self, *others])
 
 
 @dataclass
