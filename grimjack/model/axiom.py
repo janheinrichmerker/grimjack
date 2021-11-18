@@ -23,8 +23,14 @@ class Axiom(ABC):
     def weighted(self, weight: float) -> "Axiom":
         return WeightedAxiom(self, weight)
 
+    def __mul__(self, weight: float):
+        return self.weighted(weight)
+
     def aggregate(self, *others: "Axiom") -> "Axiom":
         return AggregatedAxiom([self, *others])
+
+    def __add__(self, other: "Axiom"):
+        return self.aggregate(other)
 
 
 @dataclass
