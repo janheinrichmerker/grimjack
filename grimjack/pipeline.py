@@ -96,7 +96,7 @@ class Pipeline:
                 unit="queries",
             )
             for topic in topics:
-                results = self.searcher.search(topic.title, num_hits)
+                results = self._search(topic.title, num_hits)
                 file.writelines(
                     f"{topic.id} Q0 {document.id} {document.rank} "
                     f"{document.score} {path.stem}\n"
