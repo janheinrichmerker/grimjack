@@ -8,6 +8,17 @@ from grimjack.modules import Reranker
 
 
 @dataclass
+class OriginalReranker(Reranker):
+
+    def rerank(
+            self,
+            query: str,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        return ranking
+
+
+@dataclass
 class AxiomaticReranker(Reranker):
     axiom: Axiom
 
