@@ -17,9 +17,6 @@ class Axiom(ABC):
     ) -> float:
         pass
 
-    def cached(self) -> "Axiom":
-        return CachedAxiom(self)
-
     def weighted(self, weight: float) -> "Axiom":
         return WeightedAxiom(self, weight)
 
@@ -31,6 +28,12 @@ class Axiom(ABC):
 
     def __add__(self, other: "Axiom"):
         return self.aggregate(other)
+
+    def normalized(self) -> "Axiom":
+        return NormalizedAxiom(self)
+
+    def cached(self) -> "Axiom":
+        return CachedAxiom(self)
 
 
 @dataclass
@@ -61,6 +64,25 @@ class AggregatedAxiom(Axiom):
             axiom.preference(query, document1, document2)
             for axiom in self.axioms
         )
+
+
+@dataclass
+class NormalizedAxiom(Axiom):
+    axiom: Axiom
+
+    def preference(
+            self,
+            query: str,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ) -> float:
+        preference = self.axiom.preference(query, document1, document2)
+        if preference > 0:
+            return 1
+        elif preference < 0:
+            return -1
+        else:
+            return 0
 
 
 @dataclass

@@ -63,7 +63,7 @@ class Pipeline:
                 (
                         (DocumentIdAxiom() * 1.0) +
                         (RandomAxiom() * 1.0)
-                ).cached()
+                ).normalized().cached()
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
