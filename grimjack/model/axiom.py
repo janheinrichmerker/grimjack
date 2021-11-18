@@ -58,7 +58,7 @@ class CachedAxiom(Axiom):
         if (document1.id, document2.id) in self._cache:
             return self._cache[document1.id, document2.id]
         elif (document2.id, document1.id) in self._cache:
-            return -self._cache[document1.id, document2.id]
+            return -self._cache[document2.id, document1.id]
         else:
             preference = self.axiom.preference(query, document1, document2)
             self._cache[document1.id, document2.id] = preference
