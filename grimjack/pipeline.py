@@ -35,6 +35,7 @@ class Pipeline:
             query_expansion: Optional[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
             hugging_face_api_token: Optional[str],
+            reranker: Optional[RerankerType],
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)

@@ -15,3 +15,7 @@ class QueryExpansion(Enum):
 class RetrievalModel(Enum):
     BM25 = 1
     QUERY_LIKELIHOOD_DIRICHLET = 2
+
+
+class RerankerType(Enum):
+    AXIOMATIC = 1

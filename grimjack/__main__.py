@@ -8,7 +8,7 @@ from grimjack.constants import (
     DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH
 )
-from grimjack.modules.options import RetrievalModel
+from grimjack.modules.options import RetrievalModel, RerankerType
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -35,6 +35,12 @@ _RETRIEVAL_MODELS = {
     "query-likelihood": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
     "dirichlet": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
     "qld": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+}
+
+_RERANKER_TYPES = {
+    "axiomatic": RerankerType.AXIOMATIC,
+    "axiom": RerankerType.AXIOMATIC,
+    "a": RerankerType.AXIOMATIC,
 }
 
 
@@ -120,6 +126,13 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         type=str,
         default=None,
     )
+    parser.add_argument(
+        "--reranker",
+        dest="reranker",
+        type=str,
+        choices=_RERANKER_TYPES.keys(),
+        default=None,
+    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
@@ -201,6 +214,15 @@ def _parse_huggingface_api_token(
     return token_or_path if token_or_path else None
 
 
+def _parse_reranker(reranker: str) -> Optional[RerankerType]:
+    if reranker is None:
+        return None
+    elif reranker in _STEMMERS.keys():
+        return _STEMMERS[reranker]
+    else:
+        raise Exception(f"Unknown reranker: {reranker}")
+
+
 def main():
     parser: ArgumentParser = ArgumentParser()
     _prepare_parser(parser)
@@ -221,6 +243,7 @@ def main():
     hugging_face_api_token = _parse_huggingface_api_token(
         args.huggingface_api_token
     )
+    reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -231,6 +254,7 @@ def main():
         query_expansion=query_expansion,
         retrieval_model=retrieval_model,
         hugging_face_api_token=hugging_face_api_token,
+        reranker=reranker,
     )
 
     if args.command == "search":
