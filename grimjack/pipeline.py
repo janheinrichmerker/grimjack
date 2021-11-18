@@ -4,7 +4,7 @@ from typing import Optional, List
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument
-from grimjack.model.axiom import RandomAxiom
+from grimjack.model.axiom import DocumentIdAxiom, RandomAxiom
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
 )
@@ -12,10 +12,10 @@ from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
+from grimjack.modules.query_expander import SimpleQueryExpander
 from grimjack.modules.reranker import OriginalReranker, AxiomaticReranker
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
-from grimjack.modules.query_expander import SimpleQueryExpander
 
 
 class Pipeline:
@@ -60,7 +60,10 @@ class Pipeline:
             self.reranker = OriginalReranker()
         elif reranker == RerankerType.AXIOMATIC:
             self.reranker = AxiomaticReranker(
-                RandomAxiom()
+                (
+                        (DocumentIdAxiom() * 1.0) +
+                        (RandomAxiom() * 1.0)
+                ).cached()
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
