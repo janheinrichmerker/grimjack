@@ -127,7 +127,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None,
     )
     parser.add_argument(
-        "--reranker",
+        "--reranker", "-r",
         dest="reranker",
         type=str,
         choices=_RERANKER_TYPES.keys(),
@@ -217,8 +217,8 @@ def _parse_huggingface_api_token(
 def _parse_reranker(reranker: str) -> Optional[RerankerType]:
     if reranker is None:
         return None
-    elif reranker in _STEMMERS.keys():
-        return _STEMMERS[reranker]
+    elif reranker in _RERANKER_TYPES.keys():
+        return _RERANKER_TYPES[reranker]
     else:
         raise Exception(f"Unknown reranker: {reranker}")
 
