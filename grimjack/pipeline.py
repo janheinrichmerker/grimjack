@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from tqdm import tqdm
 
+from grimjack.model import RankedDocument
 from grimjack.model.axiom import RandomAxiom
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
@@ -64,8 +65,13 @@ class Pipeline:
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
 
+    def _search(self, query: str, num_hits: int) -> List[RankedDocument]:
+        ranking = self.searcher.search(query, num_hits)
+        ranking = self.reranker.rerank(query, ranking)
+        return ranking
+
     def print_search(self, query: str, num_hits: int):
-        results = self.searcher.search(query, num_hits)
+        results = self._search(query, num_hits)
         for document in results:
             print(
                 f"Rank {document.rank:3}: {document.id} "
