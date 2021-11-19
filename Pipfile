@@ -8,7 +8,6 @@ numpy = "*"
 pyserini = "<=0.13.0"
 dload = "*"
 pytest = "*"
-jupyter = "*"
 nltk = "*"
 autopep8 = "*"
 pylint = "*"
@@ -19,7 +18,7 @@ gensim = "*"
 more-itertools = "*"
 requests = "*"
 tqdm = "*"
-
+trectools = "*"
 
 [dev-packages]
 
