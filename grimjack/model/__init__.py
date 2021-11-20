@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
 from typing import Dict
 
 
@@ -24,22 +23,60 @@ class Text(ABC):
         pass
 
 
-@dataclass
-class Query:
-    id: int
-    title: str
-    description: str
-    narrative: str
+class Query(Text):
+    @property
+    def text(self) -> str:
+        return self.title
+
+    @property
+    @abstractmethod
+    def id(self) -> int:
+        pass
+
+    @property
+    @abstractmethod
+    def title(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def narrative(self) -> str:
+        pass
 
 
-@dataclass
-class Document:
-    id: str
-    content: str
-    fields: Dict[str, str]
+class Document(Text):
+    @property
+    def text(self) -> str:
+        return self.content
+
+    @property
+    @abstractmethod
+    def id(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def content(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def fields(self) -> Dict[str, str]:
+        pass
 
 
-@dataclass
 class RankedDocument(Document):
-    score: float
-    rank: int
+    @property
+    @abstractmethod
+    def score(self) -> float:
+        pass
+
+    @property
+    @abstractmethod
+    def rank(self) -> int:
+        pass
