@@ -131,44 +131,6 @@ class CachedAxiom(Axiom):
             return preference
 
 
-class PreconditionAxiom(Axiom, ABC):
-    @abstractmethod
-    def precondition(
-            self,
-            statistics: IndexStatistics,
-            query: Query,
-            document1: RankedDocument,
-            document2: RankedDocument
-    ) -> bool:
-        pass
-
-    @abstractmethod
-    def preference_after_precondition(
-            self,
-            statistics: IndexStatistics,
-            query: Query,
-            document1: RankedDocument,
-            document2: RankedDocument
-    ) -> float:
-        pass
-
-    def preference(
-            self,
-            statistics: IndexStatistics,
-            query: Query,
-            document1: RankedDocument,
-            document2: RankedDocument
-    ) -> float:
-        if not self.precondition(statistics, query, document1, document2):
-            return 0
-        return super(PreconditionAxiom, self).preference(
-            statistics,
-            query,
-            document1,
-            document2
-        )
-
-
 class RandomAxiom(Axiom):
     def preference(
             self,
