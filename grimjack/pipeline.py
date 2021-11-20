@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from tqdm import tqdm
 
-from grimjack.model import RankedDocument
+from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import DocumentIdAxiom, RandomAxiom
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
@@ -60,8 +60,8 @@ class Pipeline:
             self.reranker = OriginalReranker()
         elif reranker == RerankerType.AXIOMATIC:
             self.reranker = AxiomaticReranker(
-                index=self.index,
-                axiom=(
+                self.index,
+                (
                         (DocumentIdAxiom() * 1.0) +
                         (RandomAxiom() * 1.0)
                 ).normalized().cached(),
@@ -69,13 +69,14 @@ class Pipeline:
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
 
-    def _search(self, query: str, num_hits: int) -> List[RankedDocument]:
+    def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
     def print_search(self, query: str, num_hits: int):
-        results = self._search(query, num_hits)
+        manual_query = Query(-1, query, "", "")
+        results = self._search(manual_query, num_hits)
         for document in results:
             print(
                 f"Rank {document.rank:3}: {document.id} "
@@ -97,7 +98,7 @@ class Pipeline:
                 unit="queries",
             )
             for topic in topics:
-                results = self._search(topic.title, num_hits)
+                results = self._search(topic, num_hits)
                 file.writelines(
                     f"{topic.id} Q0 {document.id} {document.rank} "
                     f"{document.score} {path.stem}\n"
