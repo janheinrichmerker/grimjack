@@ -9,7 +9,7 @@ from pyserini.search.querybuilder import (
 )
 
 from grimjack.model import RankedDocument
-from grimjack.model.jvm import (
+from grimjack.utils.jvm import (
     JBagOfWordsQueryGenerator,
     JIndexArgs,
     JIndexCollection,
