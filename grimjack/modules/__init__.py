@@ -71,7 +71,7 @@ class QueryExpander(ABC):
 
 class Searcher(ABC):
     @abstractmethod
-    def search(self, query: str, num_hits: int) -> List[RankedDocument]:
+    def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         pass
 
 
