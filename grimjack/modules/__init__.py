@@ -14,29 +14,6 @@ class DocumentsStore(ABC):
 
 class TextCollection(ABC):
 
-    @abstractmethod
-    def inverse_document_frequency(self, term: str) -> float:
-        pass
-
-
-class TopicsStore(ABC):
-    @property
-    @abstractmethod
-    def topics_file(self) -> Path:
-        pass
-
-    @property
-    @abstractmethod
-    def topics(self) -> List[Query]:
-        pass
-
-
-class Index(ABC):
-    @property
-    @abstractmethod
-    def index_dir(self) -> Path:
-        pass
-
     @property
     @abstractmethod
     def document_count(self) -> int:
@@ -54,12 +31,23 @@ class Index(ABC):
     def inverse_document_frequency(self, term: str) -> float:
         pass
 
+
+class TopicsStore(ABC):
+    @property
     @abstractmethod
-    def terms(self, text: str) -> list[str]:
+    def topics_file(self) -> Path:
         pass
 
+    @property
     @abstractmethod
-    def term_frequency(self, text: str, term: str) -> float:
+    def topics(self) -> List[Query]:
+        pass
+
+
+class Index(TextCollection, ABC):
+    @property
+    @abstractmethod
+    def index_dir(self) -> Path:
         pass
 
 
