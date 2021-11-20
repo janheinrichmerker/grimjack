@@ -65,7 +65,7 @@ class Index(IndexStatistics, ABC):
 
 class QueryExpander(ABC):
     @abstractmethod
-    def expand_query(self, query: str) -> List[str]:
+    def expand_query(self, query: Query) -> List[Query]:
         pass
 
 

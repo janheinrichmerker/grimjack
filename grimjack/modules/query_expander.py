@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional, Collection
+from typing import List, Optional
 
 from gensim import downloader
 from gensim.similarities import TermSimilarityIndex
@@ -8,6 +8,7 @@ from nltk import word_tokenize, pos_tag
 from nltk.downloader import Downloader
 from requests import post
 
+from grimjack.model import Query
 from grimjack.modules import QueryExpander
 from grimjack.modules.options import QueryExpansion
 
@@ -50,15 +51,20 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
             if not nltk_downloader.is_installed(dependency):
                 nltk_downloader.download(dependency)
 
-    def expand_query(self, query: str) -> List[str]:
+    def expand_query(self, query: Query) -> List[Query]:
         self._download_nltk_dependencies()
 
-        tokens = word_tokenize(query)
+        tokens = word_tokenize(query.title)
         pos_tokens = pos_tag(tokens)
 
         queries = [query]
         queries.extend(
-            query.replace(token, self.best_synonym(token))
+            Query(
+                query.id,
+                query.title.replace(token, self.best_synonym(token)),
+                query.description,
+                query.narrative
+            )
             for token, pos in pos_tokens
             if pos in _COMPARATIVE_TAGS
         )
@@ -145,6 +151,5 @@ class SimpleQueryExpander(QueryExpander):
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
                 "bigscience/T0pp", hugging_face_api_token)
 
-    def expand_query(self, query: str) -> List[str]:
-        queries = self._query_expander.expand_query(query)
-        return list(dict.fromkeys(queries))
+    def expand_query(self, query: Query) -> List[Query]:
+        return self._query_expander.expand_query(query)
