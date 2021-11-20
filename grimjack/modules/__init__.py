@@ -4,7 +4,7 @@ from typing import List, Set
 
 from math import floor
 
-from grimjack.model import RankedDocument, Query
+from grimjack.model import RankedDocument, Query, Document
 
 
 class DocumentsStore(ABC):
@@ -79,6 +79,43 @@ class Searcher(ABC):
     @abstractmethod
     def retrieval_score(self, query: Query, document: Document) -> float:
         pass
+
+
+class RerankingContext(ABC):
+
+    @property
+    @abstractmethod
+    def document_count(self) -> int:
+        pass
+
+    @abstractmethod
+    def document_frequency(self, term: str) -> int:
+        pass
+
+    @abstractmethod
+    def inverse_document_frequency(self, term: str) -> float:
+        pass
+
+    def td(self, term):
+        # TODO: What is this?
+        return floor(100 * self.inverse_document_frequency(term))
+
+    @abstractmethod
+    def terms(self, text: str) -> List[str]:
+        pass
+
+    @abstractmethod
+    def term_set(self, text: str) -> Set[str]:
+        pass
+
+    @abstractmethod
+    def term_frequency(self, text: str, term: str) -> float:
+        pass
+
+    @abstractmethod
+    def retrieval_score(self, query: Query, document: Document) -> float:
+        pass
+
 
 class Reranker(ABC):
     @abstractmethod
