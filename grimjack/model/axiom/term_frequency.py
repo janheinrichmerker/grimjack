@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from itertools import combinations
 
 from grimjack.model import RankedDocument, Query
@@ -74,3 +76,119 @@ class TFC3(Axiom):
                 )
 
         return strictly_greater(sd1, sd2)
+
+
+class M_TDC(Axiom):
+    """
+    Modified TDC as in:
+
+    Shi, S., Wen, J.R., Yu, Q., Song, R., Ma, W.Y.: Gravitation-based model
+    for information retrieval. In: SIGIR ’05.
+    """
+
+    @staticmethod
+    def precondition(
+            statistics: IndexStatistics,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        query_terms = statistics.term_set(query.title)
+        sum_term_frequency1 = 0
+        sum_term_frequency2 = 0
+        one_count_different = False
+        for t in query_terms:
+            count1 = statistics.term_frequency(document1.content, t)
+            count2 = statistics.term_frequency(document2.content, t)
+            if count1 != count2:
+                one_count_different = True
+            sum_term_frequency1 += count1
+            sum_term_frequency2 += count2
+
+        return (
+                sum_term_frequency1 == sum_term_frequency2 and
+                one_count_different
+        )
+
+    def preference(
+            self,
+            statistics: IndexStatistics,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        if not self.precondition(statistics, query, document1, document2):
+            return 0
+
+        query_terms = statistics.term_set(query.title)
+
+        score = 0
+
+        for qt1, qt2 in combinations(query_terms, 2):
+
+            if (
+                    statistics.inverse_document_frequency(qt1) <
+                    statistics.inverse_document_frequency(qt2)
+            ):
+                # Query term 1 is rarer. Swap query terms.
+                qt1, qt2 = qt2, qt1
+
+            tf_d1_qt1 = statistics.term_frequency(document1.content, qt1)
+            tf_d1_qt2 = statistics.term_frequency(document1.content, qt2)
+            tf_d2_qt1 = statistics.term_frequency(document2.content, qt1)
+            tf_d2_qt2 = statistics.term_frequency(document2.content, qt2)
+            tf_q_qt1 = statistics.term_frequency(query.title, qt1)
+            tf_q_qt2 = statistics.term_frequency(query.title, qt2)
+            if not (
+                    (
+                            tf_d1_qt1 == tf_d2_qt2 and
+                            tf_d1_qt2 == tf_d2_qt1
+                    ) or
+                    tf_q_qt1 > tf_q_qt2
+            ):
+                # Term pair is valid.
+                continue
+
+            # Document with more occurrences of query term 1 gets a point.
+            difference = tf_d1_qt1 - tf_d2_qt1
+            if difference > 0:
+                score += 1
+            elif difference < 0:
+                score -= 1
+            else:
+                # Don't change score.
+                pass
+
+        return strictly_greater(score, 0)
+
+
+@dataclass
+class LEN_M_TDC(M_TDC):
+    """
+    Modified M_TDC
+
+    The precondition for the documents' lengths can be varied.
+    Default margin fraction: 0.1
+    """
+    margin_fraction: float
+
+    def precondition(
+            self,
+            statistics: IndexStatistics,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        if not approximately_equal(
+                len(statistics.terms(document1.content)),
+                len(statistics.terms(document2.content)),
+                margin_fraction=self.margin_fraction
+        ):
+            return False
+
+        return super(LEN_M_TDC, self).precondition(
+            statistics,
+            query,
+            document1,
+            document2
+        )
