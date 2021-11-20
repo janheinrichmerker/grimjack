@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Collection, List
+from typing import List
 
 from grimjack.model import RankedDocument, Query
 
@@ -58,7 +58,7 @@ class Index(ABC):
 
 class QueryExpander(ABC):
     @abstractmethod
-    def expand_query(self, query: str) -> Collection[str]:
+    def expand_query(self, query: str) -> List[str]:
         pass
 
 

@@ -14,8 +14,8 @@ from grimjack.modules.options import QueryExpansion
 
 class OriginalQueryExpander(QueryExpander):
 
-    def expand_query(self, query: str) -> Collection[str]:
-        return {query}
+    def expand_query(self, query: str) -> List[str]:
+        return [query]
 
 
 _ADVERB_COMPARATIVE = "RBR"
@@ -50,7 +50,7 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
             if not nltk_downloader.is_installed(dependency):
                 nltk_downloader.download(dependency)
 
-    def expand_query(self, query: str) -> Collection[str]:
+    def expand_query(self, query: str) -> List[str]:
         self._download_nltk_dependencies()
 
         tokens = word_tokenize(query)
@@ -145,6 +145,6 @@ class SimpleQueryExpander(QueryExpander):
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
                 "bigscience/T0pp", hugging_face_api_token)
 
-    def expand_query(self, query: str) -> Collection[str]:
+    def expand_query(self, query: str) -> List[str]:
         queries = self._query_expander.expand_query(query)
         return list(dict.fromkeys(queries))
