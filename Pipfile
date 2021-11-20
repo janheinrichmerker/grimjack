@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyserini = "<=0.13.0"
+pyserini = "*"
 dload = "*"
 pytest = "*"
 nltk = "*"
@@ -17,6 +17,8 @@ gensim = "*"
 requests = "*"
 tqdm = "*"
 trectools = "*"
+faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
+torch = "*"  # Needed for pyserini >= 0.14.0
 
 [dev-packages]
 
