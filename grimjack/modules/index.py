@@ -1,8 +1,12 @@
 from dataclasses import dataclass
+from functools import cached_property
 from hashlib import md5
 from pathlib import Path
 from subprocess import run
 from typing import Optional
+
+from math import log
+from pyserini.index import IndexReader
 
 from grimjack.constants import INDEX_DIR
 from grimjack.modules import Index, DocumentsStore
@@ -55,20 +59,6 @@ class AnseriniIndex(Index):
         return f"{documents_hash}-{stopwords_suffix}-" \
                f"{stemmer_suffix}-{self.language}"
 
-    @property
-    def index_dir(self) -> Path:
-        """
-        Path to the document index.
-        Will index documents if needed.
-        """
-        index_dir = INDEX_DIR / self._index_suffix
-        self._index_if_needed(
-            self.documents_store.documents_dir,
-            index_dir,
-            "documents"
-        )
-        return index_dir
-
     def _index_if_needed(self, input_dir: Path, index_dir: Path, name: str):
         """
         Create an Anserini index if the index doesn't already exist.
@@ -97,3 +87,51 @@ class AnseriniIndex(Index):
             else ["-keepStopwords"]
         )
         run(index_command)
+
+    @property
+    @cached_property
+    def index_dir(self) -> Path:
+        """
+        Path to the document index.
+        Will index documents if needed.
+        """
+        index_dir = INDEX_DIR / self._index_suffix
+        self._index_if_needed(
+            self.documents_store.documents_dir,
+            index_dir,
+            "documents"
+        )
+        return index_dir
+
+    @property
+    @cached_property
+    def _index_reader(self):
+        return IndexReader(str(self.index_dir.absolute()))
+
+    @property
+    def document_count(self):
+        return self._index_reader.stats()["documents"]
+
+    def document_frequency(self, term: str):
+        return self._index_reader.get_term_counts(term)[0]
+
+    def collection_frequency(self, term: str):
+        return self._index_reader.get_term_counts(term)[1]
+
+    def inverse_document_frequency(self, term: str) -> float:
+        document_frequency = self.document_frequency(term)
+        if document_frequency == 0:
+            return 0
+        return log(self.document_count / document_frequency)
+
+    def terms(self, text: str):
+        return self._index_reader.analyze(text)
+
+    def term_frequency(self, text: str, term: str):
+        # TODO: Is this correctly implemented?
+        terms = self.terms(text)
+        term_count = sum(1 for other in terms if other == term)
+        return term_count / len(terms)
+
+
+

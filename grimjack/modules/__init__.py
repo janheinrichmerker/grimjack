@@ -30,6 +30,31 @@ class Index(ABC):
     def index_dir(self) -> Path:
         pass
 
+    @property
+    @abstractmethod
+    def document_count(self) -> int:
+        pass
+
+    @abstractmethod
+    def document_frequency(self, term: str) -> int:
+        pass
+
+    @abstractmethod
+    def collection_frequency(self, term: str) -> int:
+        pass
+
+    @abstractmethod
+    def inverse_document_frequency(self, term: str) -> float:
+        pass
+
+    @abstractmethod
+    def terms(self, text: str) -> list[str]:
+        pass
+
+    @abstractmethod
+    def term_frequency(self, text: str, term: str) -> float:
+        pass
+
 
 class QueryExpander(ABC):
     @abstractmethod
