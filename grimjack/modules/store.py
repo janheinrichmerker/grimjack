@@ -9,7 +9,7 @@ from xml.etree.ElementTree import parse, ElementTree, Element
 from dload import save_unzip
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR
-from grimjack.model import Topic
+from grimjack.model import Query
 from grimjack.modules import DocumentsStore, TopicsStore
 
 
@@ -65,8 +65,8 @@ class SimpleDocumentsStore(DocumentsStore):
         return download_dir
 
 
-def _parse_topic(xml: Element) -> Topic:
-    return Topic(
+def _parse_topic(xml: Element) -> Query:
+    return Query(
         int(xml.findtext("number")),
         xml.findtext("title"),
         xml.findtext("description"),
@@ -74,7 +74,7 @@ def _parse_topic(xml: Element) -> Topic:
     )
 
 
-def _parse_topics(tree: ElementTree) -> List[Topic]:
+def _parse_topics(tree: ElementTree) -> List[Query]:
     root = tree.getroot()
     assert root.tag == "topics"
     return [_parse_topic(child) for child in root]
@@ -111,6 +111,6 @@ class TrecTopicsStore(TopicsStore):
         return self.topics_dir / self.topics_file_path
 
     @property
-    def topics(self) -> List[Topic]:
+    def topics(self) -> List[Query]:
         xml: ElementTree = parse(self.topics_file)
         return _parse_topics(xml)

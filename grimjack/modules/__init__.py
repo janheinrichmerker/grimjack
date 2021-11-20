@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Collection, List
 
-from grimjack.model import RankedDocument, Topic
+from grimjack.model import RankedDocument, Query
 
 
 class DocumentsStore(ABC):
@@ -20,7 +20,7 @@ class TopicsStore(ABC):
 
     @property
     @abstractmethod
-    def topics(self) -> List[Topic]:
+    def topics(self) -> List[Query]:
         pass
 
 

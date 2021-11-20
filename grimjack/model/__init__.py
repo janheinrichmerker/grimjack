@@ -3,7 +3,7 @@ from typing import Dict
 
 
 @dataclass
-class Topic:
+class Query:
     id: int
     title: str
     description: str
