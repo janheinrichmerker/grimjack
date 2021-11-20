@@ -127,11 +127,11 @@ class AnseriniIndex(Index):
     def terms(self, text: str):
         return self._index_reader.analyze(text)
 
+    def term_set(self, text: str) -> set[str]:
+        return set(self.terms(text))
+
     def term_frequency(self, text: str, term: str):
         # TODO: Is this correctly implemented?
         terms = self.terms(text)
         term_count = sum(1 for other in terms if other == term)
         return term_count / len(terms)
-
-
-
