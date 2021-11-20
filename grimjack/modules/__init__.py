@@ -12,7 +12,7 @@ class DocumentsStore(ABC):
         pass
 
 
-class TextCollection(ABC):
+class IndexStatistics(ABC):
 
     @property
     @abstractmethod
@@ -31,6 +31,18 @@ class TextCollection(ABC):
     def inverse_document_frequency(self, term: str) -> float:
         pass
 
+    @abstractmethod
+    def terms(self, text: str) -> list[str]:
+        pass
+
+    @abstractmethod
+    def term_set(self, text: str) -> set[str]:
+        pass
+
+    @abstractmethod
+    def term_frequency(self, text: str, term: str) -> float:
+        pass
+
 
 class TopicsStore(ABC):
     @property
@@ -44,7 +56,7 @@ class TopicsStore(ABC):
         pass
 
 
-class Index(TextCollection, ABC):
+class Index(IndexStatistics, ABC):
     @property
     @abstractmethod
     def index_dir(self) -> Path:
