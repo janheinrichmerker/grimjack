@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from random import randint
-from typing import Iterable
+from typing import Iterable, Dict, Tuple
 
 from grimjack.model import RankedDocument, Query
 from grimjack.modules import IndexStatistics
@@ -103,7 +103,7 @@ class NormalizedAxiom(Axiom):
 @dataclass
 class CachedAxiom(Axiom):
     axiom: Axiom
-    _cache: dict[tuple[str, str], float] = field(
+    _cache: Dict[Tuple[str, str], float] = field(
         default_factory=lambda: {},
         init=False,
         repr=False

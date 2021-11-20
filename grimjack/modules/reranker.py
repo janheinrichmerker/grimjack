@@ -27,8 +27,8 @@ class AxiomaticReranker(Reranker):
             self,
             statistics: IndexStatistics,
             query: Query,
-            vertices: list[RankedDocument]
-    ) -> list[RankedDocument]:
+            vertices: List[RankedDocument]
+    ) -> List[RankedDocument]:
         if len(vertices) == 0:
             return []
 

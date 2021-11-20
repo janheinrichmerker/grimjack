@@ -3,7 +3,7 @@ from functools import cached_property
 from hashlib import md5
 from pathlib import Path
 from subprocess import run
-from typing import Optional
+from typing import Optional, List, Set
 
 from math import log
 from pyserini.index import IndexReader
@@ -119,10 +119,10 @@ class AnseriniIndex(Index):
             return 0
         return log(self.document_count / document_frequency)
 
-    def terms(self, text: str) -> list[str]:
+    def terms(self, text: str) -> List[str]:
         return self._index_reader.analyze(text)
 
-    def term_set(self, text: str) -> set[str]:
+    def term_set(self, text: str) -> Set[str]:
         return set(self.terms(text))
 
     def term_frequency(self, text: str, term: str) -> float:

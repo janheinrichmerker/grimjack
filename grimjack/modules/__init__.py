@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List
+from typing import List, Set
 
 from math import floor
 
@@ -34,11 +34,11 @@ class IndexStatistics(ABC):
         return floor(100 * self.inverse_document_frequency(term))
 
     @abstractmethod
-    def terms(self, text: str) -> list[str]:
+    def terms(self, text: str) -> List[str]:
         pass
 
     @abstractmethod
-    def term_set(self, text: str) -> set[str]:
+    def term_set(self, text: str) -> Set[str]:
         pass
 
     @abstractmethod
