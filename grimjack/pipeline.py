@@ -60,10 +60,11 @@ class Pipeline:
             self.reranker = OriginalReranker()
         elif reranker == RerankerType.AXIOMATIC:
             self.reranker = AxiomaticReranker(
-                (
+                index=self.index,
+                axiom=(
                         (DocumentIdAxiom() * 1.0) +
                         (RandomAxiom() * 1.0)
-                ).normalized().cached()
+                ).normalized().cached(),
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")

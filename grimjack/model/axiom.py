@@ -7,6 +7,7 @@ from grimjack.model import RankedDocument
 from grimjack.modules import Index
 
 
+@dataclass
 class AxiomContext:
     index: Index
 
