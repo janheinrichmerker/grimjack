@@ -1,3 +1,4 @@
+from collections import Set
 from itertools import product
 
 from nltk.corpus import wordnet
@@ -85,11 +86,13 @@ def same_query_term_subset(
 def approximately_same_length(
         context: RerankingContext,
         document1: RankedDocument,
-        document2: RankedDocument
+        document2: RankedDocument,
+        margin_fraction: float = 0.1
 ) -> bool:
     return approximately_equal(
         len(context.terms(document1.content)),
-        len(context.terms(document2.content))
+        len(context.terms(document2.content)),
+        margin_fraction
     )
 
 
@@ -115,3 +118,16 @@ def synonym_set_similarity(
         return 0
 
     return similarity_sum / n
+
+
+def vocabulary_overlap(vocabulary1: Set[str], vocabulary2: Set[str]):
+    """
+    Vocabulary overlap as calculated by the Jaccard coefficient.
+    """
+    intersection_length = len(vocabulary1 & vocabulary2)
+    if intersection_length == 0:
+        return 0
+    return (
+            intersection_length /
+            (len(vocabulary1) + len(vocabulary2) - intersection_length)
+    )
