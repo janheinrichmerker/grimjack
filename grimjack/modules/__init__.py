@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
+from math import floor
+
 from grimjack.model import RankedDocument, Query
 
 
@@ -30,6 +32,10 @@ class IndexStatistics(ABC):
     @abstractmethod
     def inverse_document_frequency(self, term: str) -> float:
         pass
+
+    def td(self, term):
+        # TODO: What is this?
+        return floor(100 * self.inverse_document_frequency(term))
 
     @abstractmethod
     def terms(self, text: str) -> list[str]:
