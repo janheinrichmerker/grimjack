@@ -88,7 +88,6 @@ class AnseriniIndex(Index):
         )
         run(index_command)
 
-    @property
     @cached_property
     def index_dir(self) -> Path:
         """
@@ -103,20 +102,16 @@ class AnseriniIndex(Index):
         )
         return index_dir
 
-    @property
     @cached_property
     def _index_reader(self):
         return IndexReader(str(self.index_dir.absolute()))
 
-    @property
-    def document_count(self):
+    @cached_property
+    def document_count(self) -> int:
         return self._index_reader.stats()["documents"]
 
-    def document_frequency(self, term: str):
-        return self._index_reader.get_term_counts(term)[0]
-
-    def collection_frequency(self, term: str):
-        return self._index_reader.get_term_counts(term)[1]
+    def document_frequency(self, term: str) -> int:
+        return self._index_reader.object.getDF(self._index_reader.reader, term)
 
     def inverse_document_frequency(self, term: str) -> float:
         document_frequency = self.document_frequency(term)
@@ -124,13 +119,13 @@ class AnseriniIndex(Index):
             return 0
         return log(self.document_count / document_frequency)
 
-    def terms(self, text: str):
+    def terms(self, text: str) -> list[str]:
         return self._index_reader.analyze(text)
 
     def term_set(self, text: str) -> set[str]:
         return set(self.terms(text))
 
-    def term_frequency(self, text: str, term: str):
+    def term_frequency(self, text: str, term: str) -> float:
         # TODO: Is this correctly implemented?
         terms = self.terms(text)
         term_count = sum(1 for other in terms if other == term)

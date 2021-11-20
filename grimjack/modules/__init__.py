@@ -26,10 +26,6 @@ class IndexStatistics(ABC):
         pass
 
     @abstractmethod
-    def collection_frequency(self, term: str) -> int:
-        pass
-
-    @abstractmethod
     def inverse_document_frequency(self, term: str) -> float:
         pass
 
