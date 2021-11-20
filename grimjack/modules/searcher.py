@@ -2,20 +2,19 @@ from dataclasses import dataclass
 from json import loads
 from typing import Collection, List, Optional
 
-from more_itertools import first
 from pyserini.search import JQuery, SimpleSearcher
 from pyserini.search.querybuilder import (
     get_boolean_query_builder,
     JBooleanClauseOccur
 )
 
+from grimjack.model import RankedDocument
 from grimjack.model.jvm import (
     JBagOfWordsQueryGenerator,
     JIndexArgs,
     JIndexCollection,
     JResult
 )
-from grimjack.model import RankedDocument
 from grimjack.modules import Searcher, Index, QueryExpander
 from grimjack.modules.options import RetrievalModel
 
@@ -58,7 +57,7 @@ class AnseriniSearcher(Searcher):
 
     def _build_boolean_query(self, queries: Collection[str]) -> JQuery:
         if len(queries) == 1:
-            return self._build_query(first(queries))
+            return self._build_query(next(iter(queries)))
 
         builder = get_boolean_query_builder()
         for query in queries:
