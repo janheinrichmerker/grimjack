@@ -12,6 +12,13 @@ class DocumentsStore(ABC):
         pass
 
 
+class TextCollection(ABC):
+
+    @abstractmethod
+    def inverse_document_frequency(self, term: str) -> float:
+        pass
+
+
 class TopicsStore(ABC):
     @property
     @abstractmethod
