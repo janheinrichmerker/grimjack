@@ -1,3 +1,7 @@
+from itertools import product
+
+from nltk.corpus import wordnet
+
 from grimjack.model import RankedDocument, Query
 from grimjack.modules import RerankingContext
 
@@ -87,3 +91,27 @@ def approximately_same_length(
         len(context.terms(document1.content)),
         len(context.terms(document2.content))
     )
+
+
+def synonym_set_similarity(
+        term1: str,
+        term2: str,
+        smoothing: int = 0
+) -> float:
+    cutoff = smoothing + 1
+    synonyms_term1 = wordnet.synsets(term1)[:cutoff]
+    synonyms_term2 = wordnet.synsets(term2)[:cutoff]
+
+    n = 0
+    similarity_sum = 0
+
+    for synonym1, synonym2 in product(synonyms_term1, synonyms_term2):
+        similarity = wordnet.wup_similarity(synonym1, synonym2)
+        if similarity is not None:
+            similarity_sum += similarity
+            n += 1
+
+    if n == 0:
+        return 0
+
+    return similarity_sum / n
