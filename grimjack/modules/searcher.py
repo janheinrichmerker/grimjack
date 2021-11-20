@@ -1,21 +1,23 @@
 from dataclasses import dataclass
+from functools import cached_property
 from json import loads
 from typing import List, Optional
 
 from pyserini.search import JQuery, SimpleSearcher
 from pyserini.search.querybuilder import (
     get_boolean_query_builder,
-    JBooleanClauseOccur
+    JBooleanClauseOccur, JTermQuery, JTerm
 )
 
-from grimjack.model import RankedDocument, Query
+from grimjack.model import RankedDocument, Query, Document
 from grimjack.modules import Searcher, Index, QueryExpander
 from grimjack.modules.options import RetrievalModel
 from grimjack.utils.jvm import (
     JBagOfWordsQueryGenerator,
     JIndexArgs,
     JIndexCollection,
-    JResult
+    JResult,
+    JConstantScoreQuery
 )
 
 
@@ -75,15 +77,40 @@ class AnseriniSearcher(Searcher):
         else:
             raise Exception(f"Unknown retrieval model: {self.retrieval_model}")
 
-    def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
+    @cached_property
+    def _searcher(self) -> SimpleSearcher:
         searcher = SimpleSearcher(str(self.index.index_dir.absolute()))
         self._setup_retrieval_model(searcher)
+        return searcher
 
+    def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         queries = self.query_expander.expand_query(query)
         anserini_query = self._build_boolean_query(queries)
 
-        hits = searcher.search(anserini_query, num_hits)
+        hits = self._searcher.search(anserini_query, num_hits)
         return [
             _parse_document(hit, i + 1)
             for i, hit in enumerate(hits)
         ]
+
+    def retrieval_score(self, query: Query, document: Document) -> float:
+        queries = self.query_expander.expand_query(query)
+        anserini_query = self._build_boolean_query(queries)
+
+        filter_query = JConstantScoreQuery(
+            JTermQuery(JTerm(JIndexArgs.ID, document.id))
+        )
+
+        builder = get_boolean_query_builder()
+        builder.add(filter_query, JBooleanClauseOccur.must.value)
+        builder.add(anserini_query, JBooleanClauseOccur.must.value)
+        filtered_query = builder.build()
+
+        hits = self._searcher.search(filtered_query, 1)
+        # We want the score of the first (and only) hit,
+        # but remember to remove 1 for the constant score query.
+        if len(hits) == 0:
+            # If we get zero results, indicates that term
+            # isn't found in the document.
+            return 0
+        return hits[0].score - 1

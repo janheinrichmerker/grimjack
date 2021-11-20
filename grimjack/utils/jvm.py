@@ -9,3 +9,5 @@ JDefaultEnglishAnalyzer = autoclass(
 JBagOfWordsQueryGenerator = autoclass(
     "io.anserini.search.query.BagOfWordsQueryGenerator"
 )
+JConstantScoreQuery = autoclass("org.apache.lucene.search.ConstantScoreQuery")
+JSimilarity = autoclass("org.apache.lucene.search.similarities.Similarity")

@@ -76,6 +76,9 @@ class Searcher(ABC):
     def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         pass
 
+    @abstractmethod
+    def retrieval_score(self, query: Query, document: Document) -> float:
+        pass
 
 class Reranker(ABC):
     @abstractmethod
