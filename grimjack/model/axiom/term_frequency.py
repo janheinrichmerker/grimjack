@@ -170,7 +170,7 @@ class LEN_M_TDC(M_TDC):
     The precondition for the documents' lengths can be varied.
     Default margin fraction: 0.1
     """
-    margin_fraction: float
+    margin_fraction: float = 0.1
 
     def precondition(
             self,
