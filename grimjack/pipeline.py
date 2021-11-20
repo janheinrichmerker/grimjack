@@ -5,6 +5,8 @@ from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import DocumentIdAxiom, RandomAxiom
+from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
+from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
 )
@@ -62,8 +64,15 @@ class Pipeline:
             self.reranker = AxiomaticReranker(
                 self.index,
                 (
-                        (DocumentIdAxiom() * 1.0) +
-                        (RandomAxiom() * 1.0)
+                        RandomAxiom() +
+                        DocumentIdAxiom() +
+                        TFC1() +
+                        TFC3() +
+                        M_TDC() +
+                        LEN_M_TDC() +
+                        LNC1() +
+                        LNC2() +
+                        TF_LNC()
                 ).normalized().cached(),
             )
         else:
