@@ -16,6 +16,7 @@ from grimjack.modules.options import (
 )
 from grimjack.modules.query_expander import SimpleQueryExpander
 from grimjack.modules.reranker import OriginalReranker, AxiomaticReranker
+from grimjack.modules.reranking_context import SimpleRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
 
@@ -58,11 +59,12 @@ class Pipeline:
             self.query_expander,
             retrieval_model,
         )
+        reranking_context = SimpleRerankingContext(self.index, self.searcher)
         if reranker is None:
             self.reranker = OriginalReranker()
         elif reranker == RerankerType.AXIOMATIC:
             self.reranker = AxiomaticReranker(
-                self.index,
+                reranking_context,
                 (
                         RandomAxiom() +
                         DocumentIdAxiom() +

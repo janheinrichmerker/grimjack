@@ -1,5 +1,5 @@
 from grimjack.model import RankedDocument, Query
-from grimjack.modules import IndexStatistics
+from grimjack.modules import RerankingContext
 
 
 def strictly_greater(x, y):
@@ -36,14 +36,14 @@ def approximately_equal(*args, margin_fraction: float = 0.1):
 
 
 def all_query_terms_in_documents(
-        statistics: IndexStatistics,
+        context: RerankingContext,
         query: Query,
         document1: RankedDocument,
         document2: RankedDocument
 ):
-    query_terms = statistics.term_set(query.title)
-    document1_terms = statistics.term_set(document1.content)
-    document2_terms = statistics.term_set(document2.content)
+    query_terms = context.term_set(query.title)
+    document1_terms = context.term_set(document1.content)
+    document2_terms = context.term_set(document2.content)
 
     if len(query_terms) <= 1:
         return False
@@ -55,7 +55,7 @@ def all_query_terms_in_documents(
 
 
 def same_query_term_subset(
-        statistics: IndexStatistics,
+        context: RerankingContext,
         query: Query,
         document1: RankedDocument,
         document2: RankedDocument
@@ -64,9 +64,9 @@ def same_query_term_subset(
     Both documents contain the same set of query terms.
     """
 
-    query_terms = statistics.term_set(query.title)
-    document1_terms = statistics.term_set(document1.content)
-    document2_terms = statistics.term_set(document2.content)
+    query_terms = context.term_set(query.title)
+    document1_terms = context.term_set(document1.content)
+    document2_terms = context.term_set(document2.content)
 
     if len(query_terms) <= 1:
         return False
@@ -79,11 +79,11 @@ def same_query_term_subset(
 
 
 def approximately_same_length(
-        statistics: IndexStatistics,
+        context: RerankingContext,
         document1: RankedDocument,
         document2: RankedDocument
 ) -> bool:
     return approximately_equal(
-        len(statistics.terms(document1.content)),
-        len(statistics.terms(document2.content))
+        len(context.terms(document1.content)),
+        len(context.terms(document2.content))
     )

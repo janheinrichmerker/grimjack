@@ -14,38 +14,6 @@ class DocumentsStore(ABC):
         pass
 
 
-class IndexStatistics(ABC):
-
-    @property
-    @abstractmethod
-    def document_count(self) -> int:
-        pass
-
-    @abstractmethod
-    def document_frequency(self, term: str) -> int:
-        pass
-
-    @abstractmethod
-    def inverse_document_frequency(self, term: str) -> float:
-        pass
-
-    def td(self, term):
-        # TODO: What is this?
-        return floor(100 * self.inverse_document_frequency(term))
-
-    @abstractmethod
-    def terms(self, text: str) -> List[str]:
-        pass
-
-    @abstractmethod
-    def term_set(self, text: str) -> Set[str]:
-        pass
-
-    @abstractmethod
-    def term_frequency(self, text: str, term: str) -> float:
-        pass
-
-
 class TopicsStore(ABC):
     @property
     @abstractmethod
@@ -58,7 +26,7 @@ class TopicsStore(ABC):
         pass
 
 
-class Index(IndexStatistics, ABC):
+class Index(ABC):
     @property
     @abstractmethod
     def index_dir(self) -> Path:

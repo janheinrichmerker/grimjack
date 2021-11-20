@@ -4,7 +4,7 @@ from random import randint
 from typing import Iterable, Dict, Tuple
 
 from grimjack.model import RankedDocument, Query
-from grimjack.modules import IndexStatistics
+from grimjack.modules import RerankingContext
 
 
 class Axiom(ABC):
@@ -12,7 +12,7 @@ class Axiom(ABC):
     @abstractmethod
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
@@ -45,13 +45,13 @@ class WeightedAxiom(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ) -> float:
         return self.weight * self.axiom.preference(
-            statistics,
+            context,
             query,
             document1,
             document2
@@ -64,13 +64,13 @@ class AggregatedAxiom(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ) -> float:
         return sum(
-            axiom.preference(statistics, query, document1, document2)
+            axiom.preference(context, query, document1, document2)
             for axiom in self.axioms
         )
 
@@ -81,13 +81,13 @@ class NormalizedAxiom(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ) -> float:
         preference = self.axiom.preference(
-            statistics,
+            context,
             query,
             document1,
             document2
@@ -111,7 +111,7 @@ class CachedAxiom(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
@@ -122,7 +122,7 @@ class CachedAxiom(Axiom):
             return -self._cache[document2.id, document1.id]
         else:
             preference = self.axiom.preference(
-                statistics,
+                context,
                 query,
                 document1,
                 document2
@@ -134,7 +134,7 @@ class CachedAxiom(Axiom):
 class RandomAxiom(Axiom):
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
@@ -149,7 +149,7 @@ class DocumentIdAxiom(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument

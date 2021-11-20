@@ -9,25 +9,25 @@ from grimjack.model.axiom.utils import (
     approximately_equal,
     approximately_same_length
 )
-from grimjack.modules import IndexStatistics
+from grimjack.modules import RerankingContext
 
 
 class TFC1(Axiom):
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ) -> float:
-        if not approximately_same_length(statistics, document1, document2):
+        if not approximately_same_length(context, document1, document2):
             return 0
 
         tf1 = 0
         tf2 = 0
-        for qt in statistics.terms(query.title):
-            tf1 += statistics.term_frequency(document1.content, qt)
-            tf2 += statistics.term_frequency(document2.content, qt)
+        for qt in context.terms(query.title):
+            tf1 += context.term_frequency(document1.content, qt)
+            tf2 += context.term_frequency(document2.content, qt)
 
         if approximately_equal(tf1, tf2):
             # Less than 10% difference.
@@ -40,27 +40,27 @@ class TFC3(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ) -> float:
-        if not approximately_same_length(statistics, document1, document2):
+        if not approximately_same_length(context, document1, document2):
             return 0
 
         sd1 = 0
         sd2 = 0
 
-        query_terms = set(statistics.terms(query.title))
+        query_terms = set(context.terms(query.title))
         for qt1, qt2 in combinations(query_terms, 2):
             if approximately_equal(
-                    statistics.td(qt1),
-                    statistics.td(qt2)
+                    context.td(qt1),
+                    context.td(qt2)
             ):
-                d1q1 = statistics.term_frequency(document1.content, qt1)
-                d2q1 = statistics.term_frequency(document2.content, qt1)
-                d1q2 = statistics.term_frequency(document1.content, qt2)
-                d2q2 = statistics.term_frequency(document2.content, qt2)
+                d1q1 = context.term_frequency(document1.content, qt1)
+                d2q1 = context.term_frequency(document2.content, qt1)
+                d1q2 = context.term_frequency(document1.content, qt2)
+                d2q2 = context.term_frequency(document2.content, qt2)
 
                 sd1 += (
                         (d2q1 == d1q1 + d1q2) and
@@ -88,18 +88,18 @@ class M_TDC(Axiom):
 
     @staticmethod
     def precondition(
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ):
-        query_terms = statistics.term_set(query.title)
+        query_terms = context.term_set(query.title)
         sum_term_frequency1 = 0
         sum_term_frequency2 = 0
         one_count_different = False
         for t in query_terms:
-            count1 = statistics.term_frequency(document1.content, t)
-            count2 = statistics.term_frequency(document2.content, t)
+            count1 = context.term_frequency(document1.content, t)
+            count2 = context.term_frequency(document2.content, t)
             if count1 != count2:
                 one_count_different = True
             sum_term_frequency1 += count1
@@ -112,33 +112,33 @@ class M_TDC(Axiom):
 
     def preference(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ):
-        if not self.precondition(statistics, query, document1, document2):
+        if not self.precondition(context, query, document1, document2):
             return 0
 
-        query_terms = statistics.term_set(query.title)
+        query_terms = context.term_set(query.title)
 
         score = 0
 
         for qt1, qt2 in combinations(query_terms, 2):
 
             if (
-                    statistics.inverse_document_frequency(qt1) <
-                    statistics.inverse_document_frequency(qt2)
+                    context.inverse_document_frequency(qt1) <
+                    context.inverse_document_frequency(qt2)
             ):
                 # Query term 1 is rarer. Swap query terms.
                 qt1, qt2 = qt2, qt1
 
-            tf_d1_qt1 = statistics.term_frequency(document1.content, qt1)
-            tf_d1_qt2 = statistics.term_frequency(document1.content, qt2)
-            tf_d2_qt1 = statistics.term_frequency(document2.content, qt1)
-            tf_d2_qt2 = statistics.term_frequency(document2.content, qt2)
-            tf_q_qt1 = statistics.term_frequency(query.title, qt1)
-            tf_q_qt2 = statistics.term_frequency(query.title, qt2)
+            tf_d1_qt1 = context.term_frequency(document1.content, qt1)
+            tf_d1_qt2 = context.term_frequency(document1.content, qt2)
+            tf_d2_qt1 = context.term_frequency(document2.content, qt1)
+            tf_d2_qt2 = context.term_frequency(document2.content, qt2)
+            tf_q_qt1 = context.term_frequency(query.title, qt1)
+            tf_q_qt2 = context.term_frequency(query.title, qt2)
             if not (
                     (
                             tf_d1_qt1 == tf_d2_qt2 and
@@ -174,20 +174,20 @@ class LEN_M_TDC(M_TDC):
 
     def precondition(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             document1: RankedDocument,
             document2: RankedDocument
     ):
         if not approximately_equal(
-                len(statistics.terms(document1.content)),
-                len(statistics.terms(document2.content)),
+                len(context.terms(document1.content)),
+                len(context.terms(document2.content)),
                 margin_fraction=self.margin_fraction
         ):
             return False
 
         return super(LEN_M_TDC, self).precondition(
-            statistics,
+            context,
             query,
             document1,
             document2

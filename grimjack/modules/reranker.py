@@ -4,7 +4,7 @@ from typing import List
 
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import Axiom
-from grimjack.modules import Reranker, Index, IndexStatistics
+from grimjack.modules import Reranker, RerankingContext
 
 
 @dataclass
@@ -20,12 +20,12 @@ class OriginalReranker(Reranker):
 
 @dataclass
 class AxiomaticReranker(Reranker):
-    statistics: Index
+    context: RerankingContext
     axiom: Axiom
 
     def kwiksort(
             self,
-            statistics: IndexStatistics,
+            context: RerankingContext,
             query: Query,
             vertices: List[RankedDocument]
     ) -> List[RankedDocument]:
@@ -42,18 +42,18 @@ class AxiomaticReranker(Reranker):
             if vertex == pivot:
                 continue
 
-            if self.axiom.preference(statistics, query, vertex, pivot) >= 0:
+            if self.axiom.preference(context, query, vertex, pivot) >= 0:
                 vertices_left.append(vertex)
             else:
                 vertices_right.append(vertex)
 
         vertices_left = self.kwiksort(
-            statistics,
+            context,
             query,
             vertices_left
         )
         vertices_right = self.kwiksort(
-            statistics,
+            context,
             query,
             vertices_right
         )
@@ -66,7 +66,7 @@ class AxiomaticReranker(Reranker):
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         ranking = ranking.copy()
-        ranking = self.kwiksort(self.statistics, query, ranking)
+        ranking = self.kwiksort(self.context, query, ranking)
         length = len(ranking)
         ranking = [
             RankedDocument(
