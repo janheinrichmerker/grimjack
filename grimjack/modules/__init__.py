@@ -79,7 +79,7 @@ class Reranker(ABC):
     @abstractmethod
     def rerank(
             self,
-            query: str,
+            query: Query,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         pass
