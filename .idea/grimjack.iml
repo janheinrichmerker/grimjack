@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
-    <facet type="Python" name="Python">
-    </facet>
+    <facet type="Python" name="Python" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
@@ -14,7 +13,7 @@
       <excludeFolder url="file://$MODULE_DIR$/data/out" />
       <excludeFolder url="file://$MODULE_DIR$/data/topics" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (grimjack)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (Project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
