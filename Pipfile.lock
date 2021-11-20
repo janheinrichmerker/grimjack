@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e543bec200c97577c73021336e5cf3cb3cbaaec3947a65706ad4dd8f40f3bce5"
+            "sha256": "b409b59693d1479204d8d93f6b046d251a470216c41b5b033ea8686c9a2a3c0b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -471,14 +471,6 @@
             ],
             "version": "==0.6.1"
         },
-        "more-itertools": {
-            "hashes": [
-                "sha256:0a2fd25d343c08d7e7212071820e7e7ea2f41d8fb45d6bc8a00cd6ce3b7aab88",
-                "sha256:88afff98d83d08fe5e4049b81e2b54c06ebb6b3871a600040865c7a592061cbb"
-            ],
-            "index": "pypi",
-            "version": "==8.11.0"
-        },
         "nltk": {
             "hashes": [
                 "sha256:834d1a8e38496369390be699be9bca4f2a0f2175b50327272b2ec7a98ffda2a0",
@@ -560,7 +552,7 @@
                 "sha256:f5162ec777ba7138906c9c274353ece5603646c6965570d82905546579573f73",
                 "sha256:fde96af889262e85aa033f8ee1d3241e32bf36228318a61f1ace579df4e8170d"
             ],
-            "index": "pypi",
+            "markers": "python_version < '3.10' and python_version >= '3.5' and platform_machine != 'aarch64' and platform_machine != 'arm64'",
             "version": "==1.21.4"
         },
         "packaging": {

@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = "*"
 pyserini = "<=0.13.0"
 dload = "*"
 pytest = "*"
@@ -15,7 +14,6 @@ pytest-cov = "*"
 rope = "*"
 flake8 = "*"
 gensim = "*"
-more-itertools = "*"
 requests = "*"
 tqdm = "*"
 trectools = "*"
