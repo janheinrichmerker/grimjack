@@ -75,6 +75,15 @@ Run all unit tests:
 pipenv run pytest
 ```
 
+### Docker
+
+Grimjack can also be used as a Docker container:
+
+```shell
+docker image build . -t grimjack
+docker container run grimjack --help
+```
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).
