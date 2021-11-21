@@ -84,6 +84,12 @@ docker image build . -t grimjack
 docker container run grimjack --help
 ```
 
+We recommend to bind mount the data directory to the container, for example:
+
+```shell
+docker container run -v "$(pwd)"/data:/workspace/data grimjack run-all data/run.txt
+```
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).
