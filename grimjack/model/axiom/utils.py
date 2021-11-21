@@ -8,6 +8,7 @@ from nltk.corpus import wordnet
 
 from grimjack.model import RankedDocument, Query
 from grimjack.modules import RerankingContext
+from grimjack.utils.nltk import download_nltk_dependencies
 
 
 def strictly_greater(x, y):
@@ -104,6 +105,8 @@ def synonym_set_similarity(
         term2: str,
         smoothing: int = 0
 ) -> float:
+    download_nltk_dependencies("wordnet")
+
     cutoff = smoothing + 1
     synonyms_term1 = wordnet.synsets(term1)[:cutoff]
     synonyms_term2 = wordnet.synsets(term2)[:cutoff]

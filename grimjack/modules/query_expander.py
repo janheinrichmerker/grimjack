@@ -11,6 +11,7 @@ from requests import post
 from grimjack.model import Query
 from grimjack.modules import QueryExpander
 from grimjack.modules.options import QueryExpansion
+from grimjack.utils.nltk import download_nltk_dependencies
 
 
 class OriginalQueryExpander(QueryExpander):
@@ -43,16 +44,8 @@ _COMPARATIVE_TAGS = [
 
 class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
 
-    @staticmethod
-    def _download_nltk_dependencies():
-        nltk_downloader = Downloader()
-        dependencies = ["punkt", "averaged_perceptron_tagger"]
-        for dependency in dependencies:
-            if not nltk_downloader.is_installed(dependency):
-                nltk_downloader.download(dependency)
-
     def expand_query(self, query: Query) -> List[Query]:
-        self._download_nltk_dependencies()
+        download_nltk_dependencies("punkt", "averaged_perceptron_tagger")
 
         tokens = word_tokenize(query.title)
         pos_tokens = pos_tag(tokens)
