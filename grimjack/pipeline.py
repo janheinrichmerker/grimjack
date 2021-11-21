@@ -4,7 +4,6 @@ from typing import Optional, List
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
-from grimjack.model.axiom import DocumentIdAxiom, RandomAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
 from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
@@ -71,8 +70,6 @@ class Pipeline:
             self.reranker = AxiomaticReranker(
                 reranking_context,
                 (
-                        RandomAxiom() +
-                        DocumentIdAxiom() +
                         TFC1() +
                         TFC3() +
                         M_TDC() +
