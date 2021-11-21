@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyserini = "*"
+pyserini = "==0.14.0"
 dload = "*"
 pytest = "*"
 nltk = "*"
@@ -19,8 +19,12 @@ tqdm = "*"
 trectools = "*"
 faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
 torch = "*"  # Needed for pyserini >= 0.14.0
+pygaggle = { git = 'https://github.com/castorini/pygaggle.git'}
 
 [dev-packages]
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
