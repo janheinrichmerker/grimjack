@@ -5,7 +5,6 @@ from typing import List, Optional
 from gensim import downloader
 from gensim.similarities import TermSimilarityIndex
 from nltk import word_tokenize, pos_tag
-from nltk.downloader import Downloader
 from requests import post
 
 from grimjack.model import Query
