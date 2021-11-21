@@ -12,10 +12,7 @@ class LB1(Axiom):
             document1: RankedDocument,
             document2: RankedDocument
     ):
-        if not approximately_equal(
-                context.retrieval_score(query, document1),
-                context.retrieval_score(query, document2)
-        ):
+        if not approximately_equal(document1.score, document2.score):
             return 0
 
         # TODO: Do we really want to use the term set here, not the list?

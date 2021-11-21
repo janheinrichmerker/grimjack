@@ -42,6 +42,3 @@ class SimpleRerankingContext(RerankingContext):
         terms = self.terms(text)
         term_count = sum(1 for other in terms if other == term)
         return term_count / len(terms)
-
-    def retrieval_score(self, query: Query, document: Document) -> float:
-        return self.searcher.retrieval_score(query, document)

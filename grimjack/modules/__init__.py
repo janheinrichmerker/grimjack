@@ -80,10 +80,6 @@ class RerankingContext(ABC):
     def term_frequency(self, text: str, term: str) -> float:
         pass
 
-    @abstractmethod
-    def retrieval_score(self, query: Query, document: Document) -> float:
-        pass
-
 
 class Reranker(ABC):
     @abstractmethod
