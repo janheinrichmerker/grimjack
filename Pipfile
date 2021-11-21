@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyserini = "==0.14.0"
+pyserini = "*"
 dload = "*"
 pytest = "*"
 nltk = "*"
@@ -19,7 +19,6 @@ tqdm = "*"
 trectools = "*"
 faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
 torch = "*"  # Needed for pyserini >= 0.14.0
-pygaggle = { git = 'https://github.com/castorini/pygaggle.git'}
 
 [dev-packages]
 
