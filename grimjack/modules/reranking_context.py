@@ -5,14 +5,12 @@ from typing import List, Set
 
 from pyserini.index import IndexReader
 
-from grimjack.model import Query, Document
-from grimjack.modules import Index, RerankingContext, Searcher
+from grimjack.modules import Index, RerankingContext
 
 
 @dataclass
-class SimpleRerankingContext(RerankingContext):
+class IndexRerankingContext(RerankingContext):
     index: Index
-    searcher: Searcher
 
     @cached_property
     def _index_reader(self):
