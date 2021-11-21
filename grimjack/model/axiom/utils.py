@@ -1,5 +1,8 @@
-from collections import Set
-from itertools import product
+from bisect import bisect_left
+from collections import Counter, defaultdict
+from itertools import product, combinations
+from statistics import mean
+from typing import List, Iterable, Set, Generator
 
 from nltk.corpus import wordnet
 
@@ -130,4 +133,93 @@ def vocabulary_overlap(vocabulary1: Set[str], vocabulary2: Set[str]):
     return (
             intersection_length /
             (len(vocabulary1) + len(vocabulary2) - intersection_length)
+    )
+
+
+def average_between_query_terms(
+        query_terms: Set[str],
+        document_terms: List[str]
+) -> float:
+    query_term_pairs = set(combinations(query_terms, 2))
+    if len(query_term_pairs) == 0:
+        # Single-term query.
+        return 0
+
+    number_words = 0
+    for item in query_term_pairs:
+        element1_position = document_terms.index(item[0])
+        element2_position = document_terms.index(item[1])
+        number_words += abs(element1_position - element2_position - 1)
+    return number_words / len(query_term_pairs)
+
+
+def take_closest(l: List[int], n: int):
+    """
+    Return closest value to n.
+    If two numbers are equally close, return the smallest number.
+
+    It is assumed that l is sorted.
+    See: https://stackoverflow.com/questions/12141150
+    """
+    position = bisect_left(l, n)
+    if position == 0:
+        return l[0]
+    if position == len(l):
+        return l[-1]
+    before = l[position - 1]
+    after = l[position]
+    if after - n < n - before:
+        return after
+    else:
+        return before
+
+
+def query_term_index_groups(
+        query_terms: Set[str],
+        document_terms: List[str]
+) -> Generator[List[int]]:
+    indexes = defaultdict(list)
+    for index, term in enumerate(document_terms):
+        if term in query_terms:
+            indexes[term].append(index)
+    for term in query_terms:
+        other_query_terms = query_terms - {term}
+        for index in indexes[term]:
+            group = [index] + [
+                take_closest(indexes[other_term], index)
+                for other_term in other_query_terms
+                if len(indexes[other_term]) > 0
+            ]
+            yield group
+
+
+def closest_grouping_size_and_count(
+        query_terms: Set[str],
+        document_terms: List[str]
+):
+    index_groups = query_term_index_groups(query_terms, document_terms)
+
+    # Number of non-query terms within groups.
+    non_query_term_occurrences = [
+        len([
+            term
+            for term in document_terms[min(index_group) + 1:max(index_group)]
+            if term not in query_terms
+        ])
+        for index_group in index_groups
+    ]
+
+    occurrences_counter = Counter(non_query_term_occurrences)
+    min_occurrences = min(occurrences_counter.keys())
+    min_occurrences_count = occurrences_counter[min_occurrences]
+    return min_occurrences, min_occurrences_count
+
+
+def average_smallest_span(
+        query_terms: Set[str],
+        document_terms: List[str]
+):
+    return mean(
+        max(group) - min(group)
+        for group in query_term_index_groups(query_terms, document_terms)
     )
