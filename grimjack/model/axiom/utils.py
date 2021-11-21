@@ -2,7 +2,7 @@ from bisect import bisect_left
 from collections import Counter, defaultdict
 from itertools import product, combinations
 from statistics import mean
-from typing import List, Iterable, Set, Generator
+from typing import List, Set, Iterator
 
 from nltk.corpus import wordnet
 
@@ -153,7 +153,7 @@ def average_between_query_terms(
     return number_words / len(query_term_pairs)
 
 
-def take_closest(l: List[int], n: int):
+def take_closest(sorted_list: List[int], target: int):
     """
     Return closest value to n.
     If two numbers are equally close, return the smallest number.
@@ -161,14 +161,14 @@ def take_closest(l: List[int], n: int):
     It is assumed that l is sorted.
     See: https://stackoverflow.com/questions/12141150
     """
-    position = bisect_left(l, n)
+    position = bisect_left(sorted_list, target)
     if position == 0:
-        return l[0]
-    if position == len(l):
-        return l[-1]
-    before = l[position - 1]
-    after = l[position]
-    if after - n < n - before:
+        return sorted_list[0]
+    if position == len(sorted_list):
+        return sorted_list[-1]
+    before = sorted_list[position - 1]
+    after = sorted_list[position]
+    if after - target < target - before:
         return after
     else:
         return before
@@ -177,7 +177,7 @@ def take_closest(l: List[int], n: int):
 def query_term_index_groups(
         query_terms: Set[str],
         document_terms: List[str]
-) -> Generator[List[int]]:
+) -> Iterator[List[int]]:
     indexes = defaultdict(list)
     for index, term in enumerate(document_terms):
         if term in query_terms:
