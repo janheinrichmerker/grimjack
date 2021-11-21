@@ -6,6 +6,11 @@ from tqdm import tqdm
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import DocumentIdAxiom, RandomAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
+from grimjack.model.axiom.lower_bound import LB1
+from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
+from grimjack.model.axiom.query_aspects import (
+    LEN_DIV, DIV, LEN_M_AND, M_AND, LEN_AND, AND, ANTI_REG, REG
+)
 from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
@@ -74,7 +79,21 @@ class Pipeline:
                         LEN_M_TDC() +
                         LNC1() +
                         LNC2() +
-                        TF_LNC()
+                        TF_LNC() +
+                        LB1() +
+                        REG() +
+                        ANTI_REG() +
+                        AND() +
+                        LEN_AND() +
+                        M_AND() +
+                        LEN_M_AND() +
+                        DIV() +
+                        LEN_DIV() +
+                        PROX1() +
+                        PROX2() +
+                        PROX3() +
+                        PROX4() +
+                        PROX5()
                 ).normalized().cached(),
             )
         else:
