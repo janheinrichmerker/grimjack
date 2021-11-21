@@ -1,12 +1,9 @@
+from dataclasses import dataclass
 from functools import cached_property
 from hashlib import md5
 from pathlib import Path
 from subprocess import run
-from typing import Optional, List, Set
-
-from dataclasses import dataclass
-from math import log
-from pyserini.index import IndexReader
+from typing import Optional
 
 from grimjack.constants import INDEX_DIR
 from grimjack.modules import Index, DocumentsStore
