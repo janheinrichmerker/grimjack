@@ -208,6 +208,8 @@ def _parse_huggingface_api_token(
         token_or_path: Union[Path, str]
 ) -> Optional[str]:
     if isinstance(token_or_path, Path):
+        if not token_or_path.exists():
+            return None
         with token_or_path.open("r") as file:
             token_or_path = file.readline().rstrip()
     token_or_path = token_or_path.strip()
