@@ -7,9 +7,10 @@ from pyserini.index import IndexReader
 
 from grimjack.model import Query, Document
 from grimjack.modules import Index, RerankingContext
-from grimjack.utils.jvm import JBM25Similarity, JDFRSimilarity, JBasicModelIn, \
-    JAfterEffectL, JNormalizationH2, JSimilarity, JLMDirichletSimilarity, \
-    JTFIDFSimilarity
+from grimjack.utils.jvm import (
+    JBM25Similarity, JDFRSimilarity, JBasicModelIn, JAfterEffectL,
+    JNormalizationH2, JSimilarity, JLMDirichletSimilarity, JClassicSimilarity
+)
 
 
 @dataclass(unsafe_hash=True)
@@ -50,7 +51,7 @@ class IndexRerankingContext(RerankingContext):
     @staticmethod
     @cache
     def _tf_idf_similarity() -> JSimilarity:
-        return JTFIDFSimilarity()
+        return JClassicSimilarity()
 
     def tf_idf_score(
             self,

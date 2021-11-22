@@ -11,8 +11,8 @@ JBagOfWordsQueryGenerator = autoclass(
 )
 JConstantScoreQuery = autoclass("org.apache.lucene.search.ConstantScoreQuery")
 JSimilarity = autoclass("org.apache.lucene.search.similarities.Similarity")
-JTFIDFSimilarity = autoclass(
-    "org.apache.lucene.search.similarities.TFIDFSimilarity"
+JClassicSimilarity = autoclass(
+    "org.apache.lucene.search.similarities.ClassicSimilarity"
 )
 JBM25Similarity = autoclass(
     "org.apache.lucene.search.similarities.BM25Similarity"
