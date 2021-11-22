@@ -8,7 +8,7 @@ from pyserini.index import IndexReader
 from grimjack.modules import Index, RerankingContext
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class IndexRerankingContext(RerankingContext):
     index: Index
 

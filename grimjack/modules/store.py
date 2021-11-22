@@ -42,7 +42,7 @@ def _download_if_needed(url: str, download_dir: Path, name: str):
         ValueError("Unknown download data format.")
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class SimpleDocumentsStore(DocumentsStore):
     documents_zip_url: str
 

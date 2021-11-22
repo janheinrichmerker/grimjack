@@ -10,7 +10,7 @@ from grimjack.modules import Index, DocumentsStore
 from grimjack.modules.options import Stemmer
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class AnseriniIndex(Index):
     documents_store: DocumentsStore
     stopwords_file: Optional[Path]
