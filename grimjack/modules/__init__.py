@@ -80,6 +80,42 @@ class RerankingContext(ABC):
     def term_frequency(self, text: str, term: str) -> float:
         pass
 
+    @abstractmethod
+    def tf_idf_score(
+            self,
+            query: Query,
+            document: Document
+    ) -> float:
+        pass
+
+    @abstractmethod
+    def bm25_score(
+            self,
+            query: Query,
+            document: Document,
+            k1: float = 1.2,
+            b: float = 0.75
+    ) -> float:
+        pass
+
+    @abstractmethod
+    def pl2_score(
+            self,
+            query: Query,
+            document: Document,
+            c: float = 0.1
+    ) -> float:
+        pass
+
+    @abstractmethod
+    def ql_score(
+            self,
+            query: Query,
+            document: Document,
+            mu: float = 1000
+    ) -> float:
+        pass
+
 
 class Reranker(ABC):
     @abstractmethod
