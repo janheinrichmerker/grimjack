@@ -1,5 +1,6 @@
 from bisect import bisect_left
 from collections import Counter, defaultdict
+from functools import lru_cache
 from itertools import product, combinations
 from statistics import mean
 from typing import List, Set, Iterator
@@ -100,16 +101,23 @@ def approximately_same_length(
     )
 
 
+@lru_cache(2048)
+def synonym_set(
+        term: str,
+        smoothing: int = 0
+) -> List[str]:
+    download_nltk_dependencies("wordnet")
+    cutoff = smoothing + 1
+    return wordnet.synsets(term)[:cutoff]
+
+
 def synonym_set_similarity(
         term1: str,
         term2: str,
         smoothing: int = 0
 ) -> float:
-    download_nltk_dependencies("wordnet")
-
-    cutoff = smoothing + 1
-    synonyms_term1 = wordnet.synsets(term1)[:cutoff]
-    synonyms_term2 = wordnet.synsets(term2)[:cutoff]
+    synonyms_term1 = synonym_set(term1, smoothing)
+    synonyms_term2 = synonym_set(term2, smoothing)
 
     n = 0
     similarity_sum = 0
