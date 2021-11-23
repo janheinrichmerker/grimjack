@@ -74,6 +74,31 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
             return synonyms[0]
 
 
+class ComparativeSynonymsNarrativeDescriptionQueryExpander(
+     ComparativeSynonymsQueryExpander, ABC):
+    def expand_query(self, query: Query) -> List[Query]:
+        queries = super().expand_query(query)
+        new_desc = self.reformulate(query.description)
+        new_narr = self.reformulate(query.narrative)
+        queries.append(Query(
+            query.id,
+            new_desc,
+            query.description,
+            query.narrative
+        ))
+        queries.append(Query(
+            query.id,
+            new_narr,
+            query.description,
+            query.narrative
+        ))
+        return queries
+
+    @abstractmethod
+    def reformulate(self, toReformulate: str) -> str:
+        pass
+
+
 @dataclass
 class GensimComparativeSynonymsQueryExpander(
     ComparativeSynonymsQueryExpander
@@ -122,6 +147,28 @@ class HuggingfaceComparativeSynonymsQueryExpander(
         return [synonym for synonym in synonyms if synonym != token]
 
 
+@dataclass
+class HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
+    ComparativeSynonymsNarrativeDescriptionQueryExpander,
+    HuggingfaceComparativeSynonymsQueryExpander
+):
+    def reformulate(self, toReformulate: str) -> str:
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        input_text = f"Extract a query: {toReformulate}"
+        payload = {"inputs": input_text}
+        response = post(self.api_url, headers=headers, json=payload)
+        if response.status_code // 100 != 2:
+            raise Exception(
+                f"HTTP Error {response.status_code}: {response.reason}\n"
+                f"Please check if you are authenticated."
+            )
+        response_json = response.json()
+        output_text: str = response_json[0]["generated_text"]
+        if input_text == output_text:
+            return toReformulate
+        return output_text
+
+
 class SimpleQueryExpander(QueryExpander):
     _query_expander: QueryExpander
 
@@ -141,6 +188,10 @@ class SimpleQueryExpander(QueryExpander):
                 "glove-wiki-gigaword-100")
         elif query_expansion == QueryExpansion.T0PP_COMPARATIVE_SYNONYMS:
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
+                "bigscience/T0pp", hugging_face_api_token)
+        elif query_expansion == QueryExpansion.T0PP_DESCRIPTION_NARRATIVE:
+            self._query_expander = \
+             HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
                 "bigscience/T0pp", hugging_face_api_token)
 
     def expand_query(self, query: Query) -> List[Query]:
