@@ -27,7 +27,9 @@ _QUERY_EXPANSIONS = {
     "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
     "t0pp-comparative-synonyms": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
     "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
-    "t0pp-description-narrative": QueryExpansion.T0PP_DESCRIPTION_NARRATIVE
+    "t0pp-description-narrative": QueryExpansion.T0PP_DESCRIPTION_NARRATIVE,
+    "query-reformulate-rule-based":
+        QueryExpansion.QUERY_REFORMULATE_RULE_BASED
 }
 
 _RETRIEVAL_MODELS = {

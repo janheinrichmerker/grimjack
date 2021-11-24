@@ -29,6 +29,13 @@ _NOUN_PLURAL = "NNS"
 _PROPER_NOUN = "NNP"
 _PROPER_NOUN_PLURAL = "NNPS"
 
+_NOUN_TAGS = [
+    _NOUN,
+    _NOUN_PLURAL,
+    _PROPER_NOUN,
+    _PROPER_NOUN_PLURAL
+]
+
 _COMPARATIVE_TAGS = [
     _ADVERB_COMPARATIVE,
     _ADVERB_SUPERLATIVE,
@@ -97,6 +104,42 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
     @abstractmethod
     def reformulate(self, toReformulate: str) -> str:
         pass
+
+
+# this needs some more work
+class ReformulateQueryRuleBased(QueryExpander, ABC):
+    def expand_query(self, query: Query) -> List[Query]:
+        tokens = word_tokenize(query.title)
+        pos_tokens = pos_tag(tokens)
+        nouns_found = []
+        output_1 = "What are the pros and cons"
+        output_2 = "What should I buy"
+        output_3 = "What do you prefer"
+        for token, pos in pos_tokens:
+            if pos in _NOUN_TAGS:
+                nouns_found.append(token)
+        if len(nouns_found) == 0:
+            return []
+        for noun in nouns_found:
+            index = nouns_found.index(noun)
+            if index != len(nouns_found)-1:
+                output_1 += f" of a {noun} or"
+                output_2 += f" a {noun} or"
+                output_3 += f" a {noun} or"
+            else:
+                output_1 += f" of a {noun}"
+                output_2 += f" a {noun}"
+                output_3 += f" a {noun}"
+        out = [output_1, output_2, output_3]
+        queries = []
+        for new_query in out:
+            queries.append(Query(
+                query.id,
+                new_query,
+                query.description,
+                query.narrative
+            ))
+        return queries
 
 
 @dataclass
@@ -193,6 +236,8 @@ class SimpleQueryExpander(QueryExpander):
             self._query_expander = \
              HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
                 "bigscience/T0pp", hugging_face_api_token)
+        elif query_expansion == QueryExpansion.QUERY_REFORMULATE_RULE_BASED:
+            self._query_expander = ReformulateQueryRuleBased()
 
     def expand_query(self, query: Query) -> List[Query]:
         return self._query_expander.expand_query(query)
