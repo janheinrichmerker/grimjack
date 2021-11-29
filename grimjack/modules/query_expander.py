@@ -61,6 +61,7 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
             Query(
                 query.id,
                 query.title.replace(token, self.best_synonym(token)),
+                query.objects,
                 query.description,
                 query.narrative
             )
@@ -90,12 +91,14 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
         queries.append(Query(
             query.id,
             new_desc,
+            query.objects,
             query.description,
             query.narrative
         ))
         queries.append(Query(
             query.id,
             new_narr,
+            query.objects,
             query.description,
             query.narrative
         ))
@@ -136,6 +139,7 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
             queries.append(Query(
                 query.id,
                 new_query,
+                query.objects,
                 query.description,
                 query.narrative
             ))
