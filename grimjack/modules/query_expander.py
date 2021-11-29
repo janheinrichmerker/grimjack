@@ -109,31 +109,23 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
         pass
 
 
-# this needs some more work
 class ReformulateQueryRuleBased(QueryExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
-        tokens = word_tokenize(query.title)
-        pos_tokens = pos_tag(tokens)
-        nouns_found = []
-        output_1 = "What are the pros and cons"
-        output_2 = "What should I buy"
-        output_3 = "What do you prefer"
-        for token, pos in pos_tokens:
-            if pos in _NOUN_TAGS:
-                nouns_found.append(token)
-        if len(nouns_found) == 0:
-            return []
-        for noun in nouns_found:
-            index = nouns_found.index(noun)
-            if index != len(nouns_found)-1:
-                output_1 += f" of a {noun} or"
-                output_2 += f" a {noun} or"
-                output_3 += f" a {noun} or"
+        output_1 = "pros and cons"
+        output_2 = "should I buy"
+        output_3 = "do you prefer"
+        for obj in query.objects:
+            index = query.objects.index(obj)
+            if index != len(query.objects)-1:
+                output_1 += f" {obj} or"
+                output_2 += f" {obj} or"
+                output_3 += f" {obj} or"
             else:
-                output_1 += f" of a {noun}"
-                output_2 += f" a {noun}"
-                output_3 += f" a {noun}"
+                output_1 += f" {obj}"
+                output_2 += f" {obj}"
+                output_3 += f" {obj}"
         out = [output_1, output_2, output_3]
+        print(output_1)
         queries = []
         for new_query in out:
             queries.append(Query(
