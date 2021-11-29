@@ -125,7 +125,6 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
                 output_2 += f" {obj}"
                 output_3 += f" {obj}"
         out = [output_1, output_2, output_3]
-        print(output_1)
         queries = []
         for new_query in out:
             queries.append(Query(
