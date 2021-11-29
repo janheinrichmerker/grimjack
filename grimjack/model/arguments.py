@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from grimjack.model import RankedDocument
 
@@ -35,3 +35,8 @@ class ArgumentTaggedDocument(RankedDocument):
 
 
 TargerDocument = ArgumentTaggedDocument
+
+
+@dataclass
+class QualityArgumentDocument(ArgumentTaggedDocument):
+    quality: List[Tuple[str, float]]

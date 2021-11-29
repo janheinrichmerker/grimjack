@@ -1,12 +1,13 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Set
 
 from grimjack.constants import (
     DEFAULT_DOCUMENTS_ZIP_URL,
     DEFAULT_TOPICS_ZIP_URL,
     DEFAULT_TOPICS_FILE_PATH,
-    DEFAULT_HUGGINGFACE_API_TOKEN_PATH
+    DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
+    DEFAULT_IBM_API_TOKEN_PATH
 )
 from grimjack.modules.options import RetrievalModel, RerankerType
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
@@ -136,6 +137,36 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         choices=_RERANKER_TYPES.keys(),
         default=None,
     )
+    parser.add_argument(
+        "--api-url",
+        dest="api_url",
+        type=str,
+        default="https://demo.webis.de/targer-api/targer-api/"
+    )
+    parser.add_argument(
+        "--cache-path",
+        dest="cache_path",
+        type=Optional[Path],
+        default=None
+    )
+    parser.add_argument(
+        "--models",
+        dest="models",
+        type=Set[str],
+        default={"tag-combined-fasttext"}
+    )
+    parser.add_argument(
+        "--ibm-api-token-file",
+        dest="ibm_api_token",
+        type=Path,
+        default=DEFAULT_IBM_API_TOKEN_PATH,
+    )
+    parser.add_argument(
+        "--ibm-api-token",
+        dest="ibm_api_token",
+        type=str,
+        default=None,
+    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
@@ -207,7 +238,7 @@ def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
         raise Exception(f"Unknown query expansion: {retrieval_model}")
 
 
-def _parse_huggingface_api_token(
+def _parse_api_token(
         token_or_path: Union[Path, str]
 ) -> Optional[str]:
     if isinstance(token_or_path, Path):
@@ -245,10 +276,16 @@ def main():
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
         args.retrieval_model
     )
-    hugging_face_api_token = _parse_huggingface_api_token(
+    hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
     )
+    ibm_api_token = _parse_api_token(
+        args.ibm_api_token
+    )
     reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
+    api_url: str = args.api_url
+    cache_path: Optional[Path] = args.cache_path
+    models: Set[str] = args.models
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -260,6 +297,10 @@ def main():
         retrieval_model=retrieval_model,
         hugging_face_api_token=hugging_face_api_token,
         reranker=reranker,
+        api_url=api_url,
+        models=models,
+        cache_path=cache_path,
+        ibm_api_token=ibm_api_token
     )
 
     if args.command == "search":
