@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from grimjack.api.ibm_debater_quality import get_quality_score
 from grimjack.model import Query
 from grimjack.model.arguments import ArgumentRankedDocument
 from grimjack.model.quality import ArgumentQualityRankedDocument
@@ -8,9 +9,16 @@ from grimjack.modules import ArgumentQualityTagger
 
 @dataclass
 class DebaterArgumentQualityTagger(ArgumentQualityTagger):
+    debater_api_token: str
+
     def tag_document(
             self,
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
-        raise NotImplementedError()
+        return get_quality_score(
+            query,
+            document,
+            set(document.arguments.keys()),
+            self.debater_api_token
+        )
