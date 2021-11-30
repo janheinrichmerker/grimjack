@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
+from grimjack.api.targer import fetch_arguments
+from grimjack.api.ibm_debater_quality import get_quality_score
 from grimjack.model.axiom import OriginalAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
@@ -49,6 +51,10 @@ class Pipeline:
             retrieval_model: Optional[RetrievalModel],
             hugging_face_api_token: Optional[str],
             reranker: Optional[RerankerType],
+            api_url: str,
+            models: Set[str],
+            cache_path: Optional[Path],
+            ibm_api_token: str
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
@@ -67,6 +73,10 @@ class Pipeline:
             self.query_expander,
             retrieval_model,
         )
+        self.api_url = api_url
+        self.models = models
+        self.cache_path = cache_path
+        self.ibm_api_token = ibm_api_token
         reranking_context = IndexRerankingContext(self.index)
         if reranker is None:
             self.reranker = OriginalReranker()
@@ -108,6 +118,19 @@ class Pipeline:
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
+        arguments_score = []
+        for doc in ranking:
+            arguments = fetch_arguments(
+                self.api_url,
+                self.models,
+                doc,
+                self.cache_path)
+            arguments_score.append(
+                get_quality_score(
+                    query,
+                    arguments,
+                    self.models,
+                    self.ibm_api_token))
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
