@@ -142,6 +142,7 @@ class ArgumentQualityTagger(ABC):
     @abstractmethod
     def tag_quality(
             self,
+            query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
         pass
