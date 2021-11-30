@@ -117,7 +117,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         "--retrieval-model", "--model", "-m",
         dest="retrieval_model",
         type=str,
-        choices=_STEMMERS.keys(),
+        choices=_RETRIEVAL_MODELS.keys(),
         default=None,
     )
     parser.add_argument(

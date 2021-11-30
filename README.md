@@ -67,10 +67,10 @@ Rerank the top 3 documents with axiomatic reranking
 
 ```shell script
 pipenv run python -m grimjack \
-  --retrieval-model query-likelihood
+  --retrieval-model query-likelihood \
   --no-stemmer --query-expansion t0pp \
-  --reranker axiomatic --rerank_hits 3 \
-  search --num_hits 10 \
+  --reranker axiomatic --rerank-hits 3 \
+  search --num-hits 10 \
   "Which is better, a laptop or a desktop?"
 ```
 
