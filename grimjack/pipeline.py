@@ -131,6 +131,7 @@ class Pipeline:
                     arguments,
                     self.models,
                     self.ibm_api_token))
+        # TODO: What to do with the arguments scores?
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
