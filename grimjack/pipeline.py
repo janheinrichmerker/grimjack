@@ -126,9 +126,9 @@ class Pipeline:
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
-        ranking = self.reranker.rerank(query, ranking)
         ranking = self.argument_tagger.tag_ranking(ranking)
         ranking = self.argument_quality_tagger.tag_ranking(query, ranking)
+        ranking = self.reranker.rerank(query, ranking)
         return ranking
 
     def print_search(self, query: str, num_hits: int):
