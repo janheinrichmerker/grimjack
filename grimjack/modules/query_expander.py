@@ -104,6 +104,10 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
 
 class ReformulateQueryRuleBased(QueryExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
+        if len(query.objects) == 0:
+            raise NotImplementedError('Rule based query reformulation'
+                                      + ' without comparative objects'
+                                      + ' is not supported')
         output_1 = "pros and cons"
         output_2 = "should I buy"
         output_3 = "do you prefer"
@@ -118,7 +122,7 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
                 output_2 += f" {obj}"
                 output_3 += f" {obj}"
         out = [output_1, output_2, output_3]
-        queries = []
+        queries = [query]
         for new_query in out:
             queries.append(Query(
                 query.id,

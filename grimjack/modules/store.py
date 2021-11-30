@@ -66,7 +66,11 @@ class SimpleDocumentsStore(DocumentsStore):
 
 
 def _parse_topic(xml: Element) -> Query:
-    objects = xml.findtext("objects").replace(", ", ",").split(",")
+    objects = xml.findtext("objects")
+    if objects is None:
+        objects = []
+    else:
+        objects = objects.replace(", ", ",").split(",")
     return Query(
         int(xml.findtext("number")),
         xml.findtext("title"),
