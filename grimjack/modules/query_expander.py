@@ -29,13 +29,6 @@ _NOUN_PLURAL = "NNS"
 _PROPER_NOUN = "NNP"
 _PROPER_NOUN_PLURAL = "NNPS"
 
-_NOUN_TAGS = [
-    _NOUN,
-    _NOUN_PLURAL,
-    _PROPER_NOUN,
-    _PROPER_NOUN_PLURAL
-]
-
 _COMPARATIVE_TAGS = [
     _ADVERB_COMPARATIVE,
     _ADVERB_SUPERLATIVE,
@@ -83,7 +76,8 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
 
 
 class ComparativeSynonymsNarrativeDescriptionQueryExpander(
-     ComparativeSynonymsQueryExpander, ABC):
+    ComparativeSynonymsQueryExpander, ABC
+):
     def expand_query(self, query: Query) -> List[Query]:
         queries = super().expand_query(query)
         new_desc = self.reformulate(query.description)
@@ -111,12 +105,19 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
 
 class ReformulateQueryRuleBased(QueryExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
+        if len(query.objects) <= 0:
+            raise ValueError(
+                f"At least one comparative object is required "
+                f"for rule-based query reformulation, "
+                f"but {len(query.objects)} were given "
+                f"for query {query.title}."
+            )
         output_1 = "pros and cons"
         output_2 = "should I buy"
         output_3 = "do you prefer"
         for obj in query.objects:
             index = query.objects.index(obj)
-            if index != len(query.objects)-1:
+            if index != len(query.objects) - 1:
                 output_1 += f" {obj} or"
                 output_2 += f" {obj} or"
                 output_3 += f" {obj} or"
@@ -125,7 +126,7 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
                 output_2 += f" {obj}"
                 output_3 += f" {obj}"
         out = [output_1, output_2, output_3]
-        queries = []
+        queries = [query]
         for new_query in out:
             queries.append(Query(
                 query.id,
@@ -223,14 +224,20 @@ class SimpleQueryExpander(QueryExpander):
         elif (query_expansion ==
               QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS):
             self._query_expander = GensimComparativeSynonymsQueryExpander(
-                "glove-wiki-gigaword-100")
+                "glove-wiki-gigaword-100"
+            )
         elif query_expansion == QueryExpansion.T0PP_COMPARATIVE_SYNONYMS:
             self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
-                "bigscience/T0pp", hugging_face_api_token)
+                "bigscience/T0pp",
+                hugging_face_api_token
+            )
         elif query_expansion == QueryExpansion.T0PP_DESCRIPTION_NARRATIVE:
-            self._query_expander = \
-             HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
-                "bigscience/T0pp", hugging_face_api_token)
+            self._query_expander = (
+                HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
+                    "bigscience/T0pp",
+                    hugging_face_api_token
+                )
+            )
         elif query_expansion == QueryExpansion.QUERY_REFORMULATE_RULE_BASED:
             self._query_expander = ReformulateQueryRuleBased()
 

@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
+from grimjack.model.axiom import OriginalAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
 from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
@@ -16,13 +17,20 @@ from grimjack.model.axiom.retrieval_score import (
 from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
+    ArgumentTagger, ArgumentQualityTagger,
 )
+from grimjack.modules.argument_quality_tagger import (
+    DebaterArgumentQualityTagger
+)
+from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
 from grimjack.modules.query_expander import SimpleQueryExpander
-from grimjack.modules.reranker import OriginalReranker, AxiomaticReranker
+from grimjack.modules.reranker import (
+    OriginalReranker, AxiomaticReranker, TopReranker
+)
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
@@ -35,6 +43,8 @@ class Pipeline:
     query_expander: QueryExpander
     searcher: Searcher
     reranker: Reranker
+    argument_tagger: ArgumentTagger
+    argument_quality_tagger: ArgumentQualityTagger
 
     def __init__(
             self,
@@ -46,8 +56,13 @@ class Pipeline:
             language: str,
             query_expansion: Optional[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
-            hugging_face_api_token: Optional[str],
             reranker: Optional[RerankerType],
+            rerank_hits: int,
+            targer_api_url: str,
+            targer_models: Set[str],
+            cache_path: Optional[Path],
+            huggingface_api_token: Optional[str],
+            debater_api_token: str
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
@@ -59,7 +74,7 @@ class Pipeline:
         )
         self.query_expander = SimpleQueryExpander(
             query_expansion,
-            hugging_face_api_token,
+            huggingface_api_token,
         )
         self.searcher = AnseriniSearcher(
             self.index,
@@ -73,6 +88,7 @@ class Pipeline:
             self.reranker = AxiomaticReranker(
                 reranking_context,
                 (
+                        OriginalAxiom() +
                         TFC1() +
                         TFC3() +
                         M_TDC() +
@@ -103,9 +119,22 @@ class Pipeline:
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
+        if rerank_hits is not None:
+            self.reranker = TopReranker(self.reranker, rerank_hits)
+        self.argument_tagger = TargerArgumentTagger(
+            targer_api_url,
+            targer_models,
+            cache_path / "targer" if cache_path is not None else None,
+        )
+        self.argument_quality_tagger = DebaterArgumentQualityTagger(
+            debater_api_token,
+            cache_path / "debater" if cache_path is not None else None,
+        )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
+        ranking = self.argument_tagger.tag_ranking(ranking)
+        ranking = self.argument_quality_tagger.tag_ranking(query, ranking)
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
@@ -126,6 +155,7 @@ class Pipeline:
             print("\n\n")
 
     def run_search_all(self, path: Path, num_hits: int):
+        # TODO: Use TrecRun and trectools.
         with path.open("w") as file:
             topics = tqdm(
                 self.topics_store.topics,

@@ -12,7 +12,7 @@ class OriginalReranker(Reranker):
 
     def rerank(
             self,
-            query: str,
+            query: Query,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         return ranking
@@ -79,3 +79,24 @@ class AxiomaticReranker(Reranker):
             for i, document in enumerate(ranking)
         ]
         return ranking
+
+
+@dataclass
+class TopReranker(Reranker):
+    reranker: Reranker
+    k: int
+
+    def rerank(
+            self,
+            query: Query,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        assert 0 <= self.k <= len(ranking)
+
+        # Rerank top-k documents.
+        reranked = self.reranker.rerank(query, ranking[:self.k - 1])
+
+        # Copy the rest of from the original ranking.
+        reranked.extend(ranking[self.k:])
+
+        return reranked

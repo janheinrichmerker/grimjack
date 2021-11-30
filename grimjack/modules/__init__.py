@@ -5,6 +5,8 @@ from typing import List, Set
 from math import floor
 
 from grimjack.model import RankedDocument, Query, Document
+from grimjack.model.arguments import ArgumentRankedDocument
+from grimjack.model.quality import ArgumentQualityRankedDocument
 
 
 class DocumentsStore(ABC):
@@ -124,4 +126,42 @@ class Reranker(ABC):
             query: Query,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
+        pass
+
+
+class ArgumentTagger(ABC):
+    def tag_ranking(
+            self,
+            ranking: List[RankedDocument]
+    ) -> List[ArgumentRankedDocument]:
+        return [
+            self.tag_document(document)
+            for document in ranking
+        ]
+
+    @abstractmethod
+    def tag_document(
+            self,
+            document: RankedDocument
+    ) -> ArgumentRankedDocument:
+        pass
+
+
+class ArgumentQualityTagger(ABC):
+    def tag_ranking(
+            self,
+            query: Query,
+            ranking: List[ArgumentRankedDocument]
+    ) -> List[ArgumentQualityRankedDocument]:
+        return [
+            self.tag_document(query, document)
+            for document in ranking
+        ]
+
+    @abstractmethod
+    def tag_document(
+            self,
+            query: Query,
+            document: ArgumentRankedDocument
+    ) -> ArgumentQualityRankedDocument:
         pass

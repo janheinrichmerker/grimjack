@@ -7,8 +7,9 @@ from typing import Optional, Dict, Set
 from requests import Response, post
 
 from grimjack.model import Document, RankedDocument
-from grimjack.model.arguments import ArgumentTag, ArgumentLabel, \
-    ArgumentSentence, ArgumentSentences, ArgumentTaggedDocument
+from grimjack.model.arguments import (
+    ArgumentTag, ArgumentLabel, ArgumentSentence, ArgumentSentences
+)
 
 
 def fetch_arguments(
@@ -16,19 +17,15 @@ def fetch_arguments(
         models: Set[str],
         document: RankedDocument,
         cache_path: Optional[Path] = None
-) -> ArgumentTaggedDocument:
+) -> Dict[str, ArgumentSentences]:
+    if cache_path is not None:
+        cache_path.mkdir(parents=True, exist_ok=True)
+
     arguments: Dict[str, ArgumentSentences] = {
         model: _fetch_sentences(api_url, model, document, cache_path)
         for model in models
     }
-    return ArgumentTaggedDocument(
-        id=document.id,
-        content=document.content,
-        fields=document.fields,
-        score=document.score,
-        rank=document.rank,
-        arguments=arguments,
-    )
+    return arguments
 
 
 def _fetch_sentences(
@@ -42,7 +39,7 @@ def _fetch_sentences(
         if cache_path is not None \
         else None
 
-    # Check if the TARGER API response is found in the cache.
+    # Check if the API response is found in the cache.
     if cache_file is not None and cache_file.exists() and cache_file.is_file():
         with cache_file.open("r") as file:
             json = loads(file.read())
@@ -59,7 +56,7 @@ def _fetch_sentences(
     )
     json = res.json()
 
-    # Cache the TARGER API response.
+    # Cache the API response.
     if cache_file is not None:
         cache_file.parent.mkdir(exist_ok=True)
         with cache_file.open("wb") as file:

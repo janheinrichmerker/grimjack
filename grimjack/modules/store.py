@@ -65,14 +65,25 @@ class SimpleDocumentsStore(DocumentsStore):
         return download_dir
 
 
+def _parse_objects(xml: Element) -> List[str]:
+    objects = xml.text.split(",")
+    return [obj.strip() for obj in objects]
+
+
 def _parse_topic(xml: Element) -> Query:
-    objects = xml.findtext("objects").replace(", ", ",").split(",")
+    title = xml.findtext("title").strip()
+    objects = xml.find("objects")
+    if objects is None:
+        raise ValueError(
+            f"No objects were found for topic '{title}'. "
+            "You may need to re-download the topic file."
+        )
     return Query(
-        int(xml.findtext("number")),
-        xml.findtext("title"),
-        objects,
-        xml.findtext("description"),
-        xml.findtext("narrative"),
+        int(xml.findtext("number").strip()),
+        title,
+        _parse_objects(objects),
+        xml.findtext("description").strip(),
+        xml.findtext("narrative").strip(),
     )
 
 

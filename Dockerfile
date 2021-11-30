@@ -8,6 +8,7 @@ RUN apt-get -y update && apt-get -y install git openjdk-11-jdk
 # Install Pip, Pipenv and Python dependencies.
 RUN pip install --upgrade pip && pip install pipenv
 COPY Pipfile Pipfile.lock /workspace/
+COPY lib/ /workspace/lib/
 RUN pipenv install --deploy
 
 # Copy source code.
