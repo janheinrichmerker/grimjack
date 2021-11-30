@@ -15,6 +15,8 @@ class ArgumentLabel(Enum):
     ARGUMENT_MP_B = "MP-B"
     ARGUMENT_MP_I = "MP-I"
     ARGUMENT_O = "O"
+    ARGUMENT_B_B = "B-B"
+    ARGUMENT_B_I = "B-I"
 
 
 @dataclass
