@@ -91,7 +91,7 @@ class TopReranker(Reranker):
             query: Query,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
-        assert 0 <= self.k < len(ranking)
+        assert 0 <= self.k <= len(ranking)
 
         # Rerank top-k documents.
         reranked = self.reranker.rerank(query, ranking[:self.k - 1])
