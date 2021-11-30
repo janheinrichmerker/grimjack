@@ -160,3 +160,20 @@ class DocumentIdAxiom(Axiom):
             return -1
         else:
             return 0
+
+
+class OriginalAxiom(Axiom):
+
+    def preference(
+            self,
+            context: RerankingContext,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ) -> float:
+        if document1.rank < document2.rank:
+            return 1
+        elif document1.rank > document2.rank:
+            return -1
+        else:
+            return 0

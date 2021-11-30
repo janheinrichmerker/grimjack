@@ -4,6 +4,7 @@ from typing import Optional, List
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
+from grimjack.model.axiom import OriginalAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
 from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
@@ -73,6 +74,7 @@ class Pipeline:
             self.reranker = AxiomaticReranker(
                 reranking_context,
                 (
+                        OriginalAxiom() +
                         TFC1() +
                         TFC3() +
                         M_TDC() +
@@ -126,6 +128,7 @@ class Pipeline:
             print("\n\n")
 
     def run_search_all(self, path: Path, num_hits: int):
+        # TODO: Use TrecRun and trectools.
         with path.open("w") as file:
             topics = tqdm(
                 self.topics_store.topics,
