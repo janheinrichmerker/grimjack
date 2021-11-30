@@ -60,11 +60,18 @@ pipenv run python -m grimjack search --help
 
 #### Examples
 
-Search for the top 3 results with query expansion using synonyms from the T0pp language model 
+Search for the top 10 results based on the query likelihood retrieval model
+with query expansion using synonyms from the T0pp language model 
 and no stemming for the index.
+Rerank the top 3 documents with axiomatic reranking
 
 ```shell script
-pipenv run python -m grimjack --no-stemmer --query-expansion t0pp search -k 3 "Which is better, a laptop or a desktop?"
+pipenv run python -m grimjack \
+  --retrieval-model query-likelihood
+  --no-stemmer --query-expansion t0pp \
+  --reranker axiomatic --rerank_hits 3 \
+  search --num_hits 10 \
+  "Which is better, a laptop or a desktop?"
 ```
 
 ### Testing
