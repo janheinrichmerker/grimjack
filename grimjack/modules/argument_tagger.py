@@ -19,9 +19,16 @@ class TargerArgumentTagger(ArgumentTagger):
             self,
             document: RankedDocument
     ) -> ArgumentRankedDocument:
-        return fetch_arguments(
+        arguments = fetch_arguments(
             self.targer_api_url,
-            self.models,
-            document,
+            self.models, document,
             self.cache_path
+        )
+        return ArgumentRankedDocument(
+            id=document.id,
+            content=document.content,
+            fields=document.fields,
+            score=document.score,
+            rank=document.rank,
+            arguments=arguments,
         )
