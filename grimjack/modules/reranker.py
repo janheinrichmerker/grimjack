@@ -93,8 +93,22 @@ class TopReranker(Reranker):
     ) -> List[RankedDocument]:
         assert 0 <= self.k <= len(ranking)
 
+        # Get the maximum score of the original ranking.
+        max_score = max(ranking, key=lambda document: document.score).score
+
         # Rerank top-k documents.
-        reranked = self.reranker.rerank(query, ranking[:self.k - 1])
+        reranked = [
+            RankedDocument(
+                document.id,
+                document.content,
+                document.fields,
+                # Add maximum original score to ensure that reranked documents
+                # stay above non-reranked documents.
+                document.score + max_score,
+                document.rank,
+            )
+            for document in self.reranker.rerank(query, ranking[:self.k])
+        ]
 
         # Copy the rest of from the original ranking.
         reranked.extend(ranking[self.k:])
