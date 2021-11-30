@@ -140,6 +140,18 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None,
     )
     parser.add_argument(
+        "--rerank-hits", "-n",
+        dest="rerank_hits",
+        type=int,
+        default=5,
+    )
+    parser.add_argument(
+        "--rerank-all",
+        dest="rerank_hits",
+        action="store_const",
+        const=None
+    )
+    parser.add_argument(
         "--targer-api-url", "--api-url",
         dest="targer_api_url",
         type=str,
@@ -279,6 +291,7 @@ def main():
         args.retrieval_model
     )
     reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
+    rerank_hits: Optional[int] = args.rerank_hits
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
     )
@@ -304,6 +317,7 @@ def main():
         retrieval_model=retrieval_model,
         huggingface_api_token=hugging_face_api_token,
         reranker=reranker,
+        rerank_hits=rerank_hits,
         targer_api_url=targer_api_url,
         targer_models=targer_models,
         debater_api_token=debater_api_token,

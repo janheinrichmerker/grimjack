@@ -19,15 +19,18 @@ from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
     ArgumentTagger, ArgumentQualityTagger,
 )
-from grimjack.modules.argument_quality_tagger import \
+from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
+)
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
 from grimjack.modules.query_expander import SimpleQueryExpander
-from grimjack.modules.reranker import OriginalReranker, AxiomaticReranker
+from grimjack.modules.reranker import (
+    OriginalReranker, AxiomaticReranker, TopReranker
+)
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
 from grimjack.modules.store import SimpleDocumentsStore, TrecTopicsStore
@@ -54,6 +57,7 @@ class Pipeline:
             query_expansion: Optional[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
             reranker: Optional[RerankerType],
+            rerank_hits: int,
             targer_api_url: str,
             targer_models: Set[str],
             cache_path: Optional[Path],
@@ -115,6 +119,8 @@ class Pipeline:
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
+        if rerank_hits is not None:
+            self.reranker = TopReranker(self.reranker, rerank_hits)
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,
