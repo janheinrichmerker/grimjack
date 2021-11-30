@@ -5,16 +5,12 @@ DATA_DIR = PROJECT_DIR / "data"
 DOCUMENTS_DIR = DATA_DIR / "documents"
 INDEX_DIR = DATA_DIR / "index"
 TOPICS_DIR = DATA_DIR / "topics"
-CACHE_DIR = PROJECT_DIR / "cache"
-TARGER_CACHE_DIR = CACHE_DIR / "targer"
 
 _BASE_DIRS = [
     DATA_DIR,
     DOCUMENTS_DIR,
     TOPICS_DIR,
     INDEX_DIR,
-    CACHE_DIR,
-    TARGER_CACHE_DIR,
 ]
 for path in _BASE_DIRS:
     path.mkdir(parents=True, exist_ok=True)
@@ -35,3 +31,4 @@ DEFAULT_TARGER_API_URL = "https://demo.webis.de/targer-api/"
 DEFAULT_HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/"
 DEFAULT_HUGGINGFACE_API_TOKEN_PATH = PROJECT_DIR / ".huggingface.txt"
 DEFAULT_DEBATER_API_TOKEN_PATH = PROJECT_DIR / ".debater.txt"
+DEFAULT_CACHE_DIR = DATA_DIR / "cache"

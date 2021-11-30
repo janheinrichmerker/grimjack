@@ -31,6 +31,9 @@ def _fetch_sentences(
         document: Document,
         cache_path: Optional[Path] = None
 ) -> ArgumentSentences:
+    if cache_path is not None:
+        cache_path.mkdir(parents=True, exist_ok=True)
+
     content_hash: str = md5(document.content.encode()).hexdigest()
     cache_file = cache_path / model / f"{document.id}-{content_hash}.json" \
         if cache_path is not None \

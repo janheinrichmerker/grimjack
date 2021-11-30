@@ -118,7 +118,7 @@ class Pipeline:
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,
-            cache_path,
+            cache_path / "targer" if cache_path is not None else None,
         )
         self.argument_quality_tagger = DebaterArgumentQualityTagger(
             debater_api_token,

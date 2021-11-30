@@ -8,7 +8,8 @@ from grimjack.constants import (
     DEFAULT_TOPICS_ZIP_URL,
     DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
-    DEFAULT_DEBATER_API_TOKEN_PATH
+    DEFAULT_DEBATER_API_TOKEN_PATH,
+    DEFAULT_CACHE_DIR
 )
 from grimjack.modules.options import RetrievalModel, RerankerType
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
@@ -145,12 +146,6 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default="https://demo.webis.de/targer-api/targer-api/"
     )
     parser.add_argument(
-        "--cache-path",
-        dest="cache_path",
-        type=Optional[Path],
-        default=None
-    )
-    parser.add_argument(
         "--targer-models", "--models",
         dest="targer_models",
         type=Set[str],
@@ -167,6 +162,12 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="debater_api_token",
         type=str,
         default=None,
+    )
+    parser.add_argument(
+        "--cache-path",
+        dest="cache_path",
+        type=Optional[Path],
+        default=DEFAULT_CACHE_DIR
     )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
