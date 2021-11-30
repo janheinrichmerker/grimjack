@@ -122,6 +122,7 @@ class Pipeline:
         )
         self.argument_quality_tagger = DebaterArgumentQualityTagger(
             debater_api_token,
+            cache_path / "debater" if cache_path is not None else None,
         )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
