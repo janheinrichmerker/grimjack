@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 from typing import List
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin
 
 from grimjack.model.arguments import ArgumentRankedDocument
 
 
-@dataclass_json
 @dataclass
-class ArgumentQualitySentence:
+class ArgumentQualitySentence(DataClassJsonMixin):
     content: str
     quality: float
 
