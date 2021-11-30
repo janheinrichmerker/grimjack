@@ -5,6 +5,11 @@ from grimjack.model.arguments import ArgumentRankedDocument
 
 
 @dataclass
+class ArgumentQualitySentence:
+    content: str
+    quality: float
+
+
+@dataclass
 class ArgumentQualityRankedDocument(ArgumentRankedDocument):
-    # TODO: Store as dict.
-    quality: List[Tuple[str, float]]
+    quality: List[ArgumentQualitySentence]

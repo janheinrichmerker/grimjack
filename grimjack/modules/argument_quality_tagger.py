@@ -19,6 +19,5 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
         return get_quality_score(
             query,
             document,
-            set(document.arguments.keys()),
             self.debater_api_token
         )
