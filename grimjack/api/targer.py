@@ -8,7 +8,7 @@ from requests import Response, post
 
 from grimjack.model import Document, RankedDocument
 from grimjack.model.arguments import ArgumentTag, ArgumentLabel, \
-    ArgumentSentence, ArgumentSentences, ArgumentTaggedDocument
+    ArgumentSentence, ArgumentSentences, ArgumentRankedDocument
 
 
 def fetch_arguments(
@@ -16,12 +16,12 @@ def fetch_arguments(
         models: Set[str],
         document: RankedDocument,
         cache_path: Optional[Path] = None
-) -> ArgumentTaggedDocument:
+) -> ArgumentRankedDocument:
     arguments: Dict[str, ArgumentSentences] = {
         model: _fetch_sentences(api_url, model, document, cache_path)
         for model in models
     }
-    return ArgumentTaggedDocument(
+    return ArgumentRankedDocument(
         id=document.id,
         content=document.content,
         fields=document.fields,

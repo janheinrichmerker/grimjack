@@ -1,11 +1,12 @@
 from debater_python_api.api.debater_api import DebaterApi
 from grimjack.model import Query
-from grimjack.model.arguments import ArgumentTaggedDocument, \
-    QualityArgumentDocument
+from grimjack.model.arguments import ArgumentRankedDocument
 from typing import List, Set
 
+from grimjack.model.quality import ArgumentQualityRankedDocument
 
-def get_arguments(arguments: ArgumentTaggedDocument,
+
+def get_arguments(arguments: ArgumentRankedDocument,
                   models: Set[str]) -> List[str]:
     extracted = []
     for model in models:
@@ -19,9 +20,9 @@ def get_arguments(arguments: ArgumentTaggedDocument,
 
 
 def get_quality_score(query: Query,
-                      arguments: ArgumentTaggedDocument,
+                      arguments: ArgumentRankedDocument,
                       models: Set[str],
-                      api_token: str) -> QualityArgumentDocument:
+                      api_token: str) -> ArgumentQualityRankedDocument:
     debater_api = DebaterApi(api_token)
     argument_quality_client = debater_api.get_argument_quality_client()
 
@@ -36,7 +37,7 @@ def get_quality_score(query: Query,
     quality = []
     for i in range(len(scores)):
         quality.append((sentence_topic_dicts[i]['sentence'], scores[i]))
-    return QualityArgumentDocument(
+    return ArgumentQualityRankedDocument(
         id=arguments.id,
         content=arguments.content,
         fields=arguments.fields,

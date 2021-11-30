@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from grimjack.model import RankedDocument
 
@@ -29,14 +29,6 @@ ArgumentSentences = List[ArgumentSentence]
 
 
 @dataclass
-class ArgumentTaggedDocument(RankedDocument):
+class ArgumentRankedDocument(RankedDocument):
     # Store tagged sentences per TARGER model.
     arguments: Dict[str, ArgumentSentences]
-
-
-TargerDocument = ArgumentTaggedDocument
-
-
-@dataclass
-class QualityArgumentDocument(ArgumentTaggedDocument):
-    quality: List[Tuple[str, float]]
