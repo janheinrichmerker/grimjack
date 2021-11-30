@@ -4,8 +4,6 @@ from typing import Optional, List, Set
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
-from grimjack.api.targer import fetch_arguments
-from grimjack.api.ibm_debater_quality import get_quality_score
 from grimjack.model.axiom import OriginalAxiom
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
@@ -19,7 +17,11 @@ from grimjack.model.axiom.retrieval_score import (
 from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
+    ArgumentTagger, ArgumentQualityTagger,
 )
+from grimjack.modules.argument_quality_tagger import \
+    DebaterArgumentQualityTagger
+from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Stemmer, QueryExpansion, RetrievalModel, RerankerType
@@ -38,6 +40,8 @@ class Pipeline:
     query_expander: QueryExpander
     searcher: Searcher
     reranker: Reranker
+    argument_tagger: ArgumentTagger
+    argument_quality_tagger: ArgumentQualityTagger
 
     def __init__(
             self,
@@ -49,12 +53,12 @@ class Pipeline:
             language: str,
             query_expansion: Optional[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
-            hugging_face_api_token: Optional[str],
             reranker: Optional[RerankerType],
-            api_url: str,
+            targer_api_url: str,
             models: Set[str],
             cache_path: Optional[Path],
-            ibm_api_token: str
+            huggingface_api_token: Optional[str],
+            debater_api_token: str
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
@@ -66,17 +70,13 @@ class Pipeline:
         )
         self.query_expander = SimpleQueryExpander(
             query_expansion,
-            hugging_face_api_token,
+            huggingface_api_token,
         )
         self.searcher = AnseriniSearcher(
             self.index,
             self.query_expander,
             retrieval_model,
         )
-        self.api_url = api_url
-        self.models = models
-        self.cache_path = cache_path
-        self.ibm_api_token = ibm_api_token
         reranking_context = IndexRerankingContext(self.index)
         if reranker is None:
             self.reranker = OriginalReranker()
@@ -115,24 +115,20 @@ class Pipeline:
             )
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
+        self.argument_tagger = TargerArgumentTagger(
+            targer_api_url,
+            models,
+            cache_path,
+        )
+        self.argument_quality_tagger = DebaterArgumentQualityTagger(
+            debater_api_token,
+        )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
-        arguments_score = []
-        for doc in ranking:
-            arguments = fetch_arguments(
-                self.api_url,
-                self.models,
-                doc,
-                self.cache_path)
-            arguments_score.append(
-                get_quality_score(
-                    query,
-                    arguments,
-                    self.models,
-                    self.ibm_api_token))
-        # TODO: What to do with the arguments scores?
         ranking = self.reranker.rerank(query, ranking)
+        ranking = self.argument_tagger.tag_ranking(ranking)
+        ranking = self.argument_quality_tagger.tag_ranking(query, ranking)
         return ranking
 
     def print_search(self, query: str, num_hits: int):

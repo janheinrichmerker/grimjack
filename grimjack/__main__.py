@@ -295,12 +295,12 @@ def main():
         language=language,
         query_expansion=query_expansion,
         retrieval_model=retrieval_model,
-        hugging_face_api_token=hugging_face_api_token,
+        huggingface_api_token=hugging_face_api_token,
         reranker=reranker,
-        api_url=api_url,
+        targer_api_url=api_url,
         models=models,
         cache_path=cache_path,
-        ibm_api_token=ibm_api_token
+        debater_api_token=ibm_api_token
     )
 
     if args.command == "search":
