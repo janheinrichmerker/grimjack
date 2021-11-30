@@ -19,7 +19,7 @@ tqdm = "*"
 trectools = "*"
 faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
 torch = "*"  # Needed for pyserini >= 0.14.0
-debater = {path='./debater_python_api-3.5.8.RELEASE.tar.xz'}
+debater = {path='lib/debater_python_api-3.5.8.tar.xz'}
 
 [dev-packages]
 
