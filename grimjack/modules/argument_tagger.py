@@ -15,7 +15,7 @@ class TargerArgumentTagger(ArgumentTagger):
     models: Set[str]
     cache_path: Optional[Path] = None
 
-    def tag_arguments(
+    def tag_document(
             self,
             document: RankedDocument
     ) -> ArgumentRankedDocument:

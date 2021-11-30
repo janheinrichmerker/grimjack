@@ -130,8 +130,17 @@ class Reranker(ABC):
 
 
 class ArgumentTagger(ABC):
+    def tag_ranking(
+            self,
+            ranking: List[RankedDocument]
+    ) -> List[ArgumentRankedDocument]:
+        return [
+            self.tag_document(document)
+            for document in ranking
+        ]
+
     @abstractmethod
-    def tag_arguments(
+    def tag_document(
             self,
             document: RankedDocument
     ) -> ArgumentRankedDocument:
@@ -139,8 +148,18 @@ class ArgumentTagger(ABC):
 
 
 class ArgumentQualityTagger(ABC):
+    def tag_ranking(
+            self,
+            query: Query,
+            ranking: List[ArgumentRankedDocument]
+    ) -> List[ArgumentQualityRankedDocument]:
+        return [
+            self.tag_document(query, document)
+            for document in ranking
+        ]
+
     @abstractmethod
-    def tag_quality(
+    def tag_document(
             self,
             query: Query,
             document: ArgumentRankedDocument

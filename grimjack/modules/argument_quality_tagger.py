@@ -8,7 +8,7 @@ from grimjack.modules import ArgumentQualityTagger
 
 @dataclass
 class DebaterArgumentQualityTagger(ArgumentQualityTagger):
-    def tag_quality(
+    def tag_document(
             self,
             query: Query,
             document: ArgumentRankedDocument
