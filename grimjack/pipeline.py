@@ -55,7 +55,7 @@ class Pipeline:
             retrieval_model: Optional[RetrievalModel],
             reranker: Optional[RerankerType],
             targer_api_url: str,
-            models: Set[str],
+            targer_models: Set[str],
             cache_path: Optional[Path],
             huggingface_api_token: Optional[str],
             debater_api_token: str
@@ -117,7 +117,7 @@ class Pipeline:
             raise ValueError(f"Unknown reranker: {reranker}")
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
-            models,
+            targer_models,
             cache_path,
         )
         self.argument_quality_tagger = DebaterArgumentQualityTagger(

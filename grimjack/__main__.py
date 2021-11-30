@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from os import getcwd
 from pathlib import Path
 from typing import Optional, Union, Set
 
@@ -7,7 +8,7 @@ from grimjack.constants import (
     DEFAULT_TOPICS_ZIP_URL,
     DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
-    DEFAULT_IBM_API_TOKEN_PATH
+    DEFAULT_DEBATER_API_TOKEN_PATH
 )
 from grimjack.modules.options import RetrievalModel, RerankerType
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
@@ -138,8 +139,8 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None,
     )
     parser.add_argument(
-        "--api-url",
-        dest="api_url",
+        "--targer-api-url", "--api-url",
+        dest="targer_api_url",
         type=str,
         default="https://demo.webis.de/targer-api/targer-api/"
     )
@@ -150,20 +151,20 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None
     )
     parser.add_argument(
-        "--models",
-        dest="models",
+        "--targer-models", "--models",
+        dest="targer_models",
         type=Set[str],
         default={"tag-combined-fasttext"}
     )
     parser.add_argument(
         "--ibm-api-token-file",
-        dest="ibm_api_token",
+        dest="debater_api_token",
         type=Path,
-        default=DEFAULT_IBM_API_TOKEN_PATH,
+        default=DEFAULT_DEBATER_API_TOKEN_PATH,
     )
     parser.add_argument(
-        "--ibm-api-token",
-        dest="ibm_api_token",
+        "--ibm-debater-api-token", "--debater-api-token", "--ibm-api-token",
+        dest="debater_api_token",
         type=str,
         default=None,
     )
@@ -276,16 +277,21 @@ def main():
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
         args.retrieval_model
     )
+    reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
     )
-    ibm_api_token = _parse_api_token(
-        args.ibm_api_token
+    targer_api_url: str = args.targer_api_url
+    targer_models: Set[str] = args.targer_models
+    debater_api_token = _parse_api_token(
+        args.debater_api_token
     )
-    reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
-    api_url: str = args.api_url
+    if debater_api_token is None:
+        raise ValueError(
+            f"Must specify IBM Debater API token in the command line "
+            f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
+        )
     cache_path: Optional[Path] = args.cache_path
-    models: Set[str] = args.models
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -297,10 +303,10 @@ def main():
         retrieval_model=retrieval_model,
         huggingface_api_token=hugging_face_api_token,
         reranker=reranker,
-        targer_api_url=api_url,
-        models=models,
+        targer_api_url=targer_api_url,
+        targer_models=targer_models,
+        debater_api_token=debater_api_token,
         cache_path=cache_path,
-        debater_api_token=ibm_api_token
     )
 
     if args.command == "search":

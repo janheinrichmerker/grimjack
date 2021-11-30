@@ -461,4 +461,5 @@ __latexindent_temp.tex
 paper/*.pdf
 talk/talk.pdf
 .huggingface.txt
+.debater.txt
 .ibm.txt
