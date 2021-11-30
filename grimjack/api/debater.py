@@ -10,12 +10,11 @@ def get_arguments(arguments: ArgumentRankedDocument,
                   models: Set[str]) -> List[str]:
     extracted = []
     for model in models:
-        dic = arguments.arguments[model]
-        for sentence in dic:
-            token = []
-            for argument_tag in sentence:
-                token.append(argument_tag.token)
-            extracted.append(" ".join(token))
+        for sentence in arguments.arguments[model]:
+            extracted.append(" ".join([
+                argument_tag.token
+                for argument_tag in sentence
+            ]))
     return extracted
 
 

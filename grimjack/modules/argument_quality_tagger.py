@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from grimjack.api.ibm_debater_quality import get_quality_score
+from grimjack.api.debater import get_quality_score
 from grimjack.model import Query
 from grimjack.model.arguments import ArgumentRankedDocument
 from grimjack.model.quality import ArgumentQualityRankedDocument
