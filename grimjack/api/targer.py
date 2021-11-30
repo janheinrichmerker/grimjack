@@ -18,6 +18,9 @@ def fetch_arguments(
         document: RankedDocument,
         cache_path: Optional[Path] = None
 ) -> Dict[str, ArgumentSentences]:
+    if cache_path is not None:
+        cache_path.mkdir(parents=True, exist_ok=True)
+
     arguments: Dict[str, ArgumentSentences] = {
         model: _fetch_sentences(api_url, model, document, cache_path)
         for model in models
@@ -31,15 +34,12 @@ def _fetch_sentences(
         document: Document,
         cache_path: Optional[Path] = None
 ) -> ArgumentSentences:
-    if cache_path is not None:
-        cache_path.mkdir(parents=True, exist_ok=True)
-
     content_hash: str = md5(document.content.encode()).hexdigest()
     cache_file = cache_path / model / f"{document.id}-{content_hash}.json" \
         if cache_path is not None \
         else None
 
-    # Check if the TARGER API response is found in the cache.
+    # Check if the API response is found in the cache.
     if cache_file is not None and cache_file.exists() and cache_file.is_file():
         with cache_file.open("r") as file:
             json = loads(file.read())
@@ -56,7 +56,7 @@ def _fetch_sentences(
     )
     json = res.json()
 
-    # Cache the TARGER API response.
+    # Cache the API response.
     if cache_file is not None:
         cache_file.parent.mkdir(exist_ok=True)
         with cache_file.open("wb") as file:
