@@ -12,7 +12,7 @@ class OriginalReranker(Reranker):
 
     def rerank(
             self,
-            query: str,
+            query: Query,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         return ranking
