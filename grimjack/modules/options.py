@@ -21,3 +21,9 @@ class RetrievalModel(Enum):
 
 class RerankerType(Enum):
     AXIOMATIC = 1
+
+
+class RetrievalScore(Enum):
+    NDCG = 1
+    PRECISION = 2
+    MAP = 3
