@@ -29,7 +29,8 @@ from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Metric, Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
-from grimjack.modules.query_expander import SimpleQueryExpander
+from grimjack.modules.query_expander import SimpleQueryExpander, \
+    AggregatedQueryExpander
 from grimjack.modules.reranker import (
     OriginalReranker, AxiomaticReranker, TopReranker
 )
@@ -58,7 +59,7 @@ class Pipeline:
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
-            query_expansion: Optional[QueryExpansion],
+            query_expansions: List[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
             reranker: Optional[RerankerType],
             rerank_hits: int,
@@ -76,10 +77,13 @@ class Pipeline:
             stemmer,
             language,
         )
-        self.query_expander = SimpleQueryExpander(
-            query_expansion,
-            huggingface_api_token,
-        )
+        self.query_expander = AggregatedQueryExpander([
+            SimpleQueryExpander(
+                query_expansion,
+                huggingface_api_token,
+            )
+            for query_expansion in query_expansions
+        ])
         self.searcher = AnseriniSearcher(
             self.index,
             self.query_expander,
@@ -192,3 +196,5 @@ class Pipeline:
                     print(f"{id:4d}: {value}")
             else:
                 print(evaluation.evaluate(run_file, depth))
+
+# bpref

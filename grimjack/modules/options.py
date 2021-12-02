@@ -7,6 +7,7 @@ class Stemmer(Enum):
 
 
 class QueryExpansion(Enum):
+    ORIGINAL = 0
     TWITTER_25_COMPARATIVE_SYNONYMS = 1
     WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS = 2
     T0PP_COMPARATIVE_SYNONYMS = 3

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from os import getcwd
 from pathlib import Path
-from typing import Optional, Union, Set
+from typing import Optional, Union, Set, List
 
 from grimjack.constants import (
     DEFAULT_DOCUMENTS_ZIP_URL, DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_ZIP_PATH,
@@ -20,6 +20,7 @@ _STEMMERS = {
 }
 
 _QUERY_EXPANSIONS = {
+    "original": QueryExpansion.ORIGINAL,
     "twitter-25-comparative-synonyms":
         QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
     "twitter-25": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
@@ -108,16 +109,17 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--query-expansion",
-        dest="query_expansion",
+        dest="query_expansions",
         type=str,
         choices=_QUERY_EXPANSIONS.keys(),
-        default=None,
+        default={"original"},
+        action="append"
     )
     parser.add_argument(
         "--no-query-expansion",
-        dest="query_expansion",
+        dest="query_expansions",
         action="store_const",
-        const=None
+        const={"original"}
     )
     parser.add_argument(
         "--retrieval-model", "--model", "-m",
@@ -306,6 +308,15 @@ def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
         raise Exception(f"Unknown query expansion: {query_expansion}")
 
 
+def _parse_query_expansions(
+        query_expansions: List[str]
+) -> List[QueryExpansion]:
+    return [
+        _parse_query_expansion(query_expansion)
+        for query_expansion in query_expansions
+    ]
+
+
 def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
     if retrieval_model is None:
         return None
@@ -352,8 +363,8 @@ def main():
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
-    query_expansion: Optional[QueryExpansion] = _parse_query_expansion(
-        args.query_expansion
+    query_expansions: Optional[QueryExpansion] = _parse_query_expansions(
+        args.query_expansions
     )
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
         args.retrieval_model
@@ -381,7 +392,7 @@ def main():
         stopwords_file=stopwords_file,
         stemmer=stemmer,
         language=language,
-        query_expansion=query_expansion,
+        query_expansions=query_expansions,
         retrieval_model=retrieval_model,
         huggingface_api_token=hugging_face_api_token,
         reranker=reranker,

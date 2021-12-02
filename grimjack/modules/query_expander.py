@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional
+from itertools import chain
+from typing import List, Optional, Collection
 
 from gensim import downloader
 from gensim.similarities import TermSimilarityIndex
@@ -208,15 +209,28 @@ class HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
         return output_text
 
 
+@dataclass
+class AggregatedQueryExpander(QueryExpander):
+    query_expanders: Collection[QueryExpander]
+
+    def expand_query(self, query: Query) -> List[Query]:
+        return list(
+            chain(*[
+                query_expander.expand_query(query)
+                for query_expander in self.query_expanders
+            ])
+        )
+
+
 class SimpleQueryExpander(QueryExpander):
     _query_expander: QueryExpander
 
     def __init__(
             self,
-            query_expansion: Optional[QueryExpansion],
+            query_expansion: QueryExpansion,
             hugging_face_api_token: Optional[str],
     ):
-        if query_expansion is None:
+        if query_expansion == QueryExpansion.ORIGINAL:
             self._query_expander = OriginalQueryExpander()
         elif query_expansion == QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS:
             self._query_expander = GensimComparativeSynonymsQueryExpander(
@@ -240,6 +254,8 @@ class SimpleQueryExpander(QueryExpander):
             )
         elif query_expansion == QueryExpansion.QUERY_REFORMULATE_RULE_BASED:
             self._query_expander = ReformulateQueryRuleBased()
+        else:
+            raise Exception(f"Unknown query expansion: {query_expansion}")
 
     def expand_query(self, query: Query) -> List[Query]:
         return self._query_expander.expand_query(query)
