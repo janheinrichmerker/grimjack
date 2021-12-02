@@ -22,7 +22,7 @@ def _hash_url(url: str) -> str:
     return md5(url.encode()).hexdigest()
 
 
-def _download_if_needed(url: str, download_dir: Path, name: str):
+def _download_unzip_if_needed(url: str, download_dir: Path, name: str):
     """
     Download and extract a ZIP or GZIP folder
     if it doesn't already exist in the download directory.
@@ -44,6 +44,18 @@ def _download_if_needed(url: str, download_dir: Path, name: str):
         ValueError("Unknown download data format.")
 
 
+def _download_if_needed(url: str, file_path: Path):
+    """
+    Download a file if it doesn't already exist.
+    """
+    if file_path.exists():
+        return  # Already downloaded.
+
+    print(f"Downloading from {url} to {file_path}.")
+    file_path.parent.mkdir()
+    save(url, str(file_path.absolute()))
+
+
 @dataclass(unsafe_hash=True)
 class SimpleDocumentsStore(DocumentsStore):
     documents_zip_url: str
@@ -62,7 +74,7 @@ class SimpleDocumentsStore(DocumentsStore):
         Will download documents if needed.
         """
         download_dir = DOCUMENTS_DIR / self._documents_zip_url_hash
-        _download_if_needed(
+        _download_unzip_if_needed(
             self.documents_zip_url, download_dir, "documents")
         return download_dir
 
@@ -114,7 +126,7 @@ class TrecTopicsStore(TopicsStore):
         Will download topics if needed.
         """
         download_dir = TOPICS_DIR / self._topics_zip_url_hash
-        _download_if_needed(self.topics_zip_url, download_dir, "topics")
+        _download_unzip_if_needed(self.topics_zip_url, download_dir, "topics")
         return download_dir
 
     @property
@@ -149,8 +161,7 @@ class TrecQrelsStore(QrelsStore):
 
         file_name = basename(url_or_path)
         file_path = QRELS_DIR / self._qrels_url_hash / file_name
-        file_path.parent.mkdir()
-        save(url_or_path, str(file_path.absolute()))
+        _download_if_needed(url_or_path, file_path)
         return file_path
 
     @property
