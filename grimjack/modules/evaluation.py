@@ -19,10 +19,13 @@ class TrecEvaluation(Evaluation):
         run = TrecRun(run_file)
         qrels = self.qrels_store.qrels
 
-        run_docs = set(run.run_data["docid"])
-        qrels_docs = set(qrels.qrels_data["docid"])
+        run_data: DataFrame = run.run_data.copy()
+        qrels_data: DataFrame = qrels.qrels_data.copy()
 
-        if len(run_docs & qrels_docs) == 0:
+        run_doc_ids = set(run_data["docid"])
+        qrels_doc_ids = set(qrels_data["docid"])
+
+        if len(run_doc_ids & qrels_doc_ids) == 0:
             warning(
                 "The chosen qrels contain no relevance judgements "
                 "for documents from the run file.\n"
@@ -35,7 +38,6 @@ class TrecEvaluation(Evaluation):
                 "The top passage's score and rank is used "
                 "as the document's score and rank."
             )
-            run_data: DataFrame = run.run_data.copy()
             run_data["docid"] = run_data["docid"].apply(
                 lambda id: id.split("___")[0]
             )
@@ -59,6 +61,19 @@ class TrecEvaluation(Evaluation):
                 ascending=False
             )
             run.run_data = run_data
+
+        run_doc_ids = set(run_data["docid"])
+        qrels_doc_ids = set(qrels_data["docid"])
+        missing_document_ids = run_doc_ids - qrels_doc_ids
+        missing_documents_proportion = (
+                len(missing_document_ids) / len(run_doc_ids)
+        )
+        if missing_documents_proportion > 0.25:
+            warning(
+                f"Qrels are missing {missing_documents_proportion:.2%} "
+                f"of the documents from the run file, "
+                f"{len(missing_document_ids)} of {len(run_doc_ids)}."
+            )
 
         return TrecEval(run, qrels)
 
