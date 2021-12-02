@@ -4,6 +4,8 @@ from typing import List, Set
 
 from math import floor
 
+from trectools import TrecQrel
+
 from grimjack.model import RankedDocument, Query, Document
 from grimjack.model.arguments import ArgumentRankedDocument
 from grimjack.model.quality import ArgumentQualityRankedDocument
@@ -25,6 +27,18 @@ class TopicsStore(ABC):
     @property
     @abstractmethod
     def topics(self) -> List[Query]:
+        pass
+
+
+class QrelsStore(ABC):
+    @property
+    @abstractmethod
+    def qrels_file(self) -> Path:
+        pass
+
+    @property
+    @abstractmethod
+    def qrels(self) -> TrecQrel:
         pass
 
 

@@ -1,5 +1,6 @@
 from pathlib import Path
-from typing import Optional, List, Set
+from tempfile import TemporaryDirectory
+from typing import Optional, List, Set, Union
 
 from tqdm import tqdm
 
@@ -26,7 +27,7 @@ from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluater import evaluate
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
-    RetrievalScore, Stemmer, QueryExpansion, RetrievalModel, RerankerType
+    Metric, Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
 from grimjack.modules.query_expander import SimpleQueryExpander
 from grimjack.modules.reranker import (
@@ -34,8 +35,9 @@ from grimjack.modules.reranker import (
 )
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
-from grimjack.modules.store import QrelStore, SimpleDocumentsStore, \
-    TrecTopicsStore
+from grimjack.modules.store import (
+    SimpleDocumentsStore, TrecTopicsStore, TrecQrelsStore
+)
 
 
 class Pipeline:
@@ -65,10 +67,6 @@ class Pipeline:
             cache_path: Optional[Path],
             huggingface_api_token: Optional[str],
             debater_api_token: str,
-            retrieval_score: RetrievalScore,
-            depth: int,
-            qrel: str,
-            qrel_zip: str
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
@@ -87,11 +85,6 @@ class Pipeline:
             self.query_expander,
             retrieval_model,
         )
-        self.retrieval_score = retrieval_score
-        self.depth = depth
-        self.qrel = qrel
-        self.qrel_zip = qrel_zip
-        self.qrelStore = QrelStore(self.qrel_zip, self.qrel)
         reranking_context = IndexRerankingContext(self.index)
         if reranker is None:
             self.reranker = OriginalReranker()
@@ -179,10 +172,22 @@ class Pipeline:
                     f"{document.score} {path.stem}\n"
                     for document in results
                 )
-        evaluation = evaluate(
-                self.qrelStore.qrels_path,
-                path.absolute(),
-                self.depth,
-                self.retrieval_score
-        )
-        print(evaluation)
+
+    def evaluate_all(
+            self,
+            metric: Metric,
+            qrels_url_or_path: Union[Path, str],
+            depth: int
+    ):
+        qrels_store = TrecQrelsStore(qrels_url_or_path)
+        with TemporaryDirectory() as directory_name:
+            directory: Path = Path(directory_name)
+            run_file = directory / "run.txt"
+            self.run_search_all(run_file, depth)
+            evaluation = evaluate(
+                qrels_store.qrels,
+                run_file,
+                depth,
+                metric,
+            )
+            print(evaluation)

@@ -28,7 +28,11 @@ DEFAULT_TOPICS_ZIP_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
 DEFAULT_TOPICS_ZIP_PATH = "topics-task2.xml"
-DEFAULT_QRELS_ZIP_URL = (
+DEFAULT_TOUCHE_2020_QRELS_URL = (
+    "https://webis.de/events/touche-20/"
+    "touche2020-task2-relevance-withbaseline.qrels"
+)
+DEFAULT_TOUCHE_2021_QRELS_URL = (
     "https://webis.de/events/touche-21/touche-task2-51-100-relevance.qrels"
 )
 DEFAULT_TARGER_API_URL = "https://demo.webis.de/targer-api/"

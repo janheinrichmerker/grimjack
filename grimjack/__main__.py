@@ -4,14 +4,10 @@ from pathlib import Path
 from typing import Optional, Union, Set
 
 from grimjack.constants import (
-    DEFAULT_DOCUMENTS_ZIP_URL,
-    DEFAULT_QRELS_FILE_PATH,
-    DEFAULT_QRELS_ZIP_URL,
-    DEFAULT_TOPICS_ZIP_URL,
-    DEFAULT_TOPICS_ZIP_PATH,
-    DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
-    DEFAULT_DEBATER_API_TOKEN_PATH,
-    DEFAULT_CACHE_DIR
+    DEFAULT_DOCUMENTS_ZIP_URL, DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_ZIP_PATH,
+    DEFAULT_HUGGINGFACE_API_TOKEN_PATH, DEFAULT_DEBATER_API_TOKEN_PATH,
+    DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
+    DEFAULT_TOUCHE_2021_QRELS_URL
 )
 from grimjack.modules.options import RetrievalModel, RerankerType, Metric
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
@@ -191,36 +187,18 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         type=Optional[Path],
         default=DEFAULT_CACHE_DIR
     )
-    parser.add_argument(
-        "--evaluation-metric", "--metric", "--evaluation-score",
-        dest="metric",
-        type=str,
-        choices=_METRICS.keys(),
-        default="ndcg",
-    )
-    parser.add_argument(
-        "--depth",
-        dest="depth",
-        type=int,
-        default=1000,
-    )
-    parser.add_argument(
-        "--qrel-file",
-        dest="qrel_file",
-        type=str,
-        default=DEFAULT_QRELS_FILE_PATH
-    )
-    parser.add_argument(
-        "--qrel-zip-url",
-        dest="qrel_zip_url",
-        type=str,
-        default=DEFAULT_QRELS_ZIP_URL
-    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
     _prepare_parser_print_search_all(parsers.add_parser("search-all"))
-    _prepare_parser_run_search_all(parsers.add_parser("run-all"))
+    _prepare_parser_run_search_all(parsers.add_parser(
+        "run-all",
+        aliases=["run"]
+    ))
+    _prepare_parser_evaluate_all(parsers.add_parser(
+        "evaluate-all",
+        aliases=["evaluate", "eval"]
+    ))
 
     return parser
 
@@ -260,6 +238,45 @@ def _prepare_parser_run_search_all(parser: ArgumentParser):
     )
 
 
+def _prepare_parser_evaluate_all(parser: ArgumentParser):
+    parser.add_argument(
+        "--metric", "--evaluation-score",
+        dest="metric",
+        type=str,
+        choices=_METRICS.keys(),
+        default="ndcg",
+    )
+    parser.add_argument(
+        "--depth",
+        dest="depth",
+        type=int,
+        default=10,
+    )
+    parser.add_argument(
+        "--qrels-path",
+        dest="qrels",
+        type=Path
+    )
+    parser.add_argument(
+        "--qrels-url",
+        dest="qrels",
+        type=str,
+        default=DEFAULT_TOUCHE_2021_QRELS_URL
+    )
+    parser.add_argument(
+        "--touche-2020", "--touche20", "--2020", "--20",
+        dest="qrels",
+        action="store_const",
+        const=DEFAULT_TOUCHE_2020_QRELS_URL
+    )
+    parser.add_argument(
+        "--touche-2021", "--touche21", "--2021", "--21",
+        dest="qrels",
+        action="store_const",
+        const=DEFAULT_TOUCHE_2021_QRELS_URL
+    )
+
+
 def _parse_stemmer(stemmer: str) -> Optional[Stemmer]:
     if stemmer is None:
         return None
@@ -287,9 +304,7 @@ def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
         raise Exception(f"Unknown query expansion: {retrieval_model}")
 
 
-def _parse_api_token(
-        token_or_path: Union[Path, str]
-) -> Optional[str]:
+def _parse_api_token(token_or_path: Union[Path, str]) -> Optional[str]:
     if isinstance(token_or_path, Path):
         if not token_or_path.exists():
             return None
@@ -347,10 +362,6 @@ def main():
             f"Must specify IBM Debater API token in the command line "
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
-    metric: Metric = _parse_metric(args.metric)
-    depth: int = args.depth
-    qrel: str = args.qrel_file
-    qrel_zip: str = args.qrel_zip_url
     cache_path: Optional[Path] = args.cache_path
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
@@ -368,10 +379,6 @@ def main():
         targer_models=targer_models,
         debater_api_token=debater_api_token,
         cache_path=cache_path,
-        retrieval_score=metric,
-        depth=depth,
-        qrel=qrel,
-        qrel_zip=qrel_zip
     )
 
     if args.command == "search":
@@ -381,10 +388,15 @@ def main():
     elif args.command == "search-all":
         num_hits: int = args.num_hits
         pipeline.print_search_all(num_hits)
-    elif args.command == "run-all":
+    elif args.command in ["run-all", "run"]:
         output_file: Path = args.output_file
         num_hits: int = args.num_hits
         pipeline.run_search_all(output_file, num_hits)
+    elif args.command in ["evaluate-all", "evaluate", "eval"]:
+        metric: Metric = _parse_metric(args.metric)
+        depth: int = args.depth
+        qrels: Union[Path, str] = args.qrels
+        pipeline.evaluate_all(metric, qrels, depth)
     else:
         parser.print_help()
 

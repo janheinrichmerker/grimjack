@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 from gzip import GzipFile
 from hashlib import md5
+from os.path import basename
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse, ElementTree, Element
 
 from dload import save_unzip
+from trectools import TrecQrel
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, QRELS_DIR
 from grimjack.model import Query
-from grimjack.modules import DocumentsStore, TopicsStore
+from grimjack.modules import DocumentsStore, TopicsStore, QrelsStore
 
 
 def _hash_url(url: str) -> str:
@@ -130,16 +132,26 @@ class TrecTopicsStore(TopicsStore):
 
 
 @dataclass
-class QrelStore():
-    qrels_zip_url: str
-    qrels_file_path: str
+class TrecQrelsStore(QrelsStore):
+    qrels_url_or_path: Union[str, Path]
 
     @property
-    def _qrels_zip_url_hash(self) -> str:
-        return _hash_url(self.qrels_zip_url)
+    def _qrels_url_hash(self) -> str:
+        url_or_path = self.qrels_url_or_path
+        assert isinstance(url_or_path, str)
+        return _hash_url(url_or_path)
 
     @property
-    def qrels_path(self) -> str:
-        download_dir = QRELS_DIR / self._qrels_zip_url_hash
-        _download_if_needed(self.qrels_zip_url, download_dir, "qrel")
-        return download_dir / self.qrels_file_path
+    def qrels_file(self) -> Path:
+        url_or_path = self.qrels_url_or_path
+        if isinstance(url_or_path, Path):
+            return url_or_path
+
+        download_dir = QRELS_DIR / self._qrels_url_hash
+        _download_if_needed(url_or_path, download_dir, "qrels")
+        file_name = basename(url_or_path)
+        return download_dir / file_name
+
+    @property
+    def qrels(self) -> TrecQrel:
+        return TrecQrel(str(self.qrels_file.absolute()))
