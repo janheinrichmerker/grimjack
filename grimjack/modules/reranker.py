@@ -42,10 +42,21 @@ class AxiomaticReranker(Reranker):
             if vertex == pivot:
                 continue
 
-            if self.axiom.preference(context, query, vertex, pivot) >= 0:
+            preference = self.axiom.preference(context, query, vertex, pivot)
+            if preference > 0:
                 vertices_left.append(vertex)
-            else:
+            elif preference < 0:
                 vertices_right.append(vertex)
+            elif vertex.rank < pivot.rank:
+                vertices_left.append(vertex)
+            elif vertex.rank > pivot.rank:
+                vertices_right.append(vertex)
+            else:
+                raise RuntimeError(
+                    f"Tie during reranking. "
+                    f"Document {vertex} has same preference "
+                    f"and rank as pivot document {pivot}."
+                )
 
         vertices_left = self.kwiksort(
             context,
