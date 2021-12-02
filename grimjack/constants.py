@@ -5,13 +5,14 @@ DATA_DIR = PROJECT_DIR / "data"
 DOCUMENTS_DIR = DATA_DIR / "documents"
 INDEX_DIR = DATA_DIR / "index"
 TOPICS_DIR = DATA_DIR / "topics"
-QRELS_DIR = DATA_DIR / "qrel"
+QRELS_DIR = DATA_DIR / "qrels"
 
 _BASE_DIRS = [
     DATA_DIR,
     DOCUMENTS_DIR,
     TOPICS_DIR,
     INDEX_DIR,
+    QRELS_DIR,
 ]
 for path in _BASE_DIRS:
     path.mkdir(parents=True, exist_ok=True)

@@ -7,7 +7,7 @@ from typing import List, Union
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse, ElementTree, Element
 
-from dload import save_unzip
+from dload import save_unzip, save
 from trectools import TrecQrel
 
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, QRELS_DIR
@@ -147,10 +147,11 @@ class TrecQrelsStore(QrelsStore):
         if isinstance(url_or_path, Path):
             return url_or_path
 
-        download_dir = QRELS_DIR / self._qrels_url_hash
-        _download_if_needed(url_or_path, download_dir, "qrels")
         file_name = basename(url_or_path)
-        return download_dir / file_name
+        file_path = QRELS_DIR / self._qrels_url_hash / file_name
+        file_path.parent.mkdir()
+        save(url_or_path, str(file_path.absolute()))
+        return file_path
 
     @property
     def qrels(self) -> TrecQrel:

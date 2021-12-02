@@ -253,15 +253,15 @@ def _prepare_parser_evaluate_all(parser: ArgumentParser):
         default=10,
     )
     parser.add_argument(
-        "--qrels-path",
-        dest="qrels",
-        type=Path
-    )
-    parser.add_argument(
         "--qrels-url",
         dest="qrels",
         type=str,
-        default=DEFAULT_TOUCHE_2021_QRELS_URL
+        default=DEFAULT_TOUCHE_2021_QRELS_URL,
+    )
+    parser.add_argument(
+        "--qrels-file-path", "--qrels-file", "--qrels-path",
+        dest="qrels",
+        type=Path,
     )
     parser.add_argument(
         "--touche-2020", "--touche20", "--2020", "--20",
