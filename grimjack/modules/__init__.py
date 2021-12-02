@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List, Set
+from typing import List, Set, Dict
 
 from math import floor
 
@@ -178,4 +178,18 @@ class ArgumentQualityTagger(ABC):
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
+        pass
+
+
+class Evaluation(ABC):
+    @abstractmethod
+    def evaluate(self, run_file: Path, depth: int) -> float:
+        pass
+
+    @abstractmethod
+    def evaluate_per_query(
+            self,
+            run_file: Path,
+            depth: int
+    ) -> Dict[int, float]:
         pass

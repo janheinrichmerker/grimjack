@@ -275,6 +275,17 @@ def _prepare_parser_evaluate_all(parser: ArgumentParser):
         action="store_const",
         const=DEFAULT_TOUCHE_2021_QRELS_URL
     )
+    parser.add_argument(
+        "--per-query",
+        dest="per_query",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--global",
+        dest="per_query",
+        action="store_false"
+    )
 
 
 def _parse_stemmer(stemmer: str) -> Optional[Stemmer]:
@@ -394,9 +405,10 @@ def main():
         pipeline.run_search_all(output_file, num_hits)
     elif args.command in ["evaluate-all", "evaluate", "eval"]:
         metric: Metric = _parse_metric(args.metric)
-        depth: int = args.depth
         qrels: Union[Path, str] = args.qrels
-        pipeline.evaluate_all(metric, qrels, depth)
+        depth: int = args.depth
+        per_query: bool = args.per_query
+        pipeline.evaluate_all(metric, qrels, depth, per_query)
     else:
         parser.print_help()
 

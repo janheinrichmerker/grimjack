@@ -24,7 +24,7 @@ from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
 )
 from grimjack.modules.argument_tagger import TargerArgumentTagger
-from grimjack.modules.evaluater import evaluate
+from grimjack.modules.evaluation import TrecEvaluation
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Metric, Stemmer, QueryExpansion, RetrievalModel, RerankerType
@@ -177,17 +177,18 @@ class Pipeline:
             self,
             metric: Metric,
             qrels_url_or_path: Union[Path, str],
-            depth: int
+            depth: int,
+            per_query: bool = False,
     ):
         qrels_store = TrecQrelsStore(qrels_url_or_path)
+        evaluation = TrecEvaluation(qrels_store, metric)
         with TemporaryDirectory() as directory_name:
             directory: Path = Path(directory_name)
             run_file = directory / "run.txt"
             self.run_search_all(run_file, depth)
-            evaluation = evaluate(
-                qrels_store.qrels,
-                run_file,
-                depth,
-                metric,
-            )
-            print(evaluation)
+            if per_query:
+                result = evaluation.evaluate_per_query(run_file, depth)
+                for id, value in result.items():
+                    print(f"{id:4d}: {value}")
+            else:
+                print(evaluation.evaluate(run_file, depth))
