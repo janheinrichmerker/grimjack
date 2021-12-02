@@ -52,7 +52,7 @@ class Pipeline:
             self,
             documents_zip_url: str,
             topics_zip_url: str,
-            topics_file_path: str,
+            topics_zip_path: str,
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
@@ -71,7 +71,7 @@ class Pipeline:
             qrel_zip: str
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
-        self.topics_store = TrecTopicsStore(topics_zip_url, topics_file_path)
+        self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
         self.index = AnseriniIndex(
             self.documents_store,
             stopwords_file,

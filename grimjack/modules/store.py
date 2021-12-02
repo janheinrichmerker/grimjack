@@ -96,7 +96,7 @@ def _parse_topics(tree: ElementTree) -> List[Query]:
 @dataclass
 class TrecTopicsStore(TopicsStore):
     topics_zip_url: str
-    topics_file_path: str
+    topics_zip_path: str
 
     @property
     def _topics_zip_url_hash(self) -> str:
@@ -121,7 +121,7 @@ class TrecTopicsStore(TopicsStore):
         Path to the downloaded topics file.
         Will download topics if needed.
         """
-        return self.topics_dir / self.topics_file_path
+        return self.topics_dir / self.topics_zip_path
 
     @property
     def topics(self) -> List[Query]:

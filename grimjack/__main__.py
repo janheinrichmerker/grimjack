@@ -8,7 +8,7 @@ from grimjack.constants import (
     DEFAULT_QRELS_FILE_PATH,
     DEFAULT_QRELS_ZIP_URL,
     DEFAULT_TOPICS_ZIP_URL,
-    DEFAULT_TOPICS_FILE_PATH,
+    DEFAULT_TOPICS_ZIP_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
     DEFAULT_DEBATER_API_TOKEN_PATH,
     DEFAULT_CACHE_DIR
@@ -73,10 +73,10 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=DEFAULT_TOPICS_ZIP_URL,
     )
     parser.add_argument(
-        "--topics-file-path", "--topics-path",
-        dest="topics_file_path",
+        "--topics-zip-path", "--topics-path", "--topics-file-path",
+        dest="topics_zip_path",
         type=str,
-        default=DEFAULT_TOPICS_FILE_PATH,
+        default=DEFAULT_TOPICS_ZIP_PATH,
     )
     parser.add_argument(
         "--stopwords",
@@ -321,7 +321,7 @@ def main():
 
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
-    topics_file_path: str = args.topics_file_path
+    topics_zip_path: str = args.topics_zip_path
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
@@ -355,7 +355,7 @@ def main():
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
-        topics_file_path=topics_file_path,
+        topics_zip_path=topics_zip_path,
         stopwords_file=stopwords_file,
         stemmer=stemmer,
         language=language,
