@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from gzip import GzipFile
 from hashlib import md5
+from logging import warning
 from os.path import basename
 from pathlib import Path
 from typing import List, Union
@@ -85,20 +86,35 @@ def _parse_objects(xml: Element) -> List[str]:
 
 
 def _parse_topic(xml: Element) -> Query:
+    number = int(xml.findtext("number").strip())
+
     title = xml.findtext("title").strip()
-    objects = xml.find("objects")
-    if objects is None:
-        raise ValueError(
+
+    objects_element = xml.find("objects")
+    if objects_element is None:
+        warning(
             f"No objects were found for topic '{title}'. "
-            "You may need to re-download the topic file."
+            "You may need to re-download the latest topic file."
         )
-    return Query(
-        int(xml.findtext("number").strip()),
-        title,
-        _parse_objects(objects),
-        xml.findtext("description").strip(),
-        xml.findtext("narrative").strip(),
-    )
+        objects = []
+    else:
+        objects = _parse_objects(objects_element)
+
+    description_element = xml.find("description")
+    if description_element is not None:
+        description = description_element.text.strip()
+    else:
+        warning(f"No description was given for topic '{title}'.")
+        description = ""
+
+    narrative_element = xml.find("narrative")
+    if narrative_element is not None:
+        narrative = narrative_element.text.strip()
+    else:
+        warning(f"No narrative was given for topic '{title}'.")
+        narrative = ""
+
+    return Query(number, title, objects, description, narrative)
 
 
 def _parse_topics(tree: ElementTree) -> List[Query]:
