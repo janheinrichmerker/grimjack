@@ -7,11 +7,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.idea/ZeppelinRemoteNotebooks" />
-      <excludeFolder url="file://$MODULE_DIR$/data/cache" />
-      <excludeFolder url="file://$MODULE_DIR$/data/documents" />
-      <excludeFolder url="file://$MODULE_DIR$/data/index" />
-      <excludeFolder url="file://$MODULE_DIR$/data/out" />
-      <excludeFolder url="file://$MODULE_DIR$/data/topics" />
+      <excludeFolder url="file://$MODULE_DIR$/data" />
     </content>
     <orderEntry type="jdk" jdkName="Pipenv (Project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
