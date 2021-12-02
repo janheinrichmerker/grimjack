@@ -21,7 +21,8 @@ def get_quality_scores(
         cache_path.mkdir(parents=True, exist_ok=True)
 
     content_hash: str = md5(document.content.encode()).hexdigest()
-    cache_file = cache_path / f"{query.id}-{document.id}-{content_hash}.json" \
+    title_hash: str = md5(query.title.encode()).hexdigest()
+    cache_file = cache_path / f"{query.id}-{document.id}-{title_hash}-{content_hash}.json" \
         if cache_path is not None \
         else None
 
