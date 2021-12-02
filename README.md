@@ -43,6 +43,16 @@ pipenv run python -m grimjack run-all data/run.txt
 This will save a run file at `data/run.txt` with the format described in
 the [shared task description](https://webis.de/events/touche-22/shared-task-2.html#submission).
 
+### Evaluate all topics
+
+To evaluate the search pipeline for all topics, run the `grimjack` CLI like this:
+
+```shell script
+pipenv run python -m grimjack evaluate-all
+```
+
+This will print the evaluation metric (default: nDCG@10) to the console.
+
 #### Options
 
 The search pipeline can be configured with the options listed in the help command.
