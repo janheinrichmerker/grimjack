@@ -13,8 +13,7 @@ from grimjack.constants import (
     DEFAULT_DEBATER_API_TOKEN_PATH,
     DEFAULT_CACHE_DIR
 )
-from grimjack.modules.options import RetrievalModel, RerankerType, \
-    RetrievalScore
+from grimjack.modules.options import RetrievalModel, RerankerType, Metric
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -52,10 +51,12 @@ _RERANKER_TYPES = {
     "a": RerankerType.AXIOMATIC,
 }
 
-_RETRIEVAL_SCORES = {
-    "ndcg": RetrievalScore.NDCG,
-    "precision": RetrievalScore.PRECISION,
-    "map": RetrievalScore.MAP
+_METRICS = {
+    "ndcg": Metric.NDCG,
+    "precision": Metric.PRECISION,
+    "prec": Metric.PRECISION,
+    "p": Metric.PRECISION,
+    "map": Metric.MAP
 }
 
 
@@ -191,10 +192,10 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=DEFAULT_CACHE_DIR
     )
     parser.add_argument(
-        "--evaluation-score",
-        dest="evaluation_score",
+        "--evaluation-metric", "--metric", "--evaluation-score",
+        dest="metric",
         type=str,
-        choices=_RETRIEVAL_SCORES.keys(),
+        choices=_METRICS.keys(),
         default="ndcg",
     )
     parser.add_argument(
@@ -307,11 +308,11 @@ def _parse_reranker(reranker: str) -> Optional[RerankerType]:
         raise Exception(f"Unknown reranker: {reranker}")
 
 
-def _parse_retrieval_score(retrieval_score: str) -> RetrievalScore:
-    if retrieval_score in _RETRIEVAL_SCORES.keys():
-        return _RETRIEVAL_SCORES[retrieval_score]
+def _parse_metric(metric: str) -> Metric:
+    if metric in _METRICS.keys():
+        return _METRICS[metric]
     else:
-        raise Exception(f"Unknown retrieval score: {retrieval_score}")
+        raise Exception(f"Unknown metric: {metric}")
 
 
 def main():
@@ -346,8 +347,7 @@ def main():
             f"Must specify IBM Debater API token in the command line "
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
-    retrieval_score: RetrievalScore = _parse_retrieval_score(
-        args.evaluation_score)
+    metric: Metric = _parse_metric(args.metric)
     depth: int = args.depth
     qrel: str = args.qrel_file
     qrel_zip: str = args.qrel_zip_url
@@ -368,7 +368,7 @@ def main():
         targer_models=targer_models,
         debater_api_token=debater_api_token,
         cache_path=cache_path,
-        retrieval_score=retrieval_score,
+        retrieval_score=metric,
         depth=depth,
         qrel=qrel,
         qrel_zip=qrel_zip

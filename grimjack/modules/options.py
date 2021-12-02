@@ -23,7 +23,7 @@ class RerankerType(Enum):
     AXIOMATIC = 1
 
 
-class RetrievalScore(Enum):
+class Metric(Enum):
     NDCG = 1
     PRECISION = 2
     MAP = 3
