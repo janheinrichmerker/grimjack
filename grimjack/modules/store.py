@@ -8,7 +8,7 @@ from xml.etree.ElementTree import parse, ElementTree, Element
 
 from dload import save_unzip
 
-from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR
+from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, QRELS_DIR
 from grimjack.model import Query
 from grimjack.modules import DocumentsStore, TopicsStore
 
@@ -127,3 +127,19 @@ class TrecTopicsStore(TopicsStore):
     def topics(self) -> List[Query]:
         xml: ElementTree = parse(self.topics_file)
         return _parse_topics(xml)
+
+
+@dataclass
+class QrelStore():
+    qrels_zip_url: str
+    qrels_file_path: str
+
+    @property
+    def _qrels_zip_url_hash(self) -> str:
+        return _hash_url(self.qrels_zip_url)
+
+    @property
+    def qrels_path(self) -> str:
+        download_dir = QRELS_DIR / self._qrels_zip_url_hash
+        _download_if_needed(self.qrels_zip_url, download_dir, "qrel")
+        return download_dir / self.qrels_file_path

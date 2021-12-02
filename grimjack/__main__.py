@@ -5,13 +5,16 @@ from typing import Optional, Union, Set
 
 from grimjack.constants import (
     DEFAULT_DOCUMENTS_ZIP_URL,
+    DEFAULT_QRELS_FILE_PATH,
+    DEFAULT_QRELS_ZIP_URL,
     DEFAULT_TOPICS_ZIP_URL,
     DEFAULT_TOPICS_FILE_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH,
     DEFAULT_DEBATER_API_TOKEN_PATH,
     DEFAULT_CACHE_DIR
 )
-from grimjack.modules.options import RetrievalModel, RerankerType
+from grimjack.modules.options import RetrievalModel, RerankerType, \
+    RetrievalScore
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -47,6 +50,12 @@ _RERANKER_TYPES = {
     "axiomatic": RerankerType.AXIOMATIC,
     "axiom": RerankerType.AXIOMATIC,
     "a": RerankerType.AXIOMATIC,
+}
+
+_RETRIEVAL_SCORES = {
+    "ndcg": RetrievalScore.NDCG,
+    "precision": RetrievalScore.PRECISION,
+    "map": RetrievalScore.MAP
 }
 
 
@@ -181,6 +190,31 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         type=Optional[Path],
         default=DEFAULT_CACHE_DIR
     )
+    parser.add_argument(
+        "--evaluation-score",
+        dest="evaluation_score",
+        type=str,
+        choices=_RETRIEVAL_SCORES.keys(),
+        default="ndcg",
+    )
+    parser.add_argument(
+        "--depth",
+        dest="depth",
+        type=int,
+        default=1000,
+    )
+    parser.add_argument(
+        "--qrel-file",
+        dest="qrel_file",
+        type=str,
+        default=DEFAULT_QRELS_FILE_PATH
+    )
+    parser.add_argument(
+        "--qrel-zip-url",
+        dest="qrel_zip_url",
+        type=str,
+        default=DEFAULT_QRELS_ZIP_URL
+    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
@@ -273,6 +307,13 @@ def _parse_reranker(reranker: str) -> Optional[RerankerType]:
         raise Exception(f"Unknown reranker: {reranker}")
 
 
+def _parse_retrieval_score(retrieval_score: str) -> RetrievalScore:
+    if retrieval_score in _RETRIEVAL_SCORES.keys():
+        return _RETRIEVAL_SCORES[retrieval_score]
+    else:
+        raise Exception(f"Unknown retrieval score: {retrieval_score}")
+
+
 def main():
     parser: ArgumentParser = ArgumentParser()
     _prepare_parser(parser)
@@ -305,6 +346,11 @@ def main():
             f"Must specify IBM Debater API token in the command line "
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
+    retrieval_score: RetrievalScore = _parse_retrieval_score(
+        args.evaluation_score)
+    depth: int = args.depth
+    qrel: str = args.qrel_file
+    qrel_zip: str = args.qrel_zip_url
     cache_path: Optional[Path] = args.cache_path
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
@@ -322,6 +368,10 @@ def main():
         targer_models=targer_models,
         debater_api_token=debater_api_token,
         cache_path=cache_path,
+        retrieval_score=retrieval_score,
+        depth=depth,
+        qrel=qrel,
+        qrel_zip=qrel_zip
     )
 
     if args.command == "search":

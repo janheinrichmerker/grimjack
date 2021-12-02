@@ -5,6 +5,7 @@ DATA_DIR = PROJECT_DIR / "data"
 DOCUMENTS_DIR = DATA_DIR / "documents"
 INDEX_DIR = DATA_DIR / "index"
 TOPICS_DIR = DATA_DIR / "topics"
+QRELS_DIR = DATA_DIR / "qrel"
 
 _BASE_DIRS = [
     DATA_DIR,
@@ -26,9 +27,13 @@ DEFAULT_DOCUMENTS_ZIP_URL = (
 DEFAULT_TOPICS_ZIP_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
+DEFAULT_QRELS_ZIP_URL = (
+    "https://webis.de/events/touche-21/touche-task2-51-100-relevance.qrels"
+)
 DEFAULT_TOPICS_FILE_PATH = "topics-task2.xml"
 DEFAULT_TARGER_API_URL = "https://demo.webis.de/targer-api/"
 DEFAULT_HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/"
 DEFAULT_HUGGINGFACE_API_TOKEN_PATH = PROJECT_DIR / ".huggingface.txt"
 DEFAULT_DEBATER_API_TOKEN_PATH = PROJECT_DIR / ".debater.txt"
 DEFAULT_CACHE_DIR = DATA_DIR / "cache"
+DEFAULT_QRELS_FILE_PATH = "touche-task2-51-100-relevance.qrels"
