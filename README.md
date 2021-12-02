@@ -6,19 +6,23 @@
 
 # 🤺 grimjack
 
-Named after the fencer [Grimjack](https://en.wikipedia.org/wiki/Grimjack).
+Argumentative passage search engine, named after the fencer [Grimjack](https://en.wikipedia.org/wiki/Grimjack).
 
-Participation in the [Touché 2022](https://webis.de/events/touche-22/) shared task 2, as part of the 
-[Advanced Information Retrieval](https://gitlab.informatik.uni-halle.de/aqvbw/Information-Retrieval/) lecture.
+Participation in the [Touché 2022](https://webis.de/events/touche-22/) shared task 2, as part of the
+[Advanced Information Retrieval](https://gitlab.informatik.uni-halle.de/aqvbw/Information-Retrieval/) lecture
+at [Martin Luther University Halle-Wittenberg](https://uni-halle.de).
 
 ## Usage
 
+The following sections describe how to use the Grimjack search engine using Pipenv.
+See the [Docker section](#docker) for instructions on how to use Grimjack inside a Docker container.
+
 ### Installation
 
-First, install [Python 3](https://python.org/downloads/), 
-[pipx](https://pipxproject.github.io/pipx/installation/#install-pipx), and 
+First, install [Python 3](https://python.org/downloads/),
+[pipx](https://pipxproject.github.io/pipx/installation/#install-pipx), and
 [Pipenv](https://pipenv.pypa.io/en/latest/install/#isolated-installation-of-pipenv-with-pipx).
-Then install dependencies (may take a while):
+Then install dependencies (this may take a while):
 
 ```shell script
 pipenv install
@@ -37,7 +41,7 @@ pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
 To search all topics and generate a run file, run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack run-all data/run.txt
+pipenv run python -m grimjack run data/run.txt
 ```
 
 This will save a run file at `data/run.txt` with the format described in
@@ -53,46 +57,94 @@ pipenv run python -m grimjack evaluate-all
 
 This will print the evaluation metric (default: nDCG@10) to the console.
 
-#### Options
+### Options
 
-The search pipeline can be configured with the options listed in the help command.
-The help command also lists all subcommands.
+The search pipeline can be configured with the options listed in the help command. The help command also lists all
+subcommands.
 
 ```shell script
 pipenv run python -m grimjack --help
 ```
 
-Each subcommand's extra options can be listed like this:
+Each subcommand's extra options can be listed, e.g.:
 
 ```shell script
 pipenv run python -m grimjack search --help
 ```
 
-#### Examples
+### Examples / Touché 2022 Runs
 
-Search for the top 10 results based on the query likelihood retrieval model
-with query expansion using synonyms from the T0pp language model 
-and no stemming for the index.
-Rerank the top 3 documents with axiomatic reranking
+The following examples correspond to the runs we submit to the
+[Touché 2022 shared task](https://webis.de/events/touche-22/).
 
-```shell script
+#### 1. Baseline
+
+```shell
 pipenv run python -m grimjack \
-  --retrieval-model query-likelihood \
-  --no-stemmer --query-expansion t0pp \
-  --reranker axiomatic --rerank-hits 3 \
-  search --num-hits 10 \
-  "Which is better, a laptop or a desktop?"
+  --retrieval-model query-likelihood-dirichlet \
+  run \
+  --num-hits 100 \
+  data/runs/grimjack-baseline.txt
 ```
 
-### Testing
+#### 2. All you need is T0
 
-Run all unit tests:
+TODO
+
+```shell
+pipenv run python -m grimjack \
+  --retrieval-model query-likelihood-dirichlet \
+  --query-expansion t0pp \
+  run \
+  --num-hits 100 \
+  data/runs/grimjack-baseline.txt
+```
+
+#### 3. Argumentative Axioms
+
+TODO
+
+```shell
+pipenv run python -m grimjack \
+  --retrieval-model query-likelihood-dirichlet \
+  run \
+  --num-hits 100 \
+  data/runs/grimjack-baseline.txt
+```
+
+#### 4. Fair Reranking
+
+TODO
+
+```shell
+pipenv run python -m grimjack \
+  --retrieval-model query-likelihood-dirichlet \
+  run \
+  --num-hits 100 \
+  data/runs/grimjack-baseline.txt
+```
+
+#### 5. Fair Argumentative Reranking with T0
+
+TODO
+
+```shell
+pipenv run python -m grimjack \
+  --retrieval-model query-likelihood-dirichlet \
+  run \
+  --num-hits 100 \
+  data/runs/grimjack-baseline.txt
+```
+
+## Testing
+
+After [installing](#installation) all dependencies, you can run all unit tests:
 
 ```shell script
 pipenv run pytest
 ```
 
-### Docker
+## Docker
 
 Grimjack can also be used as a Docker container:
 
@@ -104,7 +156,7 @@ docker container run grimjack --help
 We recommend to bind mount the data directory to the container, for example:
 
 ```shell
-docker container run -v "$(pwd)"/data:/workspace/data grimjack run-all data/run.txt
+docker container run -v "$(pwd)"/data:/workspace/data grimjack run data/run.txt
 ```
 
 ## License
