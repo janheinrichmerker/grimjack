@@ -53,7 +53,8 @@ _METRICS = {
     "precision": Metric.PRECISION,
     "prec": Metric.PRECISION,
     "p": Metric.PRECISION,
-    "map": Metric.MAP
+    "map": Metric.MAP,
+    "bpref": Metric.BPREF,
 }
 
 

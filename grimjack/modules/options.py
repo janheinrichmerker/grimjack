@@ -28,3 +28,4 @@ class Metric(Enum):
     NDCG = 1
     PRECISION = 2
     MAP = 3
+    BPREF = 4

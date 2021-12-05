@@ -204,5 +204,3 @@ class Pipeline:
                     print(f"{id:4d}: {value}")
             else:
                 print(evaluation.evaluate(run_file, depth))
-
-# bpref
