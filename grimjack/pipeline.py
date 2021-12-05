@@ -23,6 +23,9 @@ from grimjack.modules import (
 from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
 )
+from grimjack.modules.argument_quality_stance_tagger import (
+    DebaterArgumentQualityStanceTagger
+)
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
 from grimjack.modules.index import AnseriniIndex
@@ -138,11 +141,16 @@ class Pipeline:
             debater_api_token,
             cache_path / "debater" if cache_path is not None else None,
         )
+        self.argument_stance_tagger = DebaterArgumentQualityStanceTagger(
+            debater_api_token,
+            cache_path / "stance" if cache_path is not None else None,
+        )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
         ranking = self.argument_tagger.tag_ranking(ranking)
         ranking = self.argument_quality_tagger.tag_ranking(query, ranking)
+        ranking = self.argument_stance_tagger.tag_ranking(query, ranking)
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
