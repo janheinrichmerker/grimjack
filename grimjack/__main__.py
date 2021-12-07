@@ -53,7 +53,8 @@ _METRICS = {
     "precision": Metric.PRECISION,
     "prec": Metric.PRECISION,
     "p": Metric.PRECISION,
-    "map": Metric.MAP
+    "map": Metric.MAP,
+    "bpref": Metric.BPREF,
 }
 
 
@@ -112,7 +113,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="query_expansions",
         type=str,
         choices=_QUERY_EXPANSIONS.keys(),
-        default={"original"},
+        default=["original"],
         action="append"
     )
     parser.add_argument(

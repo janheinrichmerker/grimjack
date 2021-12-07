@@ -8,6 +8,7 @@ from trectools import TrecQrel
 
 from grimjack.model import RankedDocument, Query, Document
 from grimjack.model.arguments import ArgumentRankedDocument
+from grimjack.model.stance import ArgumentQualityStanceRankedDocument
 from grimjack.model.quality import ArgumentQualityRankedDocument
 
 
@@ -178,6 +179,26 @@ class ArgumentQualityTagger(ABC):
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
+        pass
+
+
+class ArgumentQualityStanceTagger(ABC):
+    def tag_ranking(
+        self,
+        query: Query,
+        ranking: List[ArgumentQualityRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
+        return [
+            self.tag_document(query, document)
+            for document in ranking
+        ]
+
+    @abstractmethod
+    def tag_document(
+        self,
+        query: Query,
+        document: ArgumentQualityRankedDocument
+    ) -> ArgumentQualityStanceRankedDocument:
         pass
 
 

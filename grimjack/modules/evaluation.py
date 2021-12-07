@@ -85,6 +85,8 @@ class TrecEvaluation(Evaluation):
             return evaluation.get_precision(depth=depth)
         elif self.metric == Metric.MAP:
             return evaluation.get_map(depth=depth)
+        elif self.metric == Metric.BPREF:
+            return evaluation.get_bpref(depth=depth)
         else:
             raise Exception(f"Unknown metric: {self.metric}")
             pass
@@ -102,6 +104,8 @@ class TrecEvaluation(Evaluation):
             result = evaluation.get_precision(depth=depth, per_query=True)
         elif self.metric == Metric.MAP:
             result = evaluation.get_map(depth=depth, per_query=True)
+        elif self.metric == Metric.BPREF:
+            result = evaluation.get_bpref(depth=depth, per_query=True)
         else:
             raise Exception(f"Unknown metric: {self.metric}")
             pass
