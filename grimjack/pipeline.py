@@ -59,7 +59,7 @@ class Pipeline:
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
-            query_expansions: List[QueryExpansion],
+            query_expansions: Set[QueryExpansion],
             retrieval_model: Optional[RetrievalModel],
             reranker: Optional[RerankerType],
             rerank_hits: int,
@@ -192,9 +192,7 @@ class Pipeline:
             self.run_search_all(run_file, depth)
             if per_query:
                 result = evaluation.evaluate_per_query(run_file, depth)
-                for id, value in result.items():
-                    print(f"{id:4d}: {value}")
+                for query_id, value in result.items():
+                    print(f"{query_id:4d}: {value}")
             else:
                 print(evaluation.evaluate(run_file, depth))
-
-# bpref

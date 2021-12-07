@@ -22,9 +22,12 @@ def get_quality_scores(
 
     content_hash: str = md5(document.content.encode()).hexdigest()
     title_hash: str = md5(query.title.encode()).hexdigest()
-    cache_file = cache_path / f"{query.id}-{document.id}-{title_hash}-{content_hash}.json" \
-        if cache_path is not None \
+    cache_file = (
+        cache_path / f"{query.id}-{document.id}-"
+                     f"{title_hash}-{content_hash}.json"
+        if cache_path is not None
         else None
+    )
 
     # Check if the API response is found in the cache.
     if cache_file is not None and cache_file.exists() and cache_file.is_file():

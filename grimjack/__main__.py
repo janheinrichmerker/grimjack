@@ -141,7 +141,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=None,
     )
     parser.add_argument(
-        "--reranker", "-r",
+        "--reranker", "--rerank", "-r",
         dest="reranker",
         type=str,
         choices=_RERANKER_TYPES.keys(),
@@ -310,11 +310,11 @@ def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
 
 def _parse_query_expansions(
         query_expansions: List[str]
-) -> List[QueryExpansion]:
-    return [
+) -> Set[QueryExpansion]:
+    return {
         _parse_query_expansion(query_expansion)
         for query_expansion in query_expansions
-    ]
+    }
 
 
 def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
@@ -363,7 +363,7 @@ def main():
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
-    query_expansions: Optional[QueryExpansion] = _parse_query_expansions(
+    query_expansions: Set[QueryExpansion] = _parse_query_expansions(
         args.query_expansions
     )
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
