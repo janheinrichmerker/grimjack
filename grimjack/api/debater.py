@@ -122,6 +122,14 @@ def get_stance_scores(
     return stance
 
 
+def _claims(query: Query) -> List[str]:
+    if len(query.objects) <= 0:
+        return [query.title]
+    claim_object_1 = f"{query.objects[0]} is the best"
+    claim_object_2 = f"{query.objects[1]} is the best"
+    return [claim_object_1, claim_object_2]
+
+
 def _fetch_stance_scores(
         query: Query,
         document: ArgumentQualityRankedDocument,
@@ -132,10 +140,7 @@ def _fetch_stance_scores(
     debater_api = DebaterApi(api_token)
     pro_con_client = debater_api.get_pro_con_client()
 
-    claim_object_1 = f"{query.objects[0]} is better than {query.objects[1]}"
-    claim_object_2 = f"{query.objects[1]} is better than {query.objects[0]}"
-    claim_equal = f"{query.objects[0]} is as good as {query.objects[1]}"
-    topics = [claim_object_1, claim_object_2, claim_equal]
+    topics = _claims(query)
     scores = []
     sentences = sent_tokenize(document.content)
     for topic in topics:
@@ -147,20 +152,15 @@ def _fetch_stance_scores(
             for sentence in sentences
         ]
         scores.append(pro_con_client.run(sentence_topic_pairs))
-    scores_claim_object_1 = scores[0]
-    scores_claim_object_2 = scores[1]
-    scores_claim_equal = scores[2]
     return [
         ArgumentQualityStanceSentence(
             sentence,
             quality.quality,
-            [object_1, object_2, equal]
+            [elem[i] for elem in scores]
         )
-        for sentence, quality, object_1, object_2, equal in zip(
+        for sentence, quality, i in zip(
             sentences,
             document.quality,
-            scores_claim_object_1,
-            scores_claim_object_2,
-            scores_claim_equal
+            range(len(scores[0]))
         )
     ]
