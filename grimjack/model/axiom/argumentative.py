@@ -72,13 +72,12 @@ def _is_claim_or_premise(tag: TargerArgumentTag) -> bool:
     return _is_claim(tag) or _is_premise(tag)
 
 
-def _count_query_terms(
-        context: RerankingContext,
+def _count_terms(
         sentences: TargerArgumentSentences,
-        query: Query
+        terms: List[str]
 ):
     term_count = 0
-    for term in context.terms(query.title):
+    for term in terms:
         normalized_term = _lemmatize(term)
         for sentence in sentences:
             for tag in sentence:
@@ -91,14 +90,21 @@ def _count_query_terms(
     return term_count
 
 
-def _query_term_position_in_argument(
+def _count_query_terms(
         context: RerankingContext,
         sentences: TargerArgumentSentences,
         query: Query
 ):
+    return _count_terms(sentences, context.terms(query.title))
+
+
+def _term_position_in_argument(
+        sentences: TargerArgumentSentences,
+        terms: List[str]
+):
     term_arg_pos: List[int] = []
     tags = [tag for sentence in sentences for tag in sentence]
-    for term in context.terms(query.title):
+    for term in terms:
         normalized_term = _lemmatize(term)
         count: int = 1
         flag: bool = False
@@ -118,6 +124,14 @@ def _query_term_position_in_argument(
     return mean(term_arg_pos)
 
 
+def _query_term_position_in_argument(
+        context: RerankingContext,
+        sentences: TargerArgumentSentences,
+        query: Query
+):
+    return _term_position_in_argument(sentences, context.terms(query.title))
+
+
 def _sentence_length(document: RankedDocument) -> float:
     download_nltk_dependencies("punkt")
     sentences = sent_tokenize(document.content)
@@ -125,6 +139,32 @@ def _sentence_length(document: RankedDocument) -> float:
         len(word_tokenize(sentence))
         for sentence in sentences
     )
+
+
+def _count_comparative_object_terms(
+        context: RerankingContext,
+        sentences: TargerArgumentSentences,
+        query: Query
+):
+    terms = [
+        term
+        for obj in query.objects
+        for term in context.terms(obj)
+    ]
+    return _count_terms(sentences, terms)
+
+
+def _comparative_object_term_position_in_argument(
+        context: RerankingContext,
+        sentences: TargerArgumentSentences,
+        query: Query
+):
+    terms = [
+        term
+        for obj in query.objects
+        for term in context.terms(obj)
+    ]
+    return _term_position_in_argument(sentences, terms)
 
 
 class ArgumentCountAxiom(Axiom):
@@ -264,6 +304,86 @@ class AverageSentenceLengthAxiom(Axiom):
                         sentence_length1 > 20
                 )
         ):
+            return -1
+        else:
+            return 0
+
+
+class ComparativeObjectTermsInArgumentAxiom(Axiom):
+    def preference(
+            self,
+            context: RerankingContext,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        if not (
+                isinstance(document1, ArgumentRankedDocument) and
+                isinstance(document2, ArgumentRankedDocument)
+        ):
+            return 0
+        document1: ArgumentRankedDocument
+        document2: ArgumentRankedDocument
+
+        if not approximately_same_length(context, document1, document2):
+            return 0
+
+        count1 = sum(
+            _count_comparative_object_terms(context, sentences, query)
+            for _, sentences in document1.arguments.items()
+        )
+        count2 = sum(
+            _count_comparative_object_terms(context, sentences, query)
+            for _, sentences in document2.arguments.items()
+        )
+
+        if count1 > count2:
+            return 1
+        elif count1 < count2:
+            return -1
+        else:
+            return 0
+
+
+class ComparativeObjectTermPositionInArgumentAxiom(Axiom):
+    def preference(
+            self,
+            context: RerankingContext,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        if not (
+                isinstance(document1, ArgumentRankedDocument) and
+                isinstance(document2, ArgumentRankedDocument)
+        ):
+            return 0
+        document1: ArgumentRankedDocument
+        document2: ArgumentRankedDocument
+
+        if not approximately_same_length(context, document1, document2):
+            return 0
+
+        position1 = mean(list(
+            _comparative_object_term_position_in_argument(
+                context,
+                sentences,
+                query
+            )
+            for _, sentences in document1.arguments.items()
+        ))
+        position2 = mean(list(
+            _comparative_object_term_position_in_argument(
+                context,
+                sentences,
+                query
+            )
+            for _, sentences in document2.arguments.items()
+        ))
+
+        if position1 < position2:
+            return 1
+        elif position1 > position2:
             return -1
         else:
             return 0

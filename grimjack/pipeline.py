@@ -8,7 +8,9 @@ from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import OriginalAxiom
 from grimjack.model.axiom.argumentative import (
     AverageSentenceLengthAxiom, QueryTermPositionInArgumentAxiom,
-    QueryTermsInArgumentAxiom, ArgumentCountAxiom
+    QueryTermsInArgumentAxiom, ArgumentCountAxiom,
+    ComparativeObjectTermsInArgumentAxiom,
+    ComparativeObjectTermPositionInArgumentAxiom
 )
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
@@ -134,7 +136,9 @@ class Pipeline:
                         ArgumentCountAxiom() +
                         QueryTermsInArgumentAxiom() +
                         QueryTermPositionInArgumentAxiom() +
-                        AverageSentenceLengthAxiom()
+                        AverageSentenceLengthAxiom() +
+                        ComparativeObjectTermsInArgumentAxiom() +
+                        ComparativeObjectTermPositionInArgumentAxiom()
                 ).normalized().cached(),
             )
         else:
