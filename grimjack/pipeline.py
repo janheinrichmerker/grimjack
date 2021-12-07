@@ -32,8 +32,9 @@ from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Metric, Stemmer, QueryExpansion, RetrievalModel, RerankerType
 )
-from grimjack.modules.query_expander import SimpleQueryExpander, \
-    AggregatedQueryExpander
+from grimjack.modules.query_expander import (
+    SimpleQueryExpander, AggregatedQueryExpander
+)
 from grimjack.modules.reranker import (
     OriginalReranker, AxiomaticReranker, TopReranker
 )
