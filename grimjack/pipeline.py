@@ -6,6 +6,10 @@ from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import OriginalAxiom
+from grimjack.model.axiom.argumentative import (
+    AverageSentenceLengthAxiom, QueryTermPositionInArgumentAxiom,
+    QueryTermsInArgumentAxiom, ArgumentCountAxiom
+)
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
 from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
@@ -126,7 +130,11 @@ class Pipeline:
                         RS_TF_IDF() +
                         RS_BM25() +
                         RS_PL2() +
-                        RS_QL()
+                        RS_QL() +
+                        ArgumentCountAxiom() +
+                        QueryTermsInArgumentAxiom() +
+                        QueryTermPositionInArgumentAxiom() +
+                        AverageSentenceLengthAxiom()
                 ).normalized().cached(),
             )
         else:
