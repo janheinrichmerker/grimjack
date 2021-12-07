@@ -32,6 +32,5 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             score=document.score,
             rank=document.rank,
             arguments=document.arguments,
-            quality=document.quality,
-            stance=stance
+            quality_stance=stance
         )

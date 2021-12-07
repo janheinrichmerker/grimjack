@@ -1,4 +1,4 @@
-from grimjack.model.quality import ArgumentQualityRankedDocument
+from grimjack.model.arguments import ArgumentRankedDocument
 from dataclasses_json import DataClassJsonMixin
 from dataclasses import dataclass
 from typing import List
@@ -12,5 +12,5 @@ class ArgumentQualityStanceSentence(DataClassJsonMixin):
 
 
 @dataclass
-class ArgumentQualityStanceRankedDocument(ArgumentQualityRankedDocument):
-    stance: List[ArgumentQualityStanceSentence]
+class ArgumentQualityStanceRankedDocument(ArgumentRankedDocument):
+    quality_stance: List[ArgumentQualityStanceSentence]
