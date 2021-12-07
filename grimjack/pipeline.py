@@ -10,7 +10,7 @@ from grimjack.model.axiom.argumentative import (
     AverageSentenceLengthAxiom, QueryTermPositionInArgumentAxiom,
     QueryTermsInArgumentAxiom, ArgumentCountAxiom,
     ComparativeObjectTermsInArgumentAxiom,
-    ComparativeObjectTermPositionInArgumentAxiom
+    ComparativeObjectTermPositionInArgumentAxiom, ArgumentQualityAxiom
 )
 from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
@@ -143,7 +143,8 @@ class Pipeline:
                         QueryTermPositionInArgumentAxiom() +
                         AverageSentenceLengthAxiom() +
                         ComparativeObjectTermsInArgumentAxiom() +
-                        ComparativeObjectTermPositionInArgumentAxiom()
+                        ComparativeObjectTermPositionInArgumentAxiom() +
+                        ArgumentQualityAxiom()
                 ).normalized().cached(),
             )
         else:

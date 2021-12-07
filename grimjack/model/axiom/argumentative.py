@@ -9,7 +9,10 @@ from targer.model import (
 from grimjack.model import RankedDocument, Query
 from grimjack.model.arguments import ArgumentRankedDocument
 from grimjack.model.axiom import Axiom
-from grimjack.model.axiom.utils import approximately_same_length
+from grimjack.model.axiom.utils import (
+    approximately_same_length, strictly_greater
+)
+from grimjack.model.quality import ArgumentQualityRankedDocument
 from grimjack.modules import RerankingContext
 from grimjack.utils.nltk import download_nltk_dependencies
 
@@ -180,8 +183,6 @@ class ArgumentCountAxiom(Axiom):
                 isinstance(document2, ArgumentRankedDocument)
         ):
             return 0
-        document1: ArgumentRankedDocument
-        document2: ArgumentRankedDocument
 
         if not approximately_same_length(context, document1, document2):
             return 0
@@ -216,8 +217,6 @@ class QueryTermsInArgumentAxiom(Axiom):
                 isinstance(document2, ArgumentRankedDocument)
         ):
             return 0
-        document1: ArgumentRankedDocument
-        document2: ArgumentRankedDocument
 
         if not approximately_same_length(context, document1, document2):
             return 0
@@ -252,8 +251,6 @@ class QueryTermPositionInArgumentAxiom(Axiom):
                 isinstance(document2, ArgumentRankedDocument)
         ):
             return 0
-        document1: ArgumentRankedDocument
-        document2: ArgumentRankedDocument
 
         if not approximately_same_length(context, document1, document2):
             return 0
@@ -322,8 +319,6 @@ class ComparativeObjectTermsInArgumentAxiom(Axiom):
                 isinstance(document2, ArgumentRankedDocument)
         ):
             return 0
-        document1: ArgumentRankedDocument
-        document2: ArgumentRankedDocument
 
         if not approximately_same_length(context, document1, document2):
             return 0
@@ -358,8 +353,6 @@ class ComparativeObjectTermPositionInArgumentAxiom(Axiom):
                 isinstance(document2, ArgumentRankedDocument)
         ):
             return 0
-        document1: ArgumentRankedDocument
-        document2: ArgumentRankedDocument
 
         if not approximately_same_length(context, document1, document2):
             return 0
@@ -387,3 +380,23 @@ class ComparativeObjectTermPositionInArgumentAxiom(Axiom):
             return -1
         else:
             return 0
+
+
+class ArgumentQualityAxiom(Axiom):
+    def preference(
+            self,
+            context: RerankingContext,
+            query: Query,
+            document1: RankedDocument,
+            document2: RankedDocument
+    ):
+        if not approximately_same_length(context, document1, document2):
+            return 0
+
+        if not (
+                isinstance(document1, ArgumentQualityRankedDocument) and
+                isinstance(document2, ArgumentQualityRankedDocument)
+        ):
+            return 0
+
+        return strictly_greater(document1.quality, document2.quality)
