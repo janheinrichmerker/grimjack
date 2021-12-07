@@ -22,6 +22,7 @@ from grimjack.model.axiom.retrieval_score import (
     RS_TF, RS_TF_IDF, RS_BM25, RS_PL2, RS_QL
 )
 from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
+from grimjack.model.axiom.term_similarity import STMC1, STMC1_f, STMC2, STMC2_f
 from grimjack.modules import (
     DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
     ArgumentTagger, ArgumentQualityTagger,
@@ -133,6 +134,10 @@ class Pipeline:
                         RS_BM25() +
                         RS_PL2() +
                         RS_QL() +
+                        STMC1() +
+                        STMC1_f() +
+                        STMC2() +
+                        STMC2_f() +
                         ArgumentCountAxiom() +
                         QueryTermsInArgumentAxiom() +
                         QueryTermPositionInArgumentAxiom() +
