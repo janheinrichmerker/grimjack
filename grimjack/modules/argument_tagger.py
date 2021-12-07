@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Set
 
-from grimjack.api.targer import fetch_arguments
+from targer.api import fetch_arguments
+
 from grimjack.model import RankedDocument
 from grimjack.model.arguments import ArgumentRankedDocument
 
@@ -20,9 +21,10 @@ class TargerArgumentTagger(ArgumentTagger):
             document: RankedDocument
     ) -> ArgumentRankedDocument:
         arguments = fetch_arguments(
+            document.content,
+            self.models,
             self.targer_api_url,
-            self.models, document,
-            self.cache_path
+            self.cache_path,
         )
         return ArgumentRankedDocument(
             id=document.id,
