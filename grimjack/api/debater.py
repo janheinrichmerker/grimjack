@@ -52,6 +52,8 @@ class CachedDebaterArgumentQualityScorer(ContextManager):
             for sentence in sentences
             if sentence not in topic_cache
         ]
+        if len(unknown) == 0:
+            return
 
         # Prefetch scores
         scores = self._client.run([
@@ -119,6 +121,8 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
             for sentence in sentences
             if sentence not in topic_cache
         ]
+        if len(unknown) == 0:
+            return
 
         # Prefetch scores
         scores = self._client.run([
