@@ -4,6 +4,7 @@ from typing import List
 
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import Axiom
+from grimjack.model.stance import ArgumentQualityStanceRankedDocument
 from grimjack.modules import Reranker, RerankingContext
 
 
@@ -126,3 +127,83 @@ class TopReranker(Reranker):
         reranked.extend(ranking[k:])
 
         return reranked
+
+
+class AlternatingStanceFairnessReranker(Reranker):
+    @staticmethod
+    def _stance(document: RankedDocument) -> float:
+        if not isinstance(
+                document,
+                ArgumentQualityStanceRankedDocument
+        ):
+            return 0
+        else:
+            return document.average_stance
+
+    def _alternate_stance(
+            self,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        old_ranking = ranking.copy()
+        new_ranking = []
+
+        last_stance: float = 0
+        while len(old_ranking) > 0:
+            index: int
+
+            if last_stance > 0:
+                # Last document was pro A.
+                # Find first pro B or neutral document next.
+                # If no such document is found, choose
+                # first document regardless of stance.
+                index = next(
+                    (
+                        i
+                        for i, document in enumerate(old_ranking)
+                        if self._stance(document) <= 0
+                    ),
+                    0
+                )
+            elif last_stance < 0:
+                # Last document was pro B.
+                # Find first pro A or neutral document next.
+                # If no such document is found, choose
+                # first document regardless of stance.
+                index = next(
+                    (
+                        i
+                        for i, document in enumerate(old_ranking)
+                        if self._stance(document) >= 0
+                    ),
+                    0
+                )
+            else:
+                # Last document was neutral.
+                # Find any document next, regardless of stance.
+                index = 0
+
+            document = old_ranking.pop(index)
+            new_ranking.append(document)
+            last_stance = self._stance(document)
+
+        return new_ranking
+
+    def rerank(
+            self,
+            query: Query,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        ranking = self._alternate_stance(ranking)
+
+        length = len(ranking)
+        ranking = [
+            RankedDocument(
+                id=document.id,
+                content=document.content,
+                fields=document.fields,
+                score=length - i,
+                rank=i + 1,
+            )
+            for i, document in enumerate(ranking)
+        ]
+        return ranking
