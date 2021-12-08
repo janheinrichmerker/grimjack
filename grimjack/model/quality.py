@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from statistics import mean
 from typing import List
 
 from dataclasses_json import DataClassJsonMixin
@@ -14,4 +15,8 @@ class ArgumentQualitySentence(DataClassJsonMixin):
 
 @dataclass
 class ArgumentQualityRankedDocument(ArgumentRankedDocument):
-    quality: List[ArgumentQualitySentence]
+    qualities: List[ArgumentQualitySentence]
+
+    @property
+    def average_quality(self) -> float:
+        return mean(sentence.quality for sentence in self.qualities)

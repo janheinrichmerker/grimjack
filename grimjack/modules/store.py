@@ -4,7 +4,7 @@ from hashlib import md5
 from logging import warning
 from os.path import basename
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Tuple, Optional
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse, ElementTree, Element
 
@@ -80,9 +80,15 @@ class SimpleDocumentsStore(DocumentsStore):
         return download_dir
 
 
-def _parse_objects(xml: Element) -> List[str]:
+def _parse_objects(xml: Element) -> Tuple[str, str]:
     objects = xml.text.split(",")
-    return [obj.strip() for obj in objects]
+    if len(objects) != 2:
+        raise RuntimeError(
+            f"Expected exactly 2 comparative objects "
+            f"but got {len(objects)}."
+                           )
+    object_a, object_b = [obj.strip() for obj in objects]
+    return object_a, object_b
 
 
 def _parse_topic(xml: Element) -> Query:
@@ -91,12 +97,13 @@ def _parse_topic(xml: Element) -> Query:
     title = xml.findtext("title").strip()
 
     objects_element = xml.find("objects")
+    objects: Optional[Tuple[str, str]]
     if objects_element is None:
         warning(
             f"No objects were found for topic '{title}'. "
             "You may need to re-download the latest topic file."
         )
-        objects = []
+        objects = None
     else:
         objects = _parse_objects(objects_element)
 

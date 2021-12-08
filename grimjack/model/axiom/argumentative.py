@@ -151,7 +151,7 @@ def _count_comparative_object_terms(
 ):
     terms = [
         term
-        for obj in query.objects
+        for obj in query.comparative_objects
         for term in context.terms(obj)
     ]
     return _count_terms(sentences, terms)
@@ -164,7 +164,7 @@ def _comparative_object_term_position_in_argument(
 ):
     terms = [
         term
-        for obj in query.objects
+        for obj in query.comparative_objects
         for term in context.terms(obj)
     ]
     return _term_position_in_argument(sentences, terms)
@@ -399,4 +399,4 @@ class ArgumentQualityAxiom(Axiom):
         ):
             return 0
 
-        return strictly_greater(document1.quality, document2.quality)
+        return strictly_greater(document1.qualities, document2.qualities)

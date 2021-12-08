@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, Tuple, Optional
 
 
 @dataclass
 class Query:
     id: int
     title: str
-    objects: List[str]
+    comparative_objects: Optional[Tuple[str, str]]
     description: str
     narrative: str
 

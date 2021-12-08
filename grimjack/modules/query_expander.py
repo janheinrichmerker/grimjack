@@ -55,7 +55,7 @@ class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
             Query(
                 query.id,
                 query.title.replace(token, self.best_synonym(token)),
-                query.objects,
+                query.comparative_objects,
                 query.description,
                 query.narrative
             )
@@ -86,56 +86,47 @@ class ComparativeSynonymsNarrativeDescriptionQueryExpander(
         queries.append(Query(
             query.id,
             new_desc,
-            query.objects,
+            query.comparative_objects,
             query.description,
             query.narrative
         ))
         queries.append(Query(
             query.id,
             new_narr,
-            query.objects,
+            query.comparative_objects,
             query.description,
             query.narrative
         ))
         return queries
 
     @abstractmethod
-    def reformulate(self, toReformulate: str) -> str:
+    def reformulate(self, text: str) -> str:
         pass
 
 
 class ReformulateQueryRuleBased(QueryExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
-        if len(query.objects) <= 0:
+        if query.comparative_objects is None:
             raise ValueError(
-                f"At least one comparative object is required "
+                f"Exactly two comparative objects are required "
                 f"for rule-based query reformulation, "
-                f"but {len(query.objects)} were given "
-                f"for query {query.title}."
+                f"but none were given for query {query.title}."
             )
-        output_1 = "pros and cons"
-        output_2 = "should I buy"
-        output_3 = "do you prefer"
-        for obj in query.objects:
-            index = query.objects.index(obj)
-            if index != len(query.objects) - 1:
-                output_1 += f" {obj} or"
-                output_2 += f" {obj} or"
-                output_3 += f" {obj} or"
-            else:
-                output_1 += f" {obj}"
-                output_2 += f" {obj}"
-                output_3 += f" {obj}"
+        object_a, object_b = query.comparative_objects
+        output_1 = f"pros and cons {object_a} or {object_b}"
+        output_2 = f"should I buy {object_a} or {object_b}"
+        output_3 = f"do you prefer {object_a} or {object_b}"
         out = [output_1, output_2, output_3]
-        queries = [query]
-        for new_query in out:
-            queries.append(Query(
+        queries = [
+            Query(
                 query.id,
                 new_query,
-                query.objects,
+                query.comparative_objects,
                 query.description,
                 query.narrative
-            ))
+            )
+            for new_query in out
+        ]
         return queries
 
 
@@ -192,9 +183,9 @@ class HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
     ComparativeSynonymsNarrativeDescriptionQueryExpander,
     HuggingfaceComparativeSynonymsQueryExpander
 ):
-    def reformulate(self, toReformulate: str) -> str:
+    def reformulate(self, text: str) -> str:
         headers = {"Authorization": f"Bearer {self.api_key}"}
-        input_text = f"Extract a query: {toReformulate}"
+        input_text = f"Extract a query: {text}"
         payload = {"inputs": input_text}
         response = post(self.api_url, headers=headers, json=payload)
         if response.status_code // 100 != 2:
@@ -205,7 +196,7 @@ class HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
         response_json = response.json()
         output_text: str = response_json[0]["generated_text"]
         if input_text == output_text:
-            return toReformulate
+            return text
         return output_text
 
 
