@@ -18,7 +18,7 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             query: Query,
             document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
-        stance = get_stance_scores(
+        stances = get_stance_scores(
             query,
             document,
             self.debater_api_token,
@@ -32,5 +32,6 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             score=document.score,
             rank=document.rank,
             arguments=document.arguments,
-            quality_stance=stance
+            qualities=document.qualities,
+            stances=stances
         )

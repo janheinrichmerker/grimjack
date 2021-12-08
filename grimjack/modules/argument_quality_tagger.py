@@ -19,7 +19,7 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
-        quality = get_quality_scores(
+        qualities = get_quality_scores(
             query,
             document,
             self.debater_api_token,
@@ -33,5 +33,5 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
             score=document.score,
             rank=document.rank,
             arguments=document.arguments,
-            quality=quality
+            qualities=qualities
         )

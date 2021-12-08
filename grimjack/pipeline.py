@@ -174,7 +174,7 @@ class Pipeline:
         return ranking
 
     def print_search(self, query: str, num_hits: int):
-        manual_query = Query(-1, query, [], "", "")
+        manual_query = Query(-1, query, None, "", "")
         results = self._search(manual_query, num_hits)
         for document in results:
             print(
