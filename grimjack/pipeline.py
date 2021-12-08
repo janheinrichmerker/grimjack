@@ -43,7 +43,8 @@ from grimjack.modules.query_expander import (
     SimpleQueryExpander, AggregatedQueryExpander
 )
 from grimjack.modules.reranker import (
-    OriginalReranker, AxiomaticReranker, TopReranker
+    OriginalReranker, AxiomaticReranker, TopReranker,
+    AlternatingStanceFairnessReranker
 )
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
@@ -147,6 +148,8 @@ class Pipeline:
                         ArgumentQualityAxiom()
                 ).normalized().cached(),
             )
+        elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
+            self.reranker = AlternatingStanceFairnessReranker()
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
         if rerank_hits is not None:

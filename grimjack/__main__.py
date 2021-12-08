@@ -46,6 +46,9 @@ _RERANKER_TYPES = {
     "axiomatic": RerankerType.AXIOMATIC,
     "axiom": RerankerType.AXIOMATIC,
     "a": RerankerType.AXIOMATIC,
+    "fairness-alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
+    "alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
+    "alt-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
 }
 
 _METRICS = {
