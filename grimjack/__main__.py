@@ -113,7 +113,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="query_expansions",
         type=str,
         choices=_QUERY_EXPANSIONS.keys(),
-        default={"original"},
+        default=["original"],
         action="append"
     )
     parser.add_argument(

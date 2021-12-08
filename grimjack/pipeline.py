@@ -24,14 +24,15 @@ from grimjack.model.axiom.retrieval_score import (
 from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
 from grimjack.model.axiom.term_similarity import STMC1, STMC1_f, STMC2, STMC2_f
 from grimjack.modules import (
-    DocumentsStore, TopicsStore, Index, QueryExpander, Searcher, Reranker,
+    ArgumentQualityStanceTagger, DocumentsStore, TopicsStore,
+    Index, QueryExpander, Searcher, Reranker,
     ArgumentTagger, ArgumentQualityTagger,
 )
 from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
 )
 from grimjack.modules.argument_quality_stance_tagger import (
-    DebaterArgumentQualityStanceTagger
+    DebaterArgumentQualityStanceTagger,
 )
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
@@ -61,6 +62,7 @@ class Pipeline:
     reranker: Reranker
     argument_tagger: ArgumentTagger
     argument_quality_tagger: ArgumentQualityTagger
+    argument_stance_tagger: ArgumentQualityStanceTagger
 
     def __init__(
             self,
