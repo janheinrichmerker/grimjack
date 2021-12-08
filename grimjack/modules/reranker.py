@@ -207,3 +207,17 @@ class AlternatingStanceFairnessReranker(Reranker):
             for i, document in enumerate(ranking)
         ]
         return ranking
+
+
+@dataclass
+class CascadeReranker(Reranker):
+    rerankers: List[Reranker]
+
+    def rerank(
+            self,
+            query: Query,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        for reranker in self.rerankers:
+            ranking = reranker.rerank(query, ranking)
+        return ranking
