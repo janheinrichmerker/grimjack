@@ -146,10 +146,17 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--reranker", "--rerank", "-r",
-        dest="reranker",
+        dest="rerankers",
         type=str,
         choices=_RERANKER_TYPES.keys(),
-        default=None,
+        default=[],
+        action="append"
+    )
+    parser.add_argument(
+        "--no-reranker", "--no-reranking",
+        dest="rerankers",
+        action="store_const",
+        const=[]
     )
     parser.add_argument(
         "--rerank-hits", "-n",
@@ -349,6 +356,15 @@ def _parse_reranker(reranker: str) -> Optional[RerankerType]:
         raise Exception(f"Unknown reranker: {reranker}")
 
 
+def _parse_rerankers(
+        rerankers: List[str]
+) -> List[RerankerType]:
+    return [
+        _parse_reranker(query_expansion)
+        for query_expansion in rerankers
+    ]
+
+
 def _parse_metric(metric: str) -> Metric:
     if metric in _METRICS.keys():
         return _METRICS[metric]
@@ -373,7 +389,7 @@ def main():
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
         args.retrieval_model
     )
-    reranker: Optional[RerankerType] = _parse_reranker(args.reranker)
+    rerankers: List[RerankerType] = _parse_rerankers(args.rerankers)
     rerank_hits: Optional[int] = args.rerank_hits
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
@@ -399,7 +415,7 @@ def main():
         query_expansions=query_expansions,
         retrieval_model=retrieval_model,
         huggingface_api_token=hugging_face_api_token,
-        reranker=reranker,
+        rerankers=rerankers,
         rerank_hits=rerank_hits,
         targer_api_url=targer_api_url,
         targer_models=targer_models,
