@@ -23,6 +23,7 @@ debater-python-api = {path='lib/debater_python_api-3.5.8.tar.xz'}
 dataclasses-json = "*"
 pandas = "*"
 pymagnitude = "*"
+annoy = "*"  # Needed for pymagnitude
 targer-api = {git = "https://github.com/heinrichreimer/targer-api.git"}
 
 [dev-packages]
