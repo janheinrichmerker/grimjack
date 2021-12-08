@@ -38,10 +38,10 @@ pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
 
 ### Generate a run file for all topics
 
-To search all topics and generate a run file, run the `grimjack` CLI like this:
+To search all topics and generate a run file (top-5 per query), run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack run data/run.txt
+pipenv run python -m grimjack run -k 5 data/run.txt
 ```
 
 This will save a run file at `data/run.txt` with the format described in
