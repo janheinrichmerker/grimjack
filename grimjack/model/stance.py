@@ -1,21 +1,22 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from statistics import mean
 from typing import List
 
-from grimjack.model.quality import ArgumentQualityRankedDocument, \
-    ArgumentQualitySentence
+from dataclasses_json import DataClassJsonMixin
+
+from grimjack.model.quality import ArgumentQualityRankedDocument
 
 
 @dataclass
-class ArgumentQualityStanceSentence(ArgumentQualitySentence):
-    stance: List[float]
+class ArgumentStanceSentence(DataClassJsonMixin):
+    content: str
+    stance: float
 
 
 @dataclass
 class ArgumentQualityStanceRankedDocument(ArgumentQualityRankedDocument):
-    quality_stance: List[ArgumentQualityStanceSentence]
-    quality: List[ArgumentQualitySentence] = field(init=False)
+    stances: List[ArgumentStanceSentence]
 
-    # noinspection PyRedeclaration
     @property
-    def quality(self) -> List[ArgumentQualitySentence]:
-        return self.quality_stance
+    def average_stance(self) -> float:
+        return mean(sentence.stance for sentence in self.stances)
