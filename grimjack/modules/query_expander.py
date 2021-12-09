@@ -130,6 +130,34 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
         return queries
 
 
+class ReformulateQueryClaims(QueryExpander, ABC):
+    def expand_query(self, query: Query) -> List[Query]:
+        if query.comparative_objects is None:
+            raise ValueError(
+                f"Exactly two comparative objects are required "
+                f"for rule-based query reformulation, "
+                f"but none were given for query {query.title}."
+            )
+        object_a, object_b = query.comparative_objects
+        claim_1 = f"{object_a} is better than {object_b}"
+        claim_2 = f"{object_a} is worse than {object_b}"
+        claim_3 = f"{object_b} is better than {object_a}"
+        claim_4 = f"{object_b} is worse than {object_a}"
+        claim_5 = f"{object_a} is as good as {object_b}"
+        claims = [claim_1, claim_2, claim_3, claim_4, claim_5]
+        queries = [
+            Query(
+                query.id,
+                new_query,
+                query.comparative_objects,
+                query.description,
+                query.narrative
+            )
+            for new_query in claims
+        ]
+        return queries
+
+
 @dataclass
 class GensimComparativeSynonymsQueryExpander(
     ComparativeSynonymsQueryExpander
@@ -245,6 +273,8 @@ class SimpleQueryExpander(QueryExpander):
             )
         elif query_expansion == QueryExpansion.QUERY_REFORMULATE_RULE_BASED:
             self._query_expander = ReformulateQueryRuleBased()
+        elif query_expansion == QueryExpansion.QUERY_REFORMULATE_CLAIMS:
+            self._query_expander = ReformulateQueryClaims()
         else:
             raise Exception(f"Unknown query expansion: {query_expansion}")
 

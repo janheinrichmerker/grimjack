@@ -31,7 +31,8 @@ _QUERY_EXPANSIONS = {
     "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
     "t0pp-description-narrative": QueryExpansion.T0PP_DESCRIPTION_NARRATIVE,
     "query-reformulate-rule-based":
-        QueryExpansion.QUERY_REFORMULATE_RULE_BASED
+        QueryExpansion.QUERY_REFORMULATE_RULE_BASED,
+    "query-reformulate-claims": QueryExpansion.QUERY_REFORMULATE_CLAIMS
 }
 
 _RETRIEVAL_MODELS = {
@@ -116,7 +117,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="query_expansions",
         type=str,
         choices=_QUERY_EXPANSIONS.keys(),
-        default={"original"},
+        default=["original"],
         action="append"
     )
     parser.add_argument(

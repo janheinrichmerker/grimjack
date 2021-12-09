@@ -13,6 +13,7 @@ class QueryExpansion(Enum):
     T0PP_COMPARATIVE_SYNONYMS = 3
     T0PP_DESCRIPTION_NARRATIVE = 4
     QUERY_REFORMULATE_RULE_BASED = 5
+    QUERY_REFORMULATE_CLAIMS = 6
 
 
 class RetrievalModel(Enum):
