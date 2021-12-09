@@ -5,7 +5,7 @@ from typing import Optional, List, Set, Union
 from tqdm import tqdm
 
 from grimjack.model import RankedDocument, Query
-from grimjack.model.axiom import OriginalAxiom
+from grimjack.model.axiom import OriginalAxiom, AggregatedAxiom
 from grimjack.model.axiom.argumentative import (
     AverageSentenceLengthAxiom, QueryTermPositionInArgumentAxiom,
     QueryTermsInArgumentAxiom, ArgumentCountAxiom,
@@ -105,51 +105,53 @@ class Pipeline:
         reranker_cascade = [OriginalReranker()]
         for reranker in rerankers:
             if reranker == RerankerType.AXIOMATIC:
-                reranker_cascade += AxiomaticReranker(
-                    reranking_context,
-                    (
-                            OriginalAxiom() +
-                            TFC1() +
-                            TFC3() +
-                            M_TDC() +
-                            LEN_M_TDC() +
-                            LNC1() +
-                            LNC2() +
-                            TF_LNC() +
-                            LB1() +
-                            REG() +
-                            ANTI_REG() +
-                            AND() +
-                            LEN_AND() +
-                            M_AND() +
-                            LEN_M_AND() +
-                            DIV() +
-                            LEN_DIV() +
-                            PROX1() +
-                            PROX2() +
-                            PROX3() +
-                            PROX4() +
-                            PROX5() +
-                            RS_TF() +
-                            RS_TF_IDF() +
-                            RS_BM25() +
-                            RS_PL2() +
-                            RS_QL() +
-                            STMC1() +
-                            STMC1_f() +
-                            STMC2() +
-                            STMC2_f() +
-                            ArgumentCountAxiom() +
-                            QueryTermsInArgumentAxiom() +
-                            QueryTermPositionInArgumentAxiom() +
-                            AverageSentenceLengthAxiom() +
-                            ComparativeObjectTermsInArgumentAxiom() +
-                            ComparativeObjectTermPositionInArgumentAxiom() +
-                            ArgumentQualityAxiom()
-                    ).normalized().cached(),
+                reranker_cascade.append(
+                    AxiomaticReranker(
+                        reranking_context,
+                        AggregatedAxiom({
+                            OriginalAxiom(),
+                            TFC1(),
+                            TFC3(),
+                            M_TDC(),
+                            LEN_M_TDC(),
+                            LNC1(),
+                            LNC2(),
+                            TF_LNC(),
+                            LB1(),
+                            REG(),
+                            ANTI_REG(),
+                            AND(),
+                            LEN_AND(),
+                            M_AND(),
+                            LEN_M_AND(),
+                            DIV(),
+                            LEN_DIV(),
+                            PROX1(),
+                            PROX2(),
+                            PROX3(),
+                            PROX4(),
+                            PROX5(),
+                            RS_TF(),
+                            RS_TF_IDF(),
+                            RS_BM25(),
+                            RS_PL2(),
+                            RS_QL(),
+                            STMC1(),
+                            STMC1_f(),
+                            STMC2(),
+                            STMC2_f(),
+                            ArgumentCountAxiom(),
+                            QueryTermsInArgumentAxiom(),
+                            QueryTermPositionInArgumentAxiom(),
+                            AverageSentenceLengthAxiom(),
+                            ComparativeObjectTermsInArgumentAxiom(),
+                            ComparativeObjectTermPositionInArgumentAxiom(),
+                            ArgumentQualityAxiom(),
+                        }).normalized().cached(),
+                    )
                 )
             elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
-                reranker_cascade += AlternatingStanceFairnessReranker()
+                reranker_cascade.append(AlternatingStanceFairnessReranker())
             else:
                 raise ValueError(f"Unknown reranker: {reranker}")
         self.reranker = CascadeReranker(reranker_cascade)
