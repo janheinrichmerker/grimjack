@@ -32,7 +32,7 @@ from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
 )
 from grimjack.modules.argument_quality_stance_tagger import (
-    DebaterArgumentQualityStanceTagger,
+    DebaterArgumentQualityStanceTagger, ThresholdArgumentQualityStanceTagger,
 )
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
@@ -179,9 +179,13 @@ class Pipeline:
         self.argument_stance_tagger = DebaterArgumentQualityStanceTagger(
             debater_api_token,
             stance_tagger,
-            stance_threshold,
             cache_path / "stance" if cache_path is not None else None,
         )
+        if stance_threshold is not None and stance_threshold > 0:
+            self.argument_stance_tagger = ThresholdArgumentQualityStanceTagger(
+                self.argument_stance_tagger,
+                stance_threshold
+            )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)

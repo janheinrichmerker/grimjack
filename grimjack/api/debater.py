@@ -240,7 +240,6 @@ def get_stance_scores(
         document: ArgumentQualityRankedDocument,
         api_token: str,
         stance_calculation: StanceTaggerType,
-        threshold_stance: float,
         cache_path: Optional[Path] = None
 ) -> List[ArgumentStanceSentence]:
     download_nltk_dependencies("punkt")
@@ -251,93 +250,71 @@ def get_stance_scores(
 
     if stance_calculation == StanceTaggerType.OBJECT:
         stance_calculator = Difference()
-    elif stance_calculation == StanceTaggerType.THRESHOLD:
-        stance_calculator = Treshold(threshold_stance)
     elif stance_calculation == StanceTaggerType.SENTIMENT:
-        stance_calculator = Sentiment(threshold_stance)
+        stance_calculator = Sentiment()
+    else:
+        raise ValueError(f"Unknown stance calculation {stance_calculation}")
 
     with CachedDebaterArgumentStanceScorer(api_token, cache_path) as scorer:
         return [
             ArgumentStanceSentence(
                 sentence,
-                stance_calculator._stance(scorer,
-                                          query.comparative_objects,
-                                          sentence)
+                stance_calculator.stance(
+                    scorer,
+                    query.comparative_objects,
+                    sentence
+                )
             )
             for sentence in sentences
         ]
 
 
 class StanceCalculator(ABC):
-    @property
     @abstractmethod
-    def _stance(self,
-                scorer: CachedDebaterArgumentStanceScorer,
-                comparative_objects: Tuple[str, str],
-                sentence: str) -> float:
+    def stance(
+            self,
+            scorer: CachedDebaterArgumentStanceScorer,
+            comparative_objects: Tuple[str, str],
+            sentence: str
+    ) -> float:
         pass
 
 
-@dataclass
 class Difference(StanceCalculator, ABC):
-    def _claim(self, comparative_object: str) -> str:
-        return f"{comparative_object}"
-
-    def _stance(self,
-                scorer: CachedDebaterArgumentStanceScorer,
-                comparative_objects: Tuple[str, str],
-                sentence: str) -> float:
+    def stance(
+            self,
+            scorer: CachedDebaterArgumentStanceScorer,
+            comparative_objects: Tuple[str, str],
+            sentence: str
+    ) -> float:
         object_a, object_b = comparative_objects
-        stance_a = scorer.score(self._claim(object_a), sentence)
-        stance_b = scorer.score(self._claim(object_b), sentence)
+        stance_a = scorer.score(object_a, sentence)
+        stance_b = scorer.score(object_b, sentence)
         return stance_a - stance_b
 
 
-@dataclass
-class Treshold(StanceCalculator, ABC):
-    treshold: float
-
-    def _claim(self, comparative_object: str) -> str:
-        return f"{comparative_object}"
-
-    def _stance(self,
-                scorer: CachedDebaterArgumentStanceScorer,
-                comparative_objects: Tuple[str, str],
-                sentence: str) -> float:
-        object_a, object_b = comparative_objects
-        stance_a = scorer.score(self._claim(object_a), sentence)
-        stance_b = scorer.score(self._claim(object_b), sentence)
-        diff = abs(stance_a - stance_b)
-        if diff <= self.treshold:
-            return 0
-        else:
-            return stance_a - stance_b
-
-
-@dataclass
 class Sentiment(StanceCalculator, ABC):
-    treshold: float
+    @staticmethod
+    def _claims(comparative_object: str) -> List[str]:
+        return [
+            f"{comparative_object}",
+            f"{comparative_object} is good",
+            f"{comparative_object} is the best"
+        ]
 
-    def _claim(self, comparative_object: str) -> List[str]:
-        return [f"{comparative_object}", f"{comparative_object} is good",
-                f"{comparative_object} is the best"]
-
-    def _stance(self,
-                scorer: CachedDebaterArgumentStanceScorer,
-                comparative_objects: Tuple[str, str],
-                sentence: str) -> float:
+    def stance(
+            self,
+            scorer: CachedDebaterArgumentStanceScorer,
+            comparative_objects: Tuple[str, str],
+            sentence: str
+    ) -> float:
         object_a, object_b = comparative_objects
-        claims_a = self._claim(object_a)
-        claims_b = self._claim(object_b)
-        stance_a = []
-        stance_b = []
-        for claim_a, claim_b in zip(claims_a, claims_b):
-            stance_a.append(scorer.score(claim_a, sentence))
-            stance_b.append(scorer.score(claim_b, sentence))
-        stance_a = mean(stance_a)
-        stance_b = mean(stance_b)
-        diff = abs(stance_a - stance_b)
-        if diff <= self.treshold:
-            return 0
-        else:
-            return stance_a - stance_b
+        stance_a = mean(
+            scorer.score(claim_a, sentence)
+            for claim_a in self._claims(object_a)
+        )
+        stance_b = mean(
+            scorer.score(claim_b, sentence)
+            for claim_b in self._claims(object_b)
+        )
+        return stance_a - stance_b

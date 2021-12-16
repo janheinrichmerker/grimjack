@@ -15,7 +15,6 @@ from grimjack.modules.options import StanceTaggerType
 class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
     debater_api_token: str
     stance_calculation: StanceTaggerType
-    threshold_stance: float
     cache_path: Optional[Path] = None
 
     def tag_ranking(
@@ -43,7 +42,6 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             document,
             self.debater_api_token,
             self.stance_calculation,
-            self.threshold_stance,
             self.cache_path
         )
 

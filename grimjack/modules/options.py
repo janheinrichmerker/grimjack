@@ -37,5 +37,4 @@ class Metric(Enum):
 
 class StanceTaggerType(Enum):
     OBJECT = 1
-    THRESHOLD = 2
-    SENTIMENT = 3
+    SENTIMENT = 2
