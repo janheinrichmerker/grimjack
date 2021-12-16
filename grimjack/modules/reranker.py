@@ -19,6 +19,20 @@ class OriginalReranker(Reranker):
         return ranking
 
 
+def _reset_score(ranking: List[RankedDocument]) -> List[RankedDocument]:
+    length = len(ranking)
+    return [
+        RankedDocument(
+            id=document.id,
+            content=document.content,
+            fields=document.fields,
+            score=length - i,
+            rank=i + 1,
+        )
+        for i, document in enumerate(ranking)
+    ]
+
+
 @dataclass
 class AxiomaticReranker(Reranker):
     context: RerankingContext
@@ -79,17 +93,7 @@ class AxiomaticReranker(Reranker):
     ) -> List[RankedDocument]:
         ranking = ranking.copy()
         ranking = self.kwiksort(self.context, query, ranking)
-        length = len(ranking)
-        ranking = [
-            RankedDocument(
-                id=document.id,
-                content=document.content,
-                fields=document.fields,
-                score=length - i,
-                rank=i + 1,
-            )
-            for i, document in enumerate(ranking)
-        ]
+        ranking = _reset_score(ranking)
         return ranking
 
 
@@ -129,19 +133,20 @@ class TopReranker(Reranker):
         return reranked
 
 
-class AlternatingStanceFairnessReranker(Reranker):
-    @staticmethod
-    def _stance(document: RankedDocument) -> float:
-        if not isinstance(
-                document,
-                ArgumentQualityStanceRankedDocument
-        ):
-            return 0
-        else:
-            return document.average_stance
+def _stance(document: RankedDocument) -> float:
+    if not isinstance(
+            document,
+            ArgumentQualityStanceRankedDocument
+    ):
+        return 0
+    else:
+        return document.average_stance
 
+
+class AlternatingStanceFairnessReranker(Reranker):
+
+    @staticmethod
     def _alternate_stance(
-            self,
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         old_ranking = ranking.copy()
@@ -160,7 +165,7 @@ class AlternatingStanceFairnessReranker(Reranker):
                     (
                         i
                         for i, document in enumerate(old_ranking)
-                        if self._stance(document) <= 0
+                        if _stance(document) <= 0
                     ),
                     0
                 )
@@ -173,7 +178,7 @@ class AlternatingStanceFairnessReranker(Reranker):
                     (
                         i
                         for i, document in enumerate(old_ranking)
-                        if self._stance(document) >= 0
+                        if _stance(document) >= 0
                     ),
                     0
                 )
@@ -184,7 +189,7 @@ class AlternatingStanceFairnessReranker(Reranker):
 
             document = old_ranking.pop(index)
             new_ranking.append(document)
-            last_stance = self._stance(document)
+            last_stance = _stance(document)
 
         return new_ranking
 
@@ -194,18 +199,7 @@ class AlternatingStanceFairnessReranker(Reranker):
             ranking: List[RankedDocument]
     ) -> List[RankedDocument]:
         ranking = self._alternate_stance(ranking)
-
-        length = len(ranking)
-        ranking = [
-            RankedDocument(
-                id=document.id,
-                content=document.content,
-                fields=document.fields,
-                score=length - i,
-                rank=i + 1,
-            )
-            for i, document in enumerate(ranking)
-        ]
+        ranking = _reset_score(ranking)
         return ranking
 
 
