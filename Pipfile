@@ -17,12 +17,6 @@ gensim = "*"
 requests = "*"
 tqdm = "*"
 trectools = "*"
-lz4 = "*"
-xxhash = "*"
-fasteners = "*"
-h5py = "*"
-platformdirs = "*"
-setuptools-scm = "*"
 faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
 torch = "*"  # Needed for pyserini >= 0.14.0
 debater-python-api = {path='./lib/debater_python_api-3.5.8.tar.xz'}
