@@ -419,7 +419,7 @@ def _parse_metric(metric: str) -> Metric:
         raise Exception(f"Unknown metric: {metric}")
 
 
-def _parse_stance_tagger_type(stance: str) -> StanceTaggerType:
+def _parse_stance_tagger(stance: str) -> StanceTaggerType:
     if stance in _STANCE_TAGGER_TYPES.keys():
         return _STANCE_TAGGER_TYPES[stance]
     else:
@@ -459,7 +459,7 @@ def main():
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
     cache_path: Optional[Path] = args.cache_path
-    stance_calculation: StanceTaggerType = _parse_stance_tagger_type(
+    stance_calculation: StanceTaggerType = _parse_stance_tagger(
         args.stance_tagger
     )
     stance_threshold: Optional[float] = args.stance_threshold
