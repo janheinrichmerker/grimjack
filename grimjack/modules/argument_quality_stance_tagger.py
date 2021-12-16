@@ -8,13 +8,13 @@ from grimjack.model.stance import (
     ArgumentQualityStanceRankedDocument, ArgumentStanceSentence
 )
 from grimjack.api.debater import get_stance_scores, preload_stance_scores
-from grimjack.modules.options import StanceCalculation
+from grimjack.modules.options import StanceTaggerType
 
 
 @dataclass
 class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
     debater_api_token: str
-    stance_calculation: StanceCalculation
+    stance_calculation: StanceTaggerType
     threshold_stance: float
     cache_path: Optional[Path] = None
 

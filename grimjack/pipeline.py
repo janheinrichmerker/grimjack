@@ -38,7 +38,7 @@ from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
-    Metric, StanceCalculation, Stemmer, QueryExpansion, RetrievalModel,
+    Metric, StanceTaggerType, Stemmer, QueryExpansion, RetrievalModel,
     RerankerType
 )
 from grimjack.modules.query_expander import (
@@ -84,8 +84,8 @@ class Pipeline:
             cache_path: Optional[Path],
             huggingface_api_token: Optional[str],
             debater_api_token: str,
-            stance_calculation: StanceCalculation,
-            threshold_stance: float,
+            stance_tagger: StanceTaggerType,
+            stance_threshold: float,
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
@@ -178,8 +178,8 @@ class Pipeline:
         )
         self.argument_stance_tagger = DebaterArgumentQualityStanceTagger(
             debater_api_token,
-            stance_calculation,
-            threshold_stance,
+            stance_tagger,
+            stance_threshold,
             cache_path / "stance" if cache_path is not None else None,
         )
 

@@ -35,7 +35,7 @@ class Metric(Enum):
     BPREF = 4
 
 
-class StanceCalculation(Enum):
-    DIFFERENCE = 1
+class StanceTaggerType(Enum):
+    OBJECT = 1
     THRESHOLD = 2
     SENTIMENT = 3

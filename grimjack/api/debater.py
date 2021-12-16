@@ -18,7 +18,7 @@ from grimjack.model.quality import (
     ArgumentQualitySentence, ArgumentQualityRankedDocument
 )
 from grimjack.model.stance import ArgumentStanceSentence
-from grimjack.modules.options import StanceCalculation
+from grimjack.modules.options import StanceTaggerType
 from grimjack.utils.nltk import download_nltk_dependencies
 from statistics import mean
 
@@ -239,7 +239,7 @@ def get_stance_scores(
         query: Query,
         document: ArgumentQualityRankedDocument,
         api_token: str,
-        stance_calculation: StanceCalculation,
+        stance_calculation: StanceTaggerType,
         threshold_stance: float,
         cache_path: Optional[Path] = None
 ) -> List[ArgumentStanceSentence]:
@@ -249,11 +249,11 @@ def get_stance_scores(
     if query.comparative_objects is None:
         return [ArgumentStanceSentence(sentence, 0) for sentence in sentences]
 
-    if stance_calculation == StanceCalculation.DIFFERENCE:
+    if stance_calculation == StanceTaggerType.OBJECT:
         stance_calculator = Difference()
-    elif stance_calculation == StanceCalculation.THRESHOLD:
+    elif stance_calculation == StanceTaggerType.THRESHOLD:
         stance_calculator = Treshold(threshold_stance)
-    elif stance_calculation == StanceCalculation.SENTIMENT:
+    elif stance_calculation == StanceTaggerType.SENTIMENT:
         stance_calculator = Sentiment(threshold_stance)
 
     with CachedDebaterArgumentStanceScorer(api_token, cache_path) as scorer:
