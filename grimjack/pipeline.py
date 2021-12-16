@@ -46,7 +46,8 @@ from grimjack.modules.query_expander import (
 )
 from grimjack.modules.reranker import (
     OriginalReranker, AxiomaticReranker, TopReranker,
-    AlternatingStanceFairnessReranker, CascadeReranker
+    AlternatingStanceFairnessReranker, CascadeReranker,
+    BalancedTopKStanceFairnessReranker
 )
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
@@ -157,6 +158,10 @@ class Pipeline:
                 )
             elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
                 reranker_cascade.append(AlternatingStanceFairnessReranker())
+            elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE:
+                reranker_cascade.append(BalancedTopKStanceFairnessReranker(5))
+            elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE:
+                reranker_cascade.append(BalancedTopKStanceFairnessReranker(10))
             else:
                 raise ValueError(f"Unknown reranker: {reranker}")
         self.reranker = CascadeReranker(reranker_cascade)

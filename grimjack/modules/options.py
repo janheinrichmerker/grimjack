@@ -24,6 +24,8 @@ class RetrievalModel(Enum):
 class RerankerType(Enum):
     AXIOMATIC = 1
     FAIRNESS_ALTERNATING_STANCE = 2
+    FAIRNESS_BALANCED_TOP_5_STANCE = 3
+    FAIRNESS_BALANCED_TOP_10_STANCE = 4
 
 
 class Metric(Enum):

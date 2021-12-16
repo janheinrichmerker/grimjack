@@ -215,3 +215,91 @@ class CascadeReranker(Reranker):
         for reranker in self.rerankers:
             ranking = reranker.rerank(query, ranking)
         return ranking
+
+
+@dataclass
+class BalancedTopKStanceFairnessReranker(Reranker):
+    k: int
+
+    def _balanced_top_k_stance(
+            self,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        ranking = ranking.copy()
+
+        def count_pro_a() -> int:
+            return sum(
+                1 for document in ranking[:self.k]
+                if _stance(document) > 0
+            )
+
+        def count_pro_b() -> int:
+            return sum(
+                1 for document in ranking[:self.k]
+                if _stance(document) < 0
+            )
+
+        diff_pro_a_pro_b: int = count_pro_a() - count_pro_b()
+
+        while abs(diff_pro_a_pro_b) > 1:
+            # The top-k ranking is currently imbalanced.
+
+            if diff_pro_a_pro_b > 0:
+                # There are currently more documents pro A.
+                # Find first pro B document after rank k and
+                # move the last pro A document from the top-k ranking
+                # behind that document.
+                # If no such document is found, we can't balance the ranking.
+                index_a = next((
+                    i
+                    for i in range(self.k + 1)
+                    if _stance(ranking[i]) > 0
+                ), None)
+                index_b = next((
+                    i
+                    for i in range(self.k + 1, len(ranking))
+                    if _stance(ranking[i]) < 0
+                ), None)
+                if index_a is None or index_b is None:
+                    return ranking
+                else:
+                    document_a = ranking.pop(index_a)
+                    # Pro B document has moved one rank up now.
+                    ranking.insert(index_b, document_a)
+            else:
+                # There are currently more documents pro B.
+                # Find first pro A document after rank k and
+                # move the last pro B document from the top-k ranking
+                # behind that document.
+                # If no such document is found,
+                # we can't balance the ranking, so return the current ranking.
+                index_b = next((
+                    i
+                    for i in range(self.k + 1)
+                    if _stance(ranking[i]) < 0
+                ), None)
+                index_a = next((
+                    i
+                    for i in range(self.k + 1, len(ranking))
+                    if _stance(ranking[i]) > 0
+                ), None)
+                if index_b is None or index_a is None:
+                    return ranking
+                else:
+                    document_b = ranking.pop(index_b)
+                    # Pro A document has moved one rank up now.
+                    ranking.insert(index_a, document_b)
+
+        # There are equally many documents pro A and pro B.
+        # Thus the ranking is already balanced.
+        # Return the current ranking.
+        return ranking
+
+    def rerank(
+            self,
+            query: Query,
+            ranking: List[RankedDocument]
+    ) -> List[RankedDocument]:
+        ranking = self._balanced_top_k_stance(ranking)
+        ranking = _reset_score(ranking)
+        return ranking

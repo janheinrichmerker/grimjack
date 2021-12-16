@@ -9,8 +9,9 @@ from grimjack.constants import (
     DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
     DEFAULT_TOUCHE_2021_QRELS_URL
 )
-from grimjack.modules.options import RetrievalModel, RerankerType, Metric,\
-    StanceCalculation
+from grimjack.modules.options import (
+    RetrievalModel, RerankerType, Metric, StanceCalculation
+)
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -51,6 +52,12 @@ _RERANKER_TYPES = {
     "fairness-alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
     "alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
     "alt-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
+    "fairness-balanced-top-10-stance":
+        RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
+    "balanced-top-10-stance": RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
+    "fairness-balanced-top-5-stance":
+        RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
+    "balanced-top-5-stance": RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
 }
 
 _METRICS = {
