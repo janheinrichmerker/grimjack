@@ -39,7 +39,7 @@ class TrecEvaluation(Evaluation):
                 "as the document's score and rank."
             )
             run_data["docid"] = run_data["docid"].apply(
-                lambda id: id.split("___")[0]
+                lambda document_id: document_id.split("___")[0]
             )
             run_data = run_data.groupby([
                 "query",
