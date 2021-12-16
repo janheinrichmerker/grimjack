@@ -1,32 +1,64 @@
+from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from dataclasses import dataclass
-from grimjack.modules import ArgumentQualityStanceTagger
 from pathlib import Path
+from statistics import mean
 from typing import Optional, List
+
+from nltk import sent_tokenize
+
+from grimjack.api.debater import CachedDebaterArgumentStanceScorer
 from grimjack.model import Query
 from grimjack.model.quality import ArgumentQualityRankedDocument
 from grimjack.model.stance import (
     ArgumentQualityStanceRankedDocument, ArgumentStanceSentence
 )
-from grimjack.api.debater import get_stance_scores, preload_stance_scores
-from grimjack.modules.options import StanceTaggerType
+from grimjack.modules import ArgumentQualityStanceTagger
+from grimjack.utils.nltk import download_nltk_dependencies
 
 
 @dataclass
-class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
+class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger, ABC):
     debater_api_token: str
-    stance_calculation: StanceTaggerType
     cache_path: Optional[Path] = None
+
+    @staticmethod
+    def _sentences(document: ArgumentQualityRankedDocument) -> List[str]:
+        download_nltk_dependencies("punkt")
+        return sent_tokenize(document.content)
+
+    @contextmanager
+    def _scorer(self) -> CachedDebaterArgumentStanceScorer:
+        with CachedDebaterArgumentStanceScorer(
+            self.debater_api_token,
+            self.cache_path
+        ) as scorer:
+            yield scorer
 
     def tag_ranking(
             self,
             query: Query,
             ranking: List[ArgumentQualityRankedDocument]
     ) -> List[ArgumentQualityStanceRankedDocument]:
-        preload_stance_scores(
-            query, ranking,
-            self.debater_api_token,
-            self.cache_path
-        )
+        if query.comparative_objects is None:
+            return super(DebaterArgumentQualityStanceTagger, self).tag_ranking(
+                query,
+                ranking
+            )
+
+        sentences = [
+            sentence
+            for document in ranking
+            for sentence in self._sentences(document)
+        ]
+
+        object_a, object_b = query.comparative_objects
+        claims = self.claims(object_a) + self.claims(object_b)
+
+        with self._scorer() as scorer:
+            for claim in claims:
+                scorer.preload(claim, sentences)
+
         return super(DebaterArgumentQualityStanceTagger, self).tag_ranking(
             query,
             ranking
@@ -37,13 +69,27 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             query: Query,
             document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
-        stances = get_stance_scores(
-            query,
-            document,
-            self.debater_api_token,
-            self.stance_calculation,
-            self.cache_path
-        )
+        sentences = self._sentences(document)
+
+        stances: List[ArgumentStanceSentence]
+        if query.comparative_objects is None:
+            stances = [
+                ArgumentStanceSentence(sentence, 0)
+                for sentence in sentences
+            ]
+        else:
+            with self._scorer() as scorer:
+                stances = [
+                    ArgumentStanceSentence(
+                        sentence,
+                        self.stance(
+                            scorer,
+                            query,
+                            sentence
+                        )
+                    )
+                    for sentence in sentences
+                ]
 
         return ArgumentQualityStanceRankedDocument(
             id=document.id,
@@ -55,6 +101,45 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             qualities=document.qualities,
             stances=stances
         )
+
+    def stance(
+            self,
+            scorer: CachedDebaterArgumentStanceScorer,
+            query: Query,
+            sentence: str
+    ) -> float:
+        object_a, object_b = query.comparative_objects
+        stance_a = mean(
+            scorer.score(claim_a, sentence)
+            for claim_a in self.claims(object_a)
+        )
+        stance_b = mean(
+            scorer.score(claim_b, sentence)
+            for claim_b in self.claims(object_b)
+        )
+        return stance_a - stance_b
+
+    @abstractmethod
+    def claims(self, comparative_object: str) -> List[str]:
+        pass
+
+
+class DebaterArgumentQualityObjectStanceTagger(
+    DebaterArgumentQualityStanceTagger
+):
+    def claims(self, comparative_object: str) -> List[str]:
+        return [comparative_object]
+
+
+class DebaterArgumentQualitySentimentStanceTagger(
+    DebaterArgumentQualityStanceTagger
+):
+    def claims(self, comparative_object: str) -> List[str]:
+        return [
+            f"{comparative_object}",
+            f"{comparative_object} is good",
+            f"{comparative_object} is the best"
+        ]
 
 
 @dataclass

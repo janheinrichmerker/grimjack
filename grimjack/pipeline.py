@@ -28,11 +28,13 @@ from grimjack.modules import (
     Index, QueryExpander, Searcher, Reranker,
     ArgumentTagger, ArgumentQualityTagger,
 )
+from grimjack.modules.argument_quality_stance_tagger import (
+    ThresholdArgumentQualityStanceTagger,
+    DebaterArgumentQualityObjectStanceTagger,
+    DebaterArgumentQualitySentimentStanceTagger,
+)
 from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
-)
-from grimjack.modules.argument_quality_stance_tagger import (
-    DebaterArgumentQualityStanceTagger, ThresholdArgumentQualityStanceTagger,
 )
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
@@ -64,8 +66,8 @@ class Pipeline:
     searcher: Searcher
     reranker: Reranker
     argument_tagger: ArgumentTagger
-    argument_quality_tagger: ArgumentQualityTagger
-    argument_stance_tagger: ArgumentQualityStanceTagger
+    quality_tagger: ArgumentQualityTagger
+    stance_tagger: ArgumentQualityStanceTagger
 
     def __init__(
             self,
@@ -172,26 +174,33 @@ class Pipeline:
             targer_models,
             cache_path,
         )
-        self.argument_quality_tagger = DebaterArgumentQualityTagger(
+        self.quality_tagger = DebaterArgumentQualityTagger(
             debater_api_token,
             cache_path,
         )
-        self.argument_stance_tagger = DebaterArgumentQualityStanceTagger(
-            debater_api_token,
-            stance_tagger,
-            cache_path,
-        )
+        if stance_tagger == StanceTaggerType.OBJECT:
+            self.stance_tagger = DebaterArgumentQualityObjectStanceTagger(
+                debater_api_token,
+                cache_path,
+            )
+        elif stance_tagger == StanceTaggerType.SENTIMENT:
+            self.stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
+                debater_api_token,
+                cache_path,
+            )
+        else:
+            raise ValueError(f"Unknown stance tagger: {stance_tagger}")
         if stance_threshold is not None and stance_threshold > 0:
-            self.argument_stance_tagger = ThresholdArgumentQualityStanceTagger(
-                self.argument_stance_tagger,
+            self.stance_tagger = ThresholdArgumentQualityStanceTagger(
+                self.stance_tagger,
                 stance_threshold
             )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
         ranking = self.searcher.search(query, num_hits)
         ranking = self.argument_tagger.tag_ranking(ranking)
-        ranking = self.argument_quality_tagger.tag_ranking(query, ranking)
-        ranking = self.argument_stance_tagger.tag_ranking(query, ranking)
+        ranking = self.quality_tagger.tag_ranking(query, ranking)
+        ranking = self.stance_tagger.tag_ranking(query, ranking)
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
