@@ -6,11 +6,14 @@ from grimjack.model import Query
 from grimjack.model.quality import ArgumentQualityRankedDocument
 from grimjack.model.stance import ArgumentQualityStanceRankedDocument
 from grimjack.api.debater import get_stance_scores, preload_stance_scores
+from grimjack.modules.options import StanceCalculation
 
 
 @dataclass
 class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
     debater_api_token: str
+    stance_calculation: StanceCalculation
+    threshold_stance: float
     cache_path: Optional[Path] = None
 
     def tag_ranking(
@@ -37,6 +40,8 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             query,
             document,
             self.debater_api_token,
+            self.stance_calculation,
+            self.threshold_stance,
             self.cache_path
         )
 

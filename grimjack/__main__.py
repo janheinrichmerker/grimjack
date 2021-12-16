@@ -9,7 +9,8 @@ from grimjack.constants import (
     DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
     DEFAULT_TOUCHE_2021_QRELS_URL
 )
-from grimjack.modules.options import RetrievalModel, RerankerType, Metric
+from grimjack.modules.options import RetrievalModel, RerankerType, Metric,\
+    StanceCalculation
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
 
 _STEMMERS = {
@@ -59,6 +60,13 @@ _METRICS = {
     "p": Metric.PRECISION,
     "map": Metric.MAP,
     "bpref": Metric.BPREF,
+}
+
+_STANCE_CALCULATION = {
+    "difference": StanceCalculation.DIFFERENCE,
+    "diff": StanceCalculation.DIFFERENCE,
+    "treshold": StanceCalculation.THRESHOLD,
+    "sentiment": StanceCalculation.SENTIMENT,
 }
 
 
@@ -200,6 +208,19 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="cache_path",
         type=Optional[Path],
         default=DEFAULT_CACHE_DIR
+    )
+    parser.add_argument(
+        "--stance-calculation",
+        dest="stance_calculation",
+        type=str,
+        choices=_STANCE_CALCULATION.keys(),
+        default="diff"
+    )
+    parser.add_argument(
+        "--treshold-stance",
+        dest="threshold_stance",
+        type=float,
+        default=0.5
     )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
@@ -373,6 +394,13 @@ def _parse_metric(metric: str) -> Metric:
         raise Exception(f"Unknown metric: {metric}")
 
 
+def _parse_stance(stance: str) -> StanceCalculation:
+    if stance in _STANCE_CALCULATION.keys():
+        return _STANCE_CALCULATION[stance]
+    else:
+        raise Exception(f"Unknown stance calculation: {stance}")
+
+
 def main():
     parser: ArgumentParser = ArgumentParser()
     _prepare_parser(parser)
@@ -406,6 +434,9 @@ def main():
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
     cache_path: Optional[Path] = args.cache_path
+    stance_calculation: StanceCalculation = _parse_stance(
+        args.stance_calculation)
+    threshold_stance: float = args.threshold_stance
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -422,6 +453,8 @@ def main():
         targer_models=targer_models,
         debater_api_token=debater_api_token,
         cache_path=cache_path,
+        stance_calculation=stance_calculation,
+        threshold_stance=threshold_stance
     )
 
     if args.command == "search":
