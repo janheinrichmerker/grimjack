@@ -42,7 +42,7 @@ class CachedDebaterArgumentQualityScorer(ContextManager):
     def cache_file_path(self):
         if self.cache_dir is None:
             return None
-        return self.cache_dir / "debater_argument_quality_cache.json"
+        return self.cache_dir / "debater-argument-quality.json"
 
     def preload(self, topic: str, sentences: List[str]) -> None:
         if topic not in self._cache:
@@ -111,7 +111,7 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
     def cache_file_path(self):
         if self.cache_dir is None:
             return None
-        return self.cache_dir / "debater_argument_stance_cache.json"
+        return self.cache_dir / "debater-argument-stance.json"
 
     def preload(self, topic: str, sentences: List[str]) -> None:
         if topic not in self._cache:

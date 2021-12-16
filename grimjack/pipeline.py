@@ -170,16 +170,16 @@ class Pipeline:
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,
-            cache_path / "targer" if cache_path is not None else None,
+            cache_path,
         )
         self.argument_quality_tagger = DebaterArgumentQualityTagger(
             debater_api_token,
-            cache_path / "debater" if cache_path is not None else None,
+            cache_path,
         )
         self.argument_stance_tagger = DebaterArgumentQualityStanceTagger(
             debater_api_token,
             stance_tagger,
-            cache_path / "stance" if cache_path is not None else None,
+            cache_path,
         )
         if stance_threshold is not None and stance_threshold > 0:
             self.argument_stance_tagger = ThresholdArgumentQualityStanceTagger(

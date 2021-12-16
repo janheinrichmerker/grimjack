@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Optional, Set
 
@@ -16,6 +17,15 @@ class TargerArgumentTagger(ArgumentTagger):
     models: Set[str]
     cache_path: Optional[Path] = None
 
+    @cached_property
+    def _targer_cache_path(self) -> Optional[Path]:
+        if self.cache_path is None:
+            return None
+
+        path = self.cache_path / "targer"
+        path.mkdir(exist_ok=True)
+        return path
+
     def tag_document(
             self,
             document: RankedDocument
@@ -24,7 +34,7 @@ class TargerArgumentTagger(ArgumentTagger):
             document.content,
             self.models,
             self.targer_api_url,
-            self.cache_path,
+            self._targer_cache_path,
         )
         return ArgumentRankedDocument(
             id=document.id,
