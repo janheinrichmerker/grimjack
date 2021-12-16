@@ -1,4 +1,4 @@
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, ArgumentTypeError
 from os import getcwd
 from pathlib import Path
 from typing import Optional, Union, Set, List
@@ -77,6 +77,16 @@ _STANCE_TAGGER_TYPES = {
     "sentiment": StanceTaggerType.SENTIMENT,
     "sent": StanceTaggerType.SENTIMENT,
 }
+
+
+def positive(numeric_type):
+    def require_positive(value):
+        number = numeric_type(value)
+        if number <= 0:
+            raise ArgumentTypeError(f"Number {value} must be positive.")
+        return number
+
+    return require_positive
 
 
 def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -179,7 +189,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--rerank-hits", "-n",
         dest="rerank_hits",
-        type=int,
+        type=positive(int),
         default=5,
     )
     parser.add_argument(
@@ -228,8 +238,14 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--stance-threshold",
         dest="stance_threshold",
-        type=float,
+        type=positive(float),
         default=0.5
+    )
+    parser.add_argument(
+        "--no-stance-threshold",
+        dest="stance_threshold",
+        action="store_const",
+        const=None
     )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
@@ -255,7 +271,7 @@ def _prepare_parser_print_search(parser: ArgumentParser):
     parser.add_argument(
         "--num-hits", "-k",
         dest="num_hits",
-        type=int,
+        type=positive(int),
         default=5,
     )
 
@@ -264,7 +280,7 @@ def _prepare_parser_print_search_all(parser: ArgumentParser):
     parser.add_argument(
         "--num-hits", "-k",
         dest="num_hits",
-        type=int,
+        type=positive(int),
         default=5,
     )
 
@@ -277,8 +293,8 @@ def _prepare_parser_run_search_all(parser: ArgumentParser):
     parser.add_argument(
         "--num-hits", "-k",
         dest="num_hits",
-        type=int,
-        default=1000,
+        type=positive(int),
+        default=100,
     )
 
 
@@ -293,7 +309,7 @@ def _prepare_parser_evaluate_all(parser: ArgumentParser):
     parser.add_argument(
         "--depth",
         dest="depth",
-        type=int,
+        type=positive(int),
         default=10,
     )
     parser.add_argument(
@@ -446,7 +462,7 @@ def main():
     stance_calculation: StanceTaggerType = _parse_stance_tagger_type(
         args.stance_tagger
     )
-    threshold_stance: float = args.threshold_stance
+    stance_threshold: Optional[float] = args.stance_threshold
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
@@ -464,7 +480,7 @@ def main():
         debater_api_token=debater_api_token,
         cache_path=cache_path,
         stance_tagger=stance_calculation,
-        stance_threshold=threshold_stance
+        stance_threshold=stance_threshold
     )
 
     if args.command == "search":

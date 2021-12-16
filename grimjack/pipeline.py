@@ -85,7 +85,7 @@ class Pipeline:
             huggingface_api_token: Optional[str],
             debater_api_token: str,
             stance_tagger: StanceTaggerType,
-            stance_threshold: float,
+            stance_threshold: Optional[float],
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
