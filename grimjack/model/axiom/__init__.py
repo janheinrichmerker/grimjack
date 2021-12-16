@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from random import randint
 from typing import Iterable, Dict, Tuple
 
 from grimjack.model import RankedDocument, Query
@@ -129,37 +128,6 @@ class CachedAxiom(Axiom):
             )
             self._cache[document1.id, document2.id] = preference
             return preference
-
-
-class RandomAxiom(Axiom):
-    def preference(
-            self,
-            context: RerankingContext,
-            query: Query,
-            document1: RankedDocument,
-            document2: RankedDocument
-    ) -> float:
-        return randint(-1, 1)
-
-
-class DocumentIdAxiom(Axiom):
-    """
-    For testing purposes only.
-    """
-
-    def preference(
-            self,
-            context: RerankingContext,
-            query: Query,
-            document1: RankedDocument,
-            document2: RankedDocument
-    ) -> float:
-        if document1.id < document2.id:
-            return 1
-        elif document1.id > document2.id:
-            return -1
-        else:
-            return 0
 
 
 class OriginalAxiom(Axiom):
