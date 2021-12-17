@@ -56,6 +56,25 @@ class QueryExpander(ABC):
         pass
 
 
+class QueryTitleExpander(QueryExpander, ABC):
+
+    def expand_query(self, query: Query) -> List[Query]:
+        return [
+            Query(
+                id=query.id,
+                title=title,
+                comparative_objects=query.comparative_objects,
+                description=query.description,
+                narrative=query.narrative
+            )
+            for title in self.expand_query_title(query)
+        ]
+
+    @abstractmethod
+    def expand_query_title(self, query: Query) -> List[str]:
+        pass
+
+
 class Searcher(ABC):
     @abstractmethod
     def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
