@@ -117,7 +117,7 @@ class Pipeline:
                 reranker_cascade.append(
                     AxiomaticReranker(
                         reranking_context,
-                        AggregatedAxiom({
+                        AggregatedAxiom([
                             OriginalAxiom(),
                             TFC1(),
                             TFC3(),
@@ -156,7 +156,7 @@ class Pipeline:
                             ComparativeObjectTermsInArgumentAxiom(),
                             ComparativeObjectTermPositionInArgumentAxiom(),
                             ArgumentQualityAxiom(),
-                        }).normalized().cached(),
+                        ]).normalized().cached(),
                     )
                 )
             elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
