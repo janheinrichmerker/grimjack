@@ -82,6 +82,9 @@ The following examples correspond to the runs we submit to the
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
+  --targer-models tag-ibm-fasttext \
+  --stance-tagger sentiment \
+  --stance-threshold 0.5 \
   run \
   --num-hits 100 \
   data/runs/grimjack-baseline.txt
@@ -94,7 +97,11 @@ TODO
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --query-expansion t0pp \
+  --query-expansion t0pp-comparative-synonyms \
+  --query-expansion t0pp-description-narrative \
+  --targer-models tag-ibm-fasttext \
+  --stance-tagger sentiment \
+  --stance-threshold 0.5 \
   run \
   --num-hits 100 \
   data/runs/grimjack-baseline.txt
@@ -107,6 +114,11 @@ TODO
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
+  --reranker axiomatic \
+  --rerank-hits 20 \
+  --targer-models tag-ibm-fasttext \
+  --stance-tagger sentiment \
+  --stance-threshold 0.5 \
   run \
   --num-hits 100 \
   data/runs/grimjack-baseline.txt
@@ -119,6 +131,10 @@ TODO
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
+  --reranker balanced-top-5-stance \
+  --targer-models tag-ibm-fasttext \
+  --stance-tagger sentiment \
+  --stance-threshold 0.5 \
   run \
   --num-hits 100 \
   data/runs/grimjack-baseline.txt
@@ -131,6 +147,14 @@ TODO
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
+  --query-expansion t0pp-comparative-synonyms \
+  --query-expansion t0pp-description-narrative \
+  --reranker axiomatic \
+  --reranker balanced-top-5-stance \
+  --rerank-hits 20 \
+  --targer-models tag-ibm-fasttext \
+  --stance-tagger sentiment \
+  --stance-threshold 0.5 \
   run \
   --num-hits 100 \
   data/runs/grimjack-baseline.txt
