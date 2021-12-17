@@ -33,7 +33,7 @@ class WordEmbeddingTermSimilarity(TermSimilarity):
 
     @cached_property
     def _embeddings(self):
-        return Magnitude(self.embeddings_path, stream=True)
+        return Magnitude(self.embeddings_path)
 
     @lru_cache
     def similarity(self, term1: str, term2: str):
@@ -41,12 +41,7 @@ class WordEmbeddingTermSimilarity(TermSimilarity):
 
 
 class FastTextWikiNewsTermSimilarity(WordEmbeddingTermSimilarity):
-    @property
-    def embeddings_path(self) -> str:
-        return (
-            "https://magnitude.plasticity.ai/"
-            "fasttext/medium/wiki-news-300d-1M-subword.magnitude"
-        )
+    embeddings_path = "fasttext/medium/wiki-news-300d-1M-subword.magnitude"
 
 
 class _STMC1Base(Axiom, TermSimilarity, ABC):
