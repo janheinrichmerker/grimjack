@@ -22,54 +22,46 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger, ABC):
     debater_api_token: str
     cache_path: Optional[Path] = None
 
-    @staticmethod
-    def _sentences(document: ArgumentQualityRankedDocument) -> List[str]:
-        download_nltk_dependencies("punkt")
-        return sent_tokenize(document.content)
-
     @contextmanager
     def _scorer(self) -> CachedDebaterArgumentStanceScorer:
         with CachedDebaterArgumentStanceScorer(
-            self.debater_api_token,
-            self.cache_path
+                self.debater_api_token,
+                self.cache_path
         ) as scorer:
             yield scorer
+
+    def _comparative_objects_claims(self, query: Query) -> List[str]:
+        if query.comparative_objects is None:
+            return []
+        object_a, object_b = query.comparative_objects
+        return self.claims(object_a) + self.claims(object_b)
 
     def tag_ranking(
             self,
             query: Query,
             ranking: List[ArgumentQualityRankedDocument]
     ) -> List[ArgumentQualityStanceRankedDocument]:
-        if query.comparative_objects is None:
-            return super(DebaterArgumentQualityStanceTagger, self).tag_ranking(
-                query,
-                ranking
-            )
-
-        sentences = [
-            sentence
-            for document in ranking
-            for sentence in self._sentences(document)
-        ]
-
-        object_a, object_b = query.comparative_objects
-        claims = self.claims(object_a) + self.claims(object_b)
-
+        download_nltk_dependencies("punkt")
         with self._scorer() as scorer:
-            for claim in claims:
-                scorer.preload(claim, sentences)
+            sentences = [
+                sentence
+                for document in ranking
+                for sentence in sent_tokenize(document.content)
+            ]
+            claims = self._comparative_objects_claims(query)
+            scorer.preload(claims, sentences)
+            return [
+                self._tag_document(scorer, query, document)
+                for document in ranking
+            ]
 
-        return super(DebaterArgumentQualityStanceTagger, self).tag_ranking(
-            query,
-            ranking
-        )
-
-    def tag_document(
+    def _tag_document(
             self,
+            scorer: CachedDebaterArgumentStanceScorer,
             query: Query,
             document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
-        sentences = self._sentences(document)
+        sentences = sent_tokenize(document.content)
 
         stances: List[ArgumentStanceSentence]
         if query.comparative_objects is None:
@@ -78,18 +70,17 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger, ABC):
                 for sentence in sentences
             ]
         else:
-            with self._scorer() as scorer:
-                stances = [
-                    ArgumentStanceSentence(
-                        sentence,
-                        self.stance(
-                            scorer,
-                            query,
-                            sentence
-                        )
+            stances = [
+                ArgumentStanceSentence(
+                    sentence,
+                    self.stance(
+                        scorer,
+                        query,
+                        sentence
                     )
-                    for sentence in sentences
-                ]
+                )
+                for sentence in sentences
+            ]
 
         return ArgumentQualityStanceRankedDocument(
             id=document.id,
@@ -101,6 +92,15 @@ class DebaterArgumentQualityStanceTagger(ArgumentQualityStanceTagger, ABC):
             qualities=document.qualities,
             stances=stances
         )
+
+    def tag_document(
+            self,
+            query: Query,
+            document: ArgumentQualityRankedDocument
+    ) -> ArgumentQualityStanceRankedDocument:
+        download_nltk_dependencies("punkt")
+        with self._scorer() as scorer:
+            return self._tag_document(scorer, query, document)
 
     def stance(
             self,

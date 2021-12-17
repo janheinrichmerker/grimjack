@@ -49,11 +49,12 @@ class CachedDebaterArgumentQualityScorer(ContextManager):
             }
             for sentence in unknown
         ])
-        for sentence, score in zip(sentences, scores):
+        for sentence, score in zip(unknown, scores):
             self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"] = score
 
     def score(self, topic: str, sentence: str) -> float:
-        self.preload(topic, [sentence])
+        if f"{md5_hash(topic)}-{md5_hash(sentence)}" not in self._cache:
+            self.preload(topic, [sentence])
         return self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"]
 
     def __getitem__(self, topic: str, sentence: str) -> float:
@@ -83,10 +84,11 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
 
     _cache: Cache = field(init=False)
 
-    def preload(self, topic: str, sentences: List[str]) -> None:
+    def preload(self, topics: List[str], sentences: List[str]) -> None:
         # Sentences we don't know yet.
         unknown = [
-            sentence
+            (topic, sentence)
+            for topic in topics
             for sentence in sentences
             if f"{md5_hash(topic)}-{md5_hash(sentence)}" not in self._cache
         ]
@@ -99,13 +101,14 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
                 "topic": topic,
                 "sentence": sentence,
             }
-            for sentence in unknown
+            for topic, sentence in unknown
         ])
-        for sentence, score in zip(sentences, scores):
+        for (topic, sentence), score in zip(unknown, scores):
             self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"] = score
 
     def score(self, topic: str, sentence: str) -> float:
-        self.preload(topic, [sentence])
+        if f"{md5_hash(topic)}-{md5_hash(sentence)}" not in self._cache:
+            self.preload([topic], [sentence])
         return self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"]
 
     def __getitem__(self, topic: str, sentence: str) -> float:

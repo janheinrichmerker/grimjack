@@ -20,16 +20,11 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
     debater_api_token: str
     cache_path: Optional[Path] = None
 
-    @staticmethod
-    def _sentences(document: ArgumentRankedDocument) -> List[str]:
-        download_nltk_dependencies("punkt")
-        return sent_tokenize(document.content)
-
     @contextmanager
     def _scorer(self) -> CachedDebaterArgumentQualityScorer:
         with CachedDebaterArgumentQualityScorer(
-            self.debater_api_token,
-            self.cache_path
+                self.debater_api_token,
+                self.cache_path
         ) as scorer:
             yield scorer
 
@@ -38,32 +33,33 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
             query: Query,
             ranking: List[ArgumentRankedDocument]
     ) -> List[ArgumentQualityRankedDocument]:
+        download_nltk_dependencies("punkt")
         sentences = [
             sentence
             for document in ranking
-            for sentence in self._sentences(document)
+            for sentence in sent_tokenize(document.content)
         ]
         with self._scorer() as scorer:
             scorer.preload(query.title, sentences)
-        return super(DebaterArgumentQualityTagger, self).tag_ranking(
-            query,
-            ranking
-        )
+            return [
+                self._tag_document(scorer, query, document)
+                for document in ranking
+            ]
 
-    def tag_document(
+    def _tag_document(
             self,
+            scorer: CachedDebaterArgumentQualityScorer,
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
-        sentences = self._sentences(document)
-        with self._scorer() as scorer:
-            qualities = [
-                ArgumentQualitySentence(
-                    sentence,
-                    scorer.score(query.title, sentence)
-                )
-                for sentence in sentences
-            ]
+        sentences = sent_tokenize(document.content)
+        qualities = [
+            ArgumentQualitySentence(
+                sentence,
+                scorer.score(query.title, sentence)
+            )
+            for sentence in sentences
+        ]
         return ArgumentQualityRankedDocument(
             id=document.id,
             content=document.content,
@@ -73,3 +69,12 @@ class DebaterArgumentQualityTagger(ArgumentQualityTagger):
             arguments=document.arguments,
             qualities=qualities
         )
+
+    def tag_document(
+            self,
+            query: Query,
+            document: ArgumentRankedDocument
+    ) -> ArgumentQualityRankedDocument:
+        download_nltk_dependencies("punkt")
+        with self._scorer() as scorer:
+            return self._tag_document(scorer, query, document)
