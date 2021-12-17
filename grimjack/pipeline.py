@@ -1,3 +1,4 @@
+from logging import info
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional, List, Set, Union
@@ -197,10 +198,15 @@ class Pipeline:
             )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
+        info("Searching...")
         ranking = self.searcher.search(query, num_hits)
+        info("Tagging arguments...")
         ranking = self.argument_tagger.tag_ranking(ranking)
+        info("Tagging argument quality...")
         ranking = self.quality_tagger.tag_ranking(query, ranking)
+        info("Tagging argument stance...")
         ranking = self.stance_tagger.tag_ranking(query, ranking)
+        info("Reranking...")
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
