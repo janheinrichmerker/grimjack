@@ -41,11 +41,15 @@ from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
-    Metric, StanceTaggerType, Stemmer, QueryExpansion, RetrievalModel,
+    Metric, StanceTaggerType, Stemmer, QueryExpanderType, RetrievalModel,
     RerankerType
 )
 from grimjack.modules.query_expander import (
-    SimpleQueryExpander, AggregatedQueryExpander
+    AggregatedQueryExpander, OriginalQueryExpander,
+    ComparativeClaimsQueryExpander, ComparativeQuestionsQueryExpander,
+    HuggingfaceDescriptionNarrativeQueryExpander,
+    HuggingfaceComparativeSynonymsQueryExpander,
+    EmbeddingComparativeSynonymsQueryExpander
 )
 from grimjack.modules.reranker import (
     OriginalReranker, AxiomaticReranker, TopReranker,
@@ -78,9 +82,9 @@ class Pipeline:
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
-            query_expansions: Set[QueryExpansion],
+            query_expander_types: Set[QueryExpanderType],
             retrieval_model: Optional[RetrievalModel],
-            rerankers: List[RerankerType],
+            reranker_types: List[RerankerType],
             rerank_hits: int,
             targer_api_url: str,
             targer_models: Set[str],
@@ -98,13 +102,50 @@ class Pipeline:
             stemmer,
             language,
         )
-        self.query_expander = AggregatedQueryExpander([
-            SimpleQueryExpander(
-                query_expansion,
-                huggingface_api_token,
-            )
-            for query_expansion in query_expansions
-        ])
+        query_expanders = [OriginalQueryExpander()]
+        for query_expander in query_expander_types:
+            if (
+                    query_expander ==
+                    QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS
+            ):
+                query_expanders.append(
+                    EmbeddingComparativeSynonymsQueryExpander(
+                        "glove/medium/glove.twitter.27B.25d.magnitude"
+                    )
+                )
+            elif (
+                    query_expander ==
+                    QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS
+            ):
+                query_expanders.append(
+                    EmbeddingComparativeSynonymsQueryExpander(
+                        "fasttext/medium/wiki-news-300d-1M-subword.magnitude"
+                    )
+                )
+            elif query_expander == QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS:
+                query_expanders.append(
+                    HuggingfaceComparativeSynonymsQueryExpander(
+                        "bigscience/T0pp",
+                        huggingface_api_token
+                    )
+                )
+            elif (
+                    query_expander ==
+                    QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE
+            ):
+                query_expanders.append(
+                    HuggingfaceDescriptionNarrativeQueryExpander(
+                        "bigscience/T0pp",
+                        huggingface_api_token
+                    )
+                )
+            elif query_expander == QueryExpanderType.COMPARATIVE_QUESTIONS:
+                query_expanders.append(ComparativeQuestionsQueryExpander())
+            elif query_expander == QueryExpanderType.COMPARATIVE_CLAIMS:
+                query_expanders.append(ComparativeClaimsQueryExpander())
+            else:
+                raise Exception(f"Unknown query expander: {query_expander}")
+        self.query_expander = AggregatedQueryExpander(query_expanders)
         self.searcher = AnseriniSearcher(
             self.index,
             self.query_expander,
@@ -112,7 +153,7 @@ class Pipeline:
         )
         reranking_context = IndexRerankingContext(self.index)
         reranker_cascade = [OriginalReranker()]
-        for reranker in rerankers:
+        for reranker in reranker_types:
             if reranker == RerankerType.AXIOMATIC:
                 reranker_cascade.append(
                     AxiomaticReranker(

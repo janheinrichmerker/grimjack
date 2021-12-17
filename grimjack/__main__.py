@@ -12,7 +12,7 @@ from grimjack.constants import (
 from grimjack.modules.options import (
     RetrievalModel, RerankerType, Metric, StanceTaggerType
 )
-from grimjack.pipeline import Pipeline, Stemmer, QueryExpansion
+from grimjack.pipeline import Pipeline, Stemmer, QueryExpanderType
 
 _STEMMERS = {
     "porter": Stemmer.PORTER,
@@ -21,20 +21,22 @@ _STEMMERS = {
     "k": Stemmer.KROVETZ,
 }
 
-_QUERY_EXPANSIONS = {
-    "original": QueryExpansion.ORIGINAL,
-    "twitter-25-comparative-synonyms":
-        QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
-    "twitter-25": QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS,
-    "wiki-gigaword-100-comparative-synonyms":
-        QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
-    "wiki-gigaword-100": QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS,
-    "t0pp-comparative-synonyms": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
-    "t0pp": QueryExpansion.T0PP_COMPARATIVE_SYNONYMS,
-    "t0pp-description-narrative": QueryExpansion.T0PP_DESCRIPTION_NARRATIVE,
-    "query-reformulate-rule-based":
-        QueryExpansion.QUERY_REFORMULATE_RULE_BASED,
-    "query-reformulate-claims": QueryExpansion.QUERY_REFORMULATE_CLAIMS
+_QUERY_EXPANDER_TYPES = {
+    "original": QueryExpanderType.ORIGINAL,
+    "glove-twitter-comparative-synonyms":
+        QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
+    "glove-twitter-synonyms":
+        QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
+    "fast-text-wiki-news-comparative-synonyms":
+        QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
+    "fast-text-wiki-news-synonyms":
+        QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
+    "t0pp-comparative-synonyms": QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
+    "t0pp-synonyms": QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
+    "t0pp-description-narrative": QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE,
+    "comparative-questions":
+        QueryExpanderType.COMPARATIVE_QUESTIONS,
+    "comparative-claims": QueryExpanderType.COMPARATIVE_CLAIMS,
 }
 
 _RETRIEVAL_MODELS = {
@@ -140,18 +142,18 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default="en",
     )
     parser.add_argument(
-        "--query-expansion",
-        dest="query_expansions",
+        "--query-expander",
+        dest="query_expanders",
         type=str,
-        choices=_QUERY_EXPANSIONS.keys(),
-        default=["original"],
+        choices=_QUERY_EXPANDER_TYPES.keys(),
+        default=[],
         action="append"
     )
     parser.add_argument(
-        "--no-query-expansion",
-        dest="query_expansions",
+        "--no-query-expander", "--no-query-expansion",
+        dest="query_expanders",
         action="store_const",
-        const={"original"}
+        const=[]
     )
     parser.add_argument(
         "--retrieval-model", "--model", "-m",
@@ -205,10 +207,23 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default="https://demo.webis.de/targer-api/targer-api/"
     )
     parser.add_argument(
-        "--targer-models", "--models",
+        "--targer-models",
         dest="targer_models",
-        type=Set[str],
-        default={"tag-combined-fasttext"}
+        type=str,
+        nargs="+",
+        default=["tag-ibm-fasttext"],
+    )
+    parser.add_argument(
+        "--targer-model",
+        dest="targer_models",
+        type=str,
+        action="append"
+    )
+    parser.add_argument(
+        "--no-targer-model",
+        dest="targer_models",
+        action="store_const",
+        const={}
     )
     parser.add_argument(
         "--ibm-api-token-file",
@@ -357,21 +372,21 @@ def _parse_stemmer(stemmer: str) -> Optional[Stemmer]:
         raise Exception(f"Unknown stemmer: {stemmer}")
 
 
-def _parse_query_expansion(query_expansion: str) -> Optional[QueryExpansion]:
-    if query_expansion is None:
+def _parse_query_expander(query_expander: str) -> Optional[QueryExpanderType]:
+    if query_expander is None:
         return None
-    elif query_expansion in _QUERY_EXPANSIONS.keys():
-        return _QUERY_EXPANSIONS[query_expansion]
+    elif query_expander in _QUERY_EXPANDER_TYPES.keys():
+        return _QUERY_EXPANDER_TYPES[query_expander]
     else:
-        raise Exception(f"Unknown query expansion: {query_expansion}")
+        raise Exception(f"Unknown query expander: {query_expander}")
 
 
-def _parse_query_expansions(
-        query_expansions: List[str]
-) -> Set[QueryExpansion]:
+def _parse_query_expanders(
+        query_expanders: List[str]
+) -> Set[QueryExpanderType]:
     return {
-        _parse_query_expansion(query_expansion)
-        for query_expansion in query_expansions
+        _parse_query_expander(query_expander)
+        for query_expander in query_expanders
     }
 
 
@@ -437,8 +452,8 @@ def main():
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
-    query_expansions: Set[QueryExpansion] = _parse_query_expansions(
-        args.query_expansions
+    query_expanders: Set[QueryExpanderType] = _parse_query_expanders(
+        args.query_expanders
     )
     retrieval_model: Optional[RetrievalModel] = _parse_retrieval_model(
         args.retrieval_model
@@ -449,7 +464,7 @@ def main():
         args.huggingface_api_token
     )
     targer_api_url: str = args.targer_api_url
-    targer_models: Set[str] = args.targer_models
+    targer_models: Set[str] = set(args.targer_models)
     debater_api_token = _parse_api_token(
         args.debater_api_token
     )
@@ -470,10 +485,10 @@ def main():
         stopwords_file=stopwords_file,
         stemmer=stemmer,
         language=language,
-        query_expansions=query_expansions,
+        query_expander_types=query_expanders,
         retrieval_model=retrieval_model,
         huggingface_api_token=hugging_face_api_token,
-        rerankers=rerankers,
+        reranker_types=rerankers,
         rerank_hits=rerank_hits,
         targer_api_url=targer_api_url,
         targer_models=targer_models,

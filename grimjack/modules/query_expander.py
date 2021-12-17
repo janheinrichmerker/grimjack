@@ -1,16 +1,15 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from itertools import chain
-from typing import List, Optional, Collection
+from functools import cached_property
+from itertools import chain, product
+from typing import List, Collection, Set, Tuple
 
-from gensim import downloader
-from gensim.similarities import TermSimilarityIndex
 from nltk import word_tokenize, pos_tag
+from pymagnitude import Magnitude
 from requests import post
 
 from grimjack.model import Query
-from grimjack.modules import QueryExpander
-from grimjack.modules.options import QueryExpansion
+from grimjack.modules import QueryExpander, QueryTitleExpander
 from grimjack.utils.nltk import download_nltk_dependencies
 
 
@@ -20,91 +19,54 @@ class OriginalQueryExpander(QueryExpander):
         return [query]
 
 
-_ADVERB_COMPARATIVE = "RBR"
-_ADVERB_SUPERLATIVE = "RBS"
-_ADJECTIVE = "JJ"
-_ADJECTIVE_COMPARATIVE = "JJR"
-_ADJECTIVE_SUPERLATIVE = "JJS"
-_NOUN = "NN"
-_NOUN_PLURAL = "NNS"
-_PROPER_NOUN = "NNP"
-_PROPER_NOUN_PLURAL = "NNPS"
+@dataclass
+class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
+    _ADVERB_COMPARATIVE = "RBR"
+    _ADVERB_SUPERLATIVE = "RBS"
+    _ADJECTIVE = "JJ"
+    _ADJECTIVE_COMPARATIVE = "JJR"
+    _ADJECTIVE_SUPERLATIVE = "JJS"
+    _NOUN = "NN"
+    _NOUN_PLURAL = "NNS"
+    _PROPER_NOUN = "NNP"
+    _PROPER_NOUN_PLURAL = "NNPS"
 
-_COMPARATIVE_TAGS = [
-    _ADVERB_COMPARATIVE,
-    _ADVERB_SUPERLATIVE,
-    _ADJECTIVE,
-    _ADJECTIVE_COMPARATIVE,
-    _ADJECTIVE_SUPERLATIVE,
-    _NOUN, _NOUN_PLURAL,
-    _PROPER_NOUN,
-    _PROPER_NOUN_PLURAL
-]
+    _COMPARATIVE_TAGS = [
+        _ADVERB_COMPARATIVE,
+        _ADVERB_SUPERLATIVE,
+        _ADJECTIVE,
+        _ADJECTIVE_COMPARATIVE,
+        _ADJECTIVE_SUPERLATIVE,
+        _NOUN, _NOUN_PLURAL,
+        _PROPER_NOUN,
+        _PROPER_NOUN_PLURAL
+    ]
 
-
-class ComparativeSynonymsQueryExpander(QueryExpander, ABC):
-
-    def expand_query(self, query: Query) -> List[Query]:
+    def expand_query_title(self, query: Query) -> List[str]:
         download_nltk_dependencies("punkt", "averaged_perceptron_tagger")
 
-        tokens = word_tokenize(query.title)
-        pos_tokens = pos_tag(tokens)
+        tokens: List[str] = word_tokenize(query.title)
+        pos_tokens: List[Tuple[str, str]] = pos_tag(tokens)
 
-        queries = [query]
-        queries.extend(
-            Query(
-                query.id,
-                query.title.replace(token, self.best_synonym(token)),
-                query.comparative_objects,
-                query.description,
-                query.narrative
-            )
-            for token, pos in pos_tokens
-            if pos in _COMPARATIVE_TAGS
-        )
+        token_synonyms: List[Set[str]] = [
+            {token} | self.synonyms(token)
+            if pos in self._COMPARATIVE_TAGS
+            else {token}
+            for i, (token, pos) in enumerate(pos_tokens)
+        ]
+        queries: list[str] = [
+            " ".join(sequence)
+            for sequence in product(*token_synonyms)
+        ]
+        queries.remove(query.title)
         return queries
 
     @abstractmethod
-    def synonyms(self, token: str) -> List[str]:
-        pass
-
-    def best_synonym(self, token: str) -> str:
-        synonyms = self.synonyms(token)
-        if len(synonyms) == 0:
-            return token
-        else:
-            return synonyms[0]
-
-
-class ComparativeSynonymsNarrativeDescriptionQueryExpander(
-    ComparativeSynonymsQueryExpander, ABC
-):
-    def expand_query(self, query: Query) -> List[Query]:
-        queries = super().expand_query(query)
-        new_desc = self.reformulate(query.description)
-        new_narr = self.reformulate(query.narrative)
-        queries.append(Query(
-            query.id,
-            new_desc,
-            query.comparative_objects,
-            query.description,
-            query.narrative
-        ))
-        queries.append(Query(
-            query.id,
-            new_narr,
-            query.comparative_objects,
-            query.description,
-            query.narrative
-        ))
-        return queries
-
-    @abstractmethod
-    def reformulate(self, text: str) -> str:
+    def synonyms(self, token: str) -> Set[str]:
         pass
 
 
-class ReformulateQueryRuleBased(QueryExpander, ABC):
+class ComparativeQuestionsQueryExpander(QueryTitleExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
         if query.comparative_objects is None:
             raise ValueError(
@@ -113,10 +75,11 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
                 f"but none were given for query {query.title}."
             )
         object_a, object_b = query.comparative_objects
-        output_1 = f"pros and cons {object_a} or {object_b}"
-        output_2 = f"should I buy {object_a} or {object_b}"
-        output_3 = f"do you prefer {object_a} or {object_b}"
-        out = [output_1, output_2, output_3]
+        out = [
+            f"pros and cons {object_a} or {object_b}",
+            f"should I buy {object_a} or {object_b}",
+            f"do you prefer {object_a} or {object_b}"
+        ]
         queries = [
             Query(
                 query.id,
@@ -130,7 +93,7 @@ class ReformulateQueryRuleBased(QueryExpander, ABC):
         return queries
 
 
-class ReformulateQueryClaims(QueryExpander, ABC):
+class ComparativeClaimsQueryExpander(QueryTitleExpander, ABC):
     def expand_query(self, query: Query) -> List[Query]:
         if query.comparative_objects is None:
             raise ValueError(
@@ -159,22 +122,20 @@ class ReformulateQueryClaims(QueryExpander, ABC):
 
 
 @dataclass
-class GensimComparativeSynonymsQueryExpander(
+class EmbeddingComparativeSynonymsQueryExpander(
     ComparativeSynonymsQueryExpander
 ):
-    model: str
+    embeddings_path: str
+    num_synonyms: int = 2
 
-    _glove_vectors: Optional[TermSimilarityIndex] = None
+    @cached_property
+    def _embeddings(self):
+        return Magnitude(self.embeddings_path)
 
-    @property
-    def glove_vectors(self) -> TermSimilarityIndex:
-        if self._glove_vectors is None:
-            self._glove_vectors = downloader.load(self.model)
-        return self._glove_vectors
-
-    def synonyms(self, token: str) -> List[str]:
-        similarities = self.glove_vectors.most_similar(token)
-        return [term for term, _ in similarities]
+    def synonyms(self, token: str) -> Set[str]:
+        return set(
+            self._embeddings.most_similar(token, topn=self.num_synonyms)
+        )
 
 
 @dataclass
@@ -183,16 +144,17 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 ):
     model: str
     api_key: str
+    num_synonyms: int = 2
 
     @property
-    def api_url(self) -> str:
+    def _api_url(self) -> str:
         return f"https://api-inference.huggingface.co/models/{self.model}"
 
-    def synonyms(self, token: str) -> List[str]:
+    def synonyms(self, token: str) -> Set[str]:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         input_text = f"What are synonyms of the word \"{token}\"?"
         payload = {"inputs": input_text}
-        response = post(self.api_url, headers=headers, json=payload)
+        response = post(self._api_url, headers=headers, json=payload)
         if response.status_code // 100 != 2:
             raise Exception(
                 f"HTTP Error {response.status_code}: {response.reason}\n"
@@ -201,21 +163,34 @@ class HuggingfaceComparativeSynonymsQueryExpander(
         response_json = response.json()
         output_text: str = response_json[0]["generated_text"]
         if input_text == output_text:
-            return []
+            return set()
         synonyms = output_text.split(",")
-        return [synonym for synonym in synonyms if synonym != token]
+        synonyms = [synonym for synonym in synonyms if synonym != token]
+        return set(synonyms[:self.num_synonyms - 1])
 
 
 @dataclass
-class HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
-    ComparativeSynonymsNarrativeDescriptionQueryExpander,
-    HuggingfaceComparativeSynonymsQueryExpander
+class HuggingfaceDescriptionNarrativeQueryExpander(
+    QueryTitleExpander
 ):
-    def reformulate(self, text: str) -> str:
+    model: str
+    api_key: str
+
+    @property
+    def _api_url(self) -> str:
+        return f"https://api-inference.huggingface.co/models/{self.model}"
+
+    def expand_query_title(self, query: Query) -> List[str]:
+        return [
+            self._reformulate(query.description),
+            self._reformulate(query.narrative),
+        ]
+
+    def _reformulate(self, text: str) -> str:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         input_text = f"Extract a query: {text}"
         payload = {"inputs": input_text}
-        response = post(self.api_url, headers=headers, json=payload)
+        response = post(self._api_url, headers=headers, json=payload)
         if response.status_code // 100 != 2:
             raise Exception(
                 f"HTTP Error {response.status_code}: {response.reason}\n"
@@ -239,44 +214,3 @@ class AggregatedQueryExpander(QueryExpander):
                 for query_expander in self.query_expanders
             ])
         )
-
-
-class SimpleQueryExpander(QueryExpander):
-    _query_expander: QueryExpander
-
-    def __init__(
-            self,
-            query_expansion: QueryExpansion,
-            hugging_face_api_token: Optional[str],
-    ):
-        if query_expansion == QueryExpansion.ORIGINAL:
-            self._query_expander = OriginalQueryExpander()
-        elif query_expansion == QueryExpansion.TWITTER_25_COMPARATIVE_SYNONYMS:
-            self._query_expander = GensimComparativeSynonymsQueryExpander(
-                "glove-twitter-25")
-        elif (query_expansion ==
-              QueryExpansion.WIKI_GIGAWORD_100_COMPARATIVE_SYNONYMS):
-            self._query_expander = GensimComparativeSynonymsQueryExpander(
-                "glove-wiki-gigaword-100"
-            )
-        elif query_expansion == QueryExpansion.T0PP_COMPARATIVE_SYNONYMS:
-            self._query_expander = HuggingfaceComparativeSynonymsQueryExpander(
-                "bigscience/T0pp",
-                hugging_face_api_token
-            )
-        elif query_expansion == QueryExpansion.T0PP_DESCRIPTION_NARRATIVE:
-            self._query_expander = (
-                HuggingfaceSynonymsNarrativeDescriptionQueryExpander(
-                    "bigscience/T0pp",
-                    hugging_face_api_token
-                )
-            )
-        elif query_expansion == QueryExpansion.QUERY_REFORMULATE_RULE_BASED:
-            self._query_expander = ReformulateQueryRuleBased()
-        elif query_expansion == QueryExpansion.QUERY_REFORMULATE_CLAIMS:
-            self._query_expander = ReformulateQueryClaims()
-        else:
-            raise Exception(f"Unknown query expansion: {query_expansion}")
-
-    def expand_query(self, query: Query) -> List[Query]:
-        return self._query_expander.expand_query(query)
