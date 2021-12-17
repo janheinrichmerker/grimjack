@@ -203,9 +203,9 @@ class ArgumentQualityTagger(ABC):
 
 class ArgumentQualityStanceTagger(ABC):
     def tag_ranking(
-        self,
-        query: Query,
-        ranking: List[ArgumentQualityRankedDocument]
+            self,
+            query: Query,
+            ranking: List[ArgumentQualityRankedDocument]
     ) -> List[ArgumentQualityStanceRankedDocument]:
         return [
             self.tag_document(query, document)
@@ -214,9 +214,9 @@ class ArgumentQualityStanceTagger(ABC):
 
     @abstractmethod
     def tag_document(
-        self,
-        query: Query,
-        document: ArgumentQualityRankedDocument
+            self,
+            query: Query,
+            document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
         pass
 
