@@ -100,7 +100,8 @@ pipenv run python -m grimjack \
   --query-expander t0pp-synonyms \
   --query-expander t0pp-description-narrative \
   --targer-model tag-ibm-fasttext \
-  --stance-tagger sentiment \
+  --quality-tagger t0pp \
+  --stance-tagger t0pp \
   --stance-threshold 0.5 \
   --num-hits 100 \
   run \
