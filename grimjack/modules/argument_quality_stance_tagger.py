@@ -173,7 +173,6 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
     ) -> float:
         task = self._task(comparative_object, sentence)
         answer = generator.generate(task).strip().lower()
-        print(answer)
         if answer == "positive":
             return 1
         elif answer == "negative":
