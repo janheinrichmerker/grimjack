@@ -127,7 +127,8 @@ class Pipeline:
                 query_expanders.append(
                     HuggingfaceComparativeSynonymsQueryExpander(
                         "bigscience/T0pp",
-                        huggingface_api_token
+                        huggingface_api_token,
+                        cache_dir=cache_path,
                     )
                 )
             elif (
@@ -137,7 +138,8 @@ class Pipeline:
                 query_expanders.append(
                     HuggingfaceDescriptionNarrativeQueryExpander(
                         "bigscience/T0pp",
-                        huggingface_api_token
+                        huggingface_api_token,
+                        cache_dir=cache_path,
                     )
                 )
             elif query_expander == QueryExpanderType.COMPARATIVE_QUESTIONS:

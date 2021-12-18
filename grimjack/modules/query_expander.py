@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain, product
-from typing import List, Collection, Set, Tuple
+from pathlib import Path
+from typing import List, Collection, Set, Tuple, Optional
 
 from nltk import word_tokenize, pos_tag
 from pymagnitude import Magnitude
-from requests import post
 
 from grimjack import logger
+from grimjack.api.huggingface import CachedHuggingfaceTextGenerator
 from grimjack.model import Query
 from grimjack.modules import QueryExpander, QueryTitleExpander
 from grimjack.utils.nltk import download_nltk_dependencies
@@ -49,6 +51,8 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
         tokens: List[str] = word_tokenize(query.title)
         pos_tokens: List[Tuple[str, str]] = pos_tag(tokens)
 
+        self.preload_synonyms(set(tokens))
+
         token_synonyms: List[Set[str]] = [
             {token} | self.synonyms(token)
             if pos in self._COMPARATIVE_TAGS
@@ -62,6 +66,9 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
         if query.title in queries:
             queries.remove(query.title)
         return queries
+
+    def preload_synonyms(self, tokens: Set[str]) -> None:
+        pass
 
     @abstractmethod
     def synonyms(self, token: str) -> Set[str]:
@@ -152,23 +159,33 @@ class HuggingfaceComparativeSynonymsQueryExpander(
     model: str
     api_key: str
     num_synonyms: int = 1
+    cache_dir: Optional[Path] = None
 
-    @property
-    def _api_url(self) -> str:
-        return f"https://api-inference.huggingface.co/models/{self.model}"
+    @contextmanager
+    def _generator(self) -> CachedHuggingfaceTextGenerator:
+        with CachedHuggingfaceTextGenerator(
+                model=self.model,
+                api_key=self.api_key,
+                cache_dir=self.cache_dir,
+        ) as generator:
+            yield generator
+
+    @staticmethod
+    def _input(token: str) -> str:
+        return f"What are synonyms of the word \"{token}\"?"
+
+    def preload_synonyms(self, tokens: Set[str]) -> None:
+        with self._generator() as generator:
+            inputs = [
+                self._input(token)
+                for token in tokens
+            ]
+            generator.preload(inputs)
 
     def synonyms(self, token: str) -> Set[str]:
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        input_text = f"What are synonyms of the word \"{token}\"?"
-        payload = {"inputs": input_text}
-        response = post(self._api_url, headers=headers, json=payload)
-        if response.status_code // 100 != 2:
-            raise Exception(
-                f"HTTP Error {response.status_code}: {response.reason}\n"
-                f"Please check if you are authenticated."
-            )
-        response_json = response.json()
-        output_text: str = response_json[0]["generated_text"]
+        input_text = self._input(token)
+        with self._generator() as generator:
+            output_text: str = generator.generate(input_text)
         if input_text == output_text:
             return set()
         synonyms = output_text.split(",")
@@ -177,37 +194,36 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 
 
 @dataclass
-class HuggingfaceDescriptionNarrativeQueryExpander(
-    QueryTitleExpander
-):
+class HuggingfaceDescriptionNarrativeQueryExpander(QueryTitleExpander):
     model: str
     api_key: str
+    cache_dir: Optional[Path] = None
 
-    @property
-    def _api_url(self) -> str:
-        return f"https://api-inference.huggingface.co/models/{self.model}"
+    @contextmanager
+    def _generator(self) -> CachedHuggingfaceTextGenerator:
+        with CachedHuggingfaceTextGenerator(
+                model=self.model,
+                api_key=self.api_key,
+                cache_dir=self.cache_dir,
+        ) as generator:
+            yield generator
+
+    @staticmethod
+    def _input(text: str) -> str:
+        return f"Extract a query: {text}"
 
     def expand_query_title(self, query: Query) -> List[str]:
-        return [
-            self._reformulate(query.description),
-            self._reformulate(query.narrative),
-        ]
-
-    def _reformulate(self, text: str) -> str:
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        input_text = f"Extract a query: {text}"
-        payload = {"inputs": input_text}
-        response = post(self._api_url, headers=headers, json=payload)
-        if response.status_code // 100 != 2:
-            raise Exception(
-                f"HTTP Error {response.status_code}: {response.reason}\n"
-                f"Please check if you are authenticated."
-            )
-        response_json = response.json()
-        output_text: str = response_json[0]["generated_text"]
-        if input_text == output_text:
-            return text
-        return output_text
+        inputs = {
+            self._input(query.description),
+            self._input(query.narrative),
+        }
+        with self._generator() as generator:
+            generator.preload(list(inputs))
+            outputs = {
+                generator.generate(text)
+                for text in inputs
+            }
+        return list(outputs - inputs)
 
 
 @dataclass
