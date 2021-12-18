@@ -8,6 +8,7 @@ from nltk import word_tokenize, pos_tag
 from pymagnitude import Magnitude
 from requests import post
 
+from grimjack import logger
 from grimjack.model import Query
 from grimjack.modules import QueryExpander, QueryTitleExpander
 from grimjack.utils.nltk import download_nltk_dependencies
@@ -131,6 +132,7 @@ class EmbeddingComparativeSynonymsQueryExpander(
 
     @cached_property
     def _embeddings(self):
+        logger.info(f"Loading embeddings from {self.embeddings_path}.")
         return Magnitude(self.embeddings_path)
 
     def synonyms(self, token: str) -> Set[str]:

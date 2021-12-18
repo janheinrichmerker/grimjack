@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Optional, Set
+from typing import Optional, Set, List
 
 from targer.api import fetch_arguments
 
+from grimjack import logger
 from grimjack.model import RankedDocument
 from grimjack.model.arguments import ArgumentRankedDocument
-
 from grimjack.modules import ArgumentTagger
 
 
@@ -30,6 +30,9 @@ class TargerArgumentTagger(ArgumentTagger):
             self,
             document: RankedDocument
     ) -> ArgumentRankedDocument:
+        logger.debug(
+            f"Fetching arguments for document {document.id} from TARGER API."
+        )
         arguments = fetch_arguments(
             document.content,
             self.models,

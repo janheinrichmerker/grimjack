@@ -6,6 +6,7 @@ from typing import Set, Tuple
 
 from pymagnitude import Magnitude
 
+from grimjack import logger
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import Axiom
 from grimjack.model.axiom.utils import approximately_equal, strictly_greater, \
@@ -33,6 +34,7 @@ class WordEmbeddingTermSimilarity(TermSimilarity):
 
     @cached_property
     def _embeddings(self):
+        logger.info(f"Loading embeddings from {self.embeddings_path}.")
         return Magnitude(self.embeddings_path)
 
     @lru_cache
