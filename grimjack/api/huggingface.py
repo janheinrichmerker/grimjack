@@ -6,8 +6,7 @@ from typing import ContextManager, Optional, Dict, List
 
 from diskcache import Cache
 from requests import post, HTTPError
-
-from grimjack import logger
+from tqdm import tqdm
 
 
 def md5_hash(text: str) -> str:
@@ -41,8 +40,11 @@ class CachedHuggingfaceTextGenerator(ContextManager):
             return
 
         # Prefetch generated texts
-        logger.info(f"Generating {len(unknown)} texts with Huggingface API.")
-        for text in texts:
+        for text in tqdm(
+                unknown,
+                desc="Generating texts with Huggingface API",
+                unit="texts"
+        ):
             payload = {"inputs": text}
             response = post(
                 url=self._api_url,
@@ -52,7 +54,8 @@ class CachedHuggingfaceTextGenerator(ContextManager):
             if response.status_code // 100 != 2:
                 raise HTTPError(
                     f"Failed to generate text '{text}' with Huggingface API. "
-                    f"Check if you are authenticated.",
+                    f"Check if you are authenticated. "
+                    f"Got response {response.status_code} {response.reason}",
                     response=response,
                 )
             response_json = response.json()
