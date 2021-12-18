@@ -7,6 +7,8 @@ from typing import ContextManager, Optional, Dict, List
 from diskcache import Cache
 from requests import post, HTTPError
 
+from grimjack import logger
+
 
 def md5_hash(text: str) -> str:
     return md5(text.encode()).hexdigest()
@@ -39,6 +41,7 @@ class CachedHuggingfaceTextGenerator(ContextManager):
             return
 
         # Prefetch generated texts
+        logger.info(f"Generating {len(unknown)} texts with Huggingface API.")
         for text in texts:
             payload = {"inputs": text}
             response = post(
