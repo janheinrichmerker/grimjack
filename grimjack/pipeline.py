@@ -146,11 +146,7 @@ class Pipeline:
             else:
                 raise Exception(f"Unknown query expander: {query_expander}")
         self.query_expander = AggregatedQueryExpander(query_expanders)
-        self.searcher = AnseriniSearcher(
-            self.index,
-            self.query_expander,
-            retrieval_model,
-        )
+        self.searcher = AnseriniSearcher(self.index, retrieval_model)
         reranking_context = IndexRerankingContext(self.index)
         reranker_cascade = [OriginalReranker()]
         for reranker in reranker_types:
@@ -239,15 +235,17 @@ class Pipeline:
             )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
-        logger.info("Searching...")
-        ranking = self.searcher.search(query, num_hits)
-        logger.info("Tagging arguments...")
+        logger.info("Expanding query.")
+        queries = self.query_expander.expand_query(query)
+        logger.info("Searching queries.")
+        ranking = self.searcher.search_boolean(queries, num_hits)
+        logger.info("Tagging retrieved arguments.")
         ranking = self.argument_tagger.tag_ranking(ranking)
-        logger.info("Tagging argument quality...")
+        logger.info("Tagging retrieved argument quality.")
         ranking = self.quality_tagger.tag_ranking(query, ranking)
-        logger.info("Tagging argument stance...")
+        logger.info("Tagging retrieved argument stance.")
         ranking = self.stance_tagger.tag_ranking(query, ranking)
-        logger.info("Reranking...")
+        logger.info("Reranking retrieved arguments.")
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 

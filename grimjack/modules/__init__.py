@@ -81,7 +81,11 @@ class Searcher(ABC):
         pass
 
     @abstractmethod
-    def retrieval_score(self, query: Query, document: Document) -> float:
+    def search_boolean(
+            self,
+            queries: List[Query],
+            num_hits: int
+    ) -> List[RankedDocument]:
         pass
 
 
