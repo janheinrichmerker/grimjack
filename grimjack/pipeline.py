@@ -17,13 +17,12 @@ from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
 from grimjack.model.axiom.lower_bound import LB1
 from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
 from grimjack.model.axiom.query_aspects import (
-    LEN_DIV, DIV, LEN_M_AND, M_AND, LEN_AND, AND, ANTI_REG, REG
+    DIV, M_AND, AND, ANTI_REG, REG
 )
 from grimjack.model.axiom.retrieval_score import (
     RS_TF, RS_TF_IDF, RS_BM25, RS_PL2, RS_QL
 )
-from grimjack.model.axiom.term_frequency import LEN_M_TDC, M_TDC, TFC3, TFC1
-from grimjack.model.axiom.term_similarity import STMC1, STMC1_f, STMC2, STMC2_f
+from grimjack.model.axiom.term_frequency import M_TDC, TFC3, TFC1
 from grimjack.modules import (
     ArgumentQualityStanceTagger, DocumentsStore, TopicsStore,
     Index, QueryExpander, Searcher, Reranker,
@@ -160,11 +159,10 @@ class Pipeline:
                     AxiomaticReranker(
                         reranking_context,
                         AggregatedAxiom([
-                            OriginalAxiom(),
+                            OriginalAxiom() * (29 / 2),
                             TFC1(),
                             TFC3(),
                             M_TDC(),
-                            LEN_M_TDC(),
                             LNC1(),
                             LNC2(),
                             TF_LNC(),
@@ -172,11 +170,8 @@ class Pipeline:
                             REG(),
                             ANTI_REG(),
                             AND(),
-                            LEN_AND(),
                             M_AND(),
-                            LEN_M_AND(),
                             DIV(),
-                            LEN_DIV(),
                             PROX1(),
                             PROX2(),
                             PROX3(),
@@ -187,10 +182,6 @@ class Pipeline:
                             RS_BM25(),
                             RS_PL2(),
                             RS_QL(),
-                            STMC1(),
-                            STMC1_f(),
-                            STMC2(),
-                            STMC2_f(),
                             ArgumentCountAxiom(),
                             QueryTermsInArgumentAxiom(),
                             QueryTermPositionInArgumentAxiom(),
