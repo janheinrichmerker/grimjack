@@ -39,33 +39,29 @@ class CachedHuggingfaceTextGenerator(ContextManager):
             return
 
         # Prefetch generated texts
-        payload = {"inputs": texts}
-        response = post(
-            url=self._api_url,
-            headers=self._headers,
-            json=payload
-        )
-        if response.status_code // 100 != 2:
-            raise HTTPError(
-                f"Failed to generate texts with Huggingface API. "
-                f"Check if you are authenticated.",
-                response=response,
+        for text in texts:
+            payload = {"inputs": text}
+            response = post(
+                url=self._api_url,
+                headers=self._headers,
+                json=payload
             )
-        response_json = response.json()
-        generated_texts: List[str] = [
-            item["generated_text"]
-            for item in response_json
-        ]
-
-        for text, generated_text in zip(unknown, generated_texts):
+            if response.status_code // 100 != 2:
+                raise HTTPError(
+                    f"Failed to generate text '{text}' with Huggingface API. "
+                    f"Check if you are authenticated.",
+                    response=response,
+                )
+            response_json = response.json()
+            generated_text: str = response_json[0]["generated_text"]
             self._cache[md5_hash(text)] = generated_text
 
-    def generate(self, text: str) -> float:
+    def generate(self, text: str) -> str:
         if md5_hash(text) not in self._cache:
             self.preload([text])
         return self._cache[md5_hash(text)]
 
-    def __getitem__(self, text: str) -> float:
+    def __getitem__(self, text: str) -> str:
         return self.generate(text)
 
     def __post_init__(self):
