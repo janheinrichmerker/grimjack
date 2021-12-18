@@ -36,14 +36,14 @@ from grimjack.modules.argument_quality_stance_tagger import (
     HuggingfaceArgumentQualityStanceTagger,
 )
 from grimjack.modules.argument_quality_tagger import (
-    DebaterArgumentQualityTagger
+    DebaterArgumentQualityTagger, HuggingfaceArgumentQualityTagger
 )
 from grimjack.modules.argument_tagger import TargerArgumentTagger
 from grimjack.modules.evaluation import TrecEvaluation
 from grimjack.modules.index import AnseriniIndex
 from grimjack.modules.options import (
     Metric, StanceTaggerType, Stemmer, QueryExpanderType, RetrievalModel,
-    RerankerType
+    RerankerType, QualityTaggerType
 )
 from grimjack.modules.query_expander import (
     AggregatedQueryExpander, OriginalQueryExpander,
@@ -92,6 +92,7 @@ class Pipeline:
             cache_path: Optional[Path],
             huggingface_api_token: Optional[str],
             debater_api_token: str,
+            quality_tagger: QualityTaggerType,
             stance_tagger: StanceTaggerType,
             stance_threshold: Optional[float],
             num_hits: int,
@@ -216,10 +217,19 @@ class Pipeline:
             targer_models,
             cache_path,
         )
-        self.quality_tagger = DebaterArgumentQualityTagger(
-            debater_api_token,
-            cache_path,
-        )
+        if quality_tagger == QualityTaggerType.DEBATER:
+            self.quality_tagger = DebaterArgumentQualityTagger(
+                debater_api_token,
+                cache_path,
+            )
+        elif quality_tagger == QualityTaggerType.HUGGINGFACE_T0PP:
+            self.quality_tagger = HuggingfaceArgumentQualityTagger(
+                "bigscience/T0pp",
+                huggingface_api_token,
+                cache_path,
+            )
+        else:
+            raise ValueError(f"Unknown quality tagger: {stance_tagger}")
         if stance_tagger == StanceTaggerType.OBJECT:
             self.stance_tagger = DebaterArgumentQualityObjectStanceTagger(
                 debater_api_token,

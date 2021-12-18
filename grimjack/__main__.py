@@ -12,7 +12,7 @@ from grimjack.constants import (
     DEFAULT_TOUCHE_2021_QRELS_URL
 )
 from grimjack.modules.options import (
-    RetrievalModel, RerankerType, Metric, StanceTaggerType
+    RetrievalModel, RerankerType, Metric, StanceTaggerType, QualityTaggerType
 )
 from grimjack.pipeline import Pipeline, Stemmer, QueryExpanderType
 
@@ -71,6 +71,11 @@ _METRICS = {
     "p": Metric.PRECISION,
     "map": Metric.MAP,
     "bpref": Metric.BPREF,
+}
+
+_QUALITY_TAGGER_TYPES = {
+    "debater": QualityTaggerType.DEBATER,
+    "t0pp": QualityTaggerType.HUGGINGFACE_T0PP,
 }
 
 _STANCE_TAGGER_TYPES = {
@@ -253,6 +258,13 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=DEFAULT_CACHE_DIR
     )
     parser.add_argument(
+        "--quality-tagger",
+        dest="quality_tagger",
+        type=str,
+        choices=_QUALITY_TAGGER_TYPES.keys(),
+        default="debater"
+    )
+    parser.add_argument(
         "--stance-tagger",
         dest="stance_tagger",
         type=str,
@@ -432,11 +444,18 @@ def _parse_metric(metric: str) -> Metric:
         raise Exception(f"Unknown metric: {metric}")
 
 
-def _parse_stance_tagger(stance: str) -> StanceTaggerType:
-    if stance in _STANCE_TAGGER_TYPES.keys():
-        return _STANCE_TAGGER_TYPES[stance]
+def _parse_quality_tagger(quality_tagger: str) -> QualityTaggerType:
+    if quality_tagger in _QUALITY_TAGGER_TYPES.keys():
+        return _QUALITY_TAGGER_TYPES[quality_tagger]
     else:
-        raise Exception(f"Unknown stance calculation: {stance}")
+        raise Exception(f"Unknown quality tagger: {quality_tagger}")
+
+
+def _parse_stance_tagger(stance_tagger: str) -> StanceTaggerType:
+    if stance_tagger in _STANCE_TAGGER_TYPES.keys():
+        return _STANCE_TAGGER_TYPES[stance_tagger]
+    else:
+        raise Exception(f"Unknown stance tagger: {stance_tagger}")
 
 
 def main():
@@ -477,7 +496,10 @@ def main():
             f"or in '{DEFAULT_DEBATER_API_TOKEN_PATH.relative_to(getcwd())}'."
         )
     cache_path: Optional[Path] = args.cache_path
-    stance_calculation: StanceTaggerType = _parse_stance_tagger(
+    quality_tagger: QualityTaggerType = _parse_quality_tagger(
+        args.quality_tagger
+    )
+    stance_tagger: StanceTaggerType = _parse_stance_tagger(
         args.stance_tagger
     )
     stance_threshold: Optional[float] = args.stance_threshold
@@ -507,7 +529,8 @@ def main():
         targer_models=targer_models,
         debater_api_token=debater_api_token,
         cache_path=cache_path,
-        stance_tagger=stance_calculation,
+        quality_tagger=quality_tagger,
+        stance_tagger=stance_tagger,
         stance_threshold=stance_threshold,
         num_hits=num_hits,
     )

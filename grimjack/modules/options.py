@@ -35,6 +35,11 @@ class Metric(Enum):
     BPREF = 4
 
 
+class QualityTaggerType(Enum):
+    DEBATER = 1
+    HUGGINGFACE_T0PP = 2
+
+
 class StanceTaggerType(Enum):
     OBJECT = 1
     SENTIMENT = 2
