@@ -127,7 +127,7 @@ class EmbeddingComparativeSynonymsQueryExpander(
     ComparativeSynonymsQueryExpander
 ):
     embeddings_path: str
-    num_synonyms: int = 2
+    num_synonyms: int = 1
 
     @cached_property
     def _embeddings(self):
@@ -135,7 +135,11 @@ class EmbeddingComparativeSynonymsQueryExpander(
 
     def synonyms(self, token: str) -> Set[str]:
         return set(
-            self._embeddings.most_similar(token, topn=self.num_synonyms)
+            self._embeddings.most_similar(
+                token,
+                topn=self.num_synonyms,
+                return_similarities=False,
+            )
         )
 
 
@@ -145,7 +149,7 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 ):
     model: str
     api_key: str
-    num_synonyms: int = 2
+    num_synonyms: int = 1
 
     @property
     def _api_url(self) -> str:
