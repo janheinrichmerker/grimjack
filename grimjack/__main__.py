@@ -207,17 +207,11 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default="https://demo.webis.de/targer-api/targer-api/"
     )
     parser.add_argument(
-        "--targer-models",
-        dest="targer_models",
-        type=str,
-        nargs="+",
-        default=["tag-ibm-fasttext"],
-    )
-    parser.add_argument(
         "--targer-model",
         dest="targer_models",
         type=str,
-        action="append"
+        action="append",
+        default=["tag-ibm-fasttext"],
     )
     parser.add_argument(
         "--no-targer-model",
