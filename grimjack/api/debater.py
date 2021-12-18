@@ -57,9 +57,6 @@ class CachedDebaterArgumentQualityScorer(ContextManager):
             self.preload(topic, [sentence])
         return self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"]
 
-    def __getitem__(self, topic: str, sentence: str) -> float:
-        return self.score(topic, sentence)
-
     def __post_init__(self):
         cache_subdir = self.cache_dir / "debater" / "quality"
         self._cache = Cache(str(cache_subdir.absolute()))
@@ -110,9 +107,6 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
         if f"{md5_hash(topic)}-{md5_hash(sentence)}" not in self._cache:
             self.preload([topic], [sentence])
         return self._cache[f"{md5_hash(topic)}-{md5_hash(sentence)}"]
-
-    def __getitem__(self, topic: str, sentence: str) -> float:
-        return self.score(topic, sentence)
 
     def __post_init__(self):
         cache_subdir = self.cache_dir / "debater" / "stance"
