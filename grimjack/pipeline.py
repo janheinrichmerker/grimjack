@@ -1,10 +1,10 @@
-from logging import info
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional, List, Set, Union
 
 from tqdm import tqdm
 
+from grimjack import logger
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import OriginalAxiom, AggregatedAxiom
 from grimjack.model.axiom.argumentative import (
@@ -239,15 +239,15 @@ class Pipeline:
             )
 
     def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
-        info("Searching...")
+        logger.info("Searching...")
         ranking = self.searcher.search(query, num_hits)
-        info("Tagging arguments...")
+        logger.info("Tagging arguments...")
         ranking = self.argument_tagger.tag_ranking(ranking)
-        info("Tagging argument quality...")
+        logger.info("Tagging argument quality...")
         ranking = self.quality_tagger.tag_ranking(query, ranking)
-        info("Tagging argument stance...")
+        logger.info("Tagging argument stance...")
         ranking = self.stance_tagger.tag_ranking(query, ranking)
-        info("Reranking...")
+        logger.info("Reranking...")
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 

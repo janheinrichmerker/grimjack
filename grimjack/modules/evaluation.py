@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from logging import warning, info
 from pathlib import Path
 from typing import Dict
 
 from pandas import DataFrame, NamedAgg
 from trectools import TrecRun, TrecEval
 
+from grimjack import logger
 from grimjack.modules import Evaluation, QrelsStore
 from grimjack.modules.options import Metric
 
@@ -26,13 +26,13 @@ class TrecEvaluation(Evaluation):
         qrels_doc_ids = set(qrels_data["docid"])
 
         if len(run_doc_ids & qrels_doc_ids) == 0:
-            warning(
+            logger.warning(
                 "The chosen qrels contain no relevance judgements "
                 "for documents from the run file.\n"
                 "You're likely using document-level qrels "
                 "but a passage-level run file."
             )
-            info(
+            logger.info(
                 "Trying to merge run file passages into documents "
                 "to evaluate on the document level.\n"
                 "The top passage's score and rank is used "
@@ -69,7 +69,7 @@ class TrecEvaluation(Evaluation):
                 len(missing_document_ids) / len(run_doc_ids)
         )
         if missing_documents_proportion > 0.25:
-            warning(
+            logger.warning(
                 f"Qrels are missing {missing_documents_proportion:.2%} "
                 f"of the documents from the run file, "
                 f"{len(missing_document_ids)} of {len(run_doc_ids)}."

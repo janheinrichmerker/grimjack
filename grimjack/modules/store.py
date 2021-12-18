@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from gzip import GzipFile
 from hashlib import md5
-from logging import warning
 from os.path import basename
 from pathlib import Path
 from typing import List, Union, Tuple, Optional
@@ -11,6 +10,7 @@ from xml.etree.ElementTree import parse, ElementTree, Element
 from dload import save_unzip, save
 from trectools import TrecQrel
 
+from grimjack import logger
 from grimjack.constants import DOCUMENTS_DIR, TOPICS_DIR, QRELS_DIR
 from grimjack.model import Query
 from grimjack.modules import DocumentsStore, TopicsStore, QrelsStore
@@ -99,7 +99,7 @@ def _parse_topic(xml: Element) -> Query:
     objects_element = xml.find("objects")
     objects: Optional[Tuple[str, str]]
     if objects_element is None:
-        warning(
+        logger.warning(
             f"No objects were found for topic '{title}'. "
             "You may need to re-download the latest topic file."
         )
@@ -111,14 +111,14 @@ def _parse_topic(xml: Element) -> Query:
     if description_element is not None:
         description = description_element.text.strip()
     else:
-        warning(f"No description was given for topic '{title}'.")
+        logger.warning(f"No description was given for topic '{title}'.")
         description = ""
 
     narrative_element = xml.find("narrative")
     if narrative_element is not None:
         narrative = narrative_element.text.strip()
     else:
-        warning(f"No narrative was given for topic '{title}'.")
+        logger.warning(f"No narrative was given for topic '{title}'.")
         narrative = ""
 
     return Query(number, title, objects, description, narrative)
