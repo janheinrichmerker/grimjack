@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Optional, Set, List
+from typing import Optional, Set
 
 from targer.api import fetch_arguments
 
