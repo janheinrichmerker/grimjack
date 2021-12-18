@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
-from logging import INFO, WARNING
+from logging import INFO, WARNING, DEBUG
 from os import getcwd
 from pathlib import Path
 from typing import Optional, Union, Set, List
@@ -489,10 +489,14 @@ def main():
     )
     stance_threshold: Optional[float] = args.stance_threshold
 
-    if verbose:
+    if not verbose and not quiet:
         logger.setLevel(INFO)
-    if quiet:
+    elif verbose:
+        logger.setLevel(DEBUG)
+    elif quiet:
         logger.setLevel(WARNING)
+    else:
+        raise ValueError("Can't log quietly and verbosely at the same time.")
 
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
