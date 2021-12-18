@@ -38,3 +38,4 @@ class Metric(Enum):
 class StanceTaggerType(Enum):
     OBJECT = 1
     SENTIMENT = 2
+    T0PP = 3

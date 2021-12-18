@@ -80,6 +80,7 @@ _STANCE_TAGGER_TYPES = {
     "diff": StanceTaggerType.OBJECT,
     "sentiment": StanceTaggerType.SENTIMENT,
     "sent": StanceTaggerType.SENTIMENT,
+    "t0pp": StanceTaggerType.T0PP,
 }
 
 

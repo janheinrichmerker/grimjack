@@ -33,6 +33,7 @@ from grimjack.modules.argument_quality_stance_tagger import (
     ThresholdArgumentQualityStanceTagger,
     DebaterArgumentQualityObjectStanceTagger,
     DebaterArgumentQualitySentimentStanceTagger,
+    HuggingfaceArgumentQualityStanceTagger,
 )
 from grimjack.modules.argument_quality_tagger import (
     DebaterArgumentQualityTagger
@@ -227,6 +228,12 @@ class Pipeline:
         elif stance_tagger == StanceTaggerType.SENTIMENT:
             self.stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
                 debater_api_token,
+                cache_path,
+            )
+        elif stance_tagger == StanceTaggerType.T0PP:
+            self.stance_tagger = HuggingfaceArgumentQualityStanceTagger(
+                "bigscience/T0pp",
+                huggingface_api_token,
                 cache_path,
             )
         else:
