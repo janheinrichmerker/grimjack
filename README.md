@@ -82,7 +82,7 @@ The following examples correspond to the runs we submit to the
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --targer-models tag-ibm-fasttext \
+  --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
   run \
@@ -97,14 +97,14 @@ TODO
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --query-expansion t0pp-comparative-synonyms \
-  --query-expansion t0pp-description-narrative \
-  --targer-models tag-ibm-fasttext \
+  --query-expander t0pp-synonyms \
+  --query-expander t0pp-description-narrative \
+  --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
   run \
   --num-hits 100 \
-  data/runs/grimjack-baseline.txt
+  data/runs/grimjack-all-you-need-is-t0.txt
 ```
 
 #### 3. Argumentative Axioms
@@ -116,12 +116,12 @@ pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --reranker axiomatic \
   --rerank-hits 20 \
-  --targer-models tag-ibm-fasttext \
+  --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
   run \
   --num-hits 100 \
-  data/runs/grimjack-baseline.txt
+  data/runs/grimjack-argumentative-axioms.txt
 ```
 
 #### 4. Fair Reranking
@@ -132,32 +132,33 @@ TODO
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --reranker balanced-top-5-stance \
-  --targer-models tag-ibm-fasttext \
+  --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
   run \
   --num-hits 100 \
-  data/runs/grimjack-baseline.txt
+  data/runs/grimjack-fair-reranking.txt
 ```
 
-#### 5. Fair Argumentative Reranking with T0
+#### 5. Argumentative Fair Reranking with T0
 
 TODO
 
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --query-expansion t0pp-comparative-synonyms \
-  --query-expansion t0pp-description-narrative \
+  --query-expander fast-text-wiki-news-synonyms \
+  --query-expander t0pp-synonyms \
+  --query-expander t0pp-description-narrative \
   --reranker axiomatic \
   --reranker balanced-top-5-stance \
   --rerank-hits 20 \
-  --targer-models tag-ibm-fasttext \
+  --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
   run \
   --num-hits 100 \
-  data/runs/grimjack-baseline.txt
+  data/runs/grimjack-argumentative-fair-reranking-with-T0.txt
 ```
 
 ## Testing
