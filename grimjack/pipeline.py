@@ -63,6 +63,174 @@ from grimjack.modules.store import (
 )
 
 
+def _query_expander(
+        query_expander_types: Set[QueryExpanderType],
+        huggingface_api_token: Optional[str],
+        cache_path: Optional[Path],
+) -> QueryExpander:
+    query_expanders = [OriginalQueryExpander()]
+    for query_expander in query_expander_types:
+        if (
+                query_expander ==
+                QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS
+        ):
+            query_expanders.append(
+                EmbeddingComparativeSynonymsQueryExpander(
+                    "glove/medium/glove.twitter.27B.25d.magnitude"
+                )
+            )
+        elif (
+                query_expander ==
+                QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS
+        ):
+            query_expanders.append(
+                EmbeddingComparativeSynonymsQueryExpander(
+                    "fasttext/medium/wiki-news-300d-1M-subword.magnitude"
+                )
+            )
+        elif query_expander == QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS:
+            query_expanders.append(
+                HuggingfaceComparativeSynonymsQueryExpander(
+                    "bigscience/T0pp",
+                    huggingface_api_token,
+                    cache_dir=cache_path,
+                )
+            )
+        elif (
+                query_expander ==
+                QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE
+        ):
+            query_expanders.append(
+                HuggingfaceDescriptionNarrativeQueryExpander(
+                    "bigscience/T0pp",
+                    huggingface_api_token,
+                    cache_dir=cache_path,
+                )
+            )
+        elif query_expander == QueryExpanderType.COMPARATIVE_QUESTIONS:
+            query_expanders.append(ComparativeQuestionsQueryExpander())
+        elif query_expander == QueryExpanderType.COMPARATIVE_CLAIMS:
+            query_expanders.append(ComparativeClaimsQueryExpander())
+        else:
+            raise Exception(f"Unknown query expander: {query_expander}")
+    return AggregatedQueryExpander(query_expanders)
+
+
+def _reranker(
+        reranker_types: List[RerankerType],
+        rerank_hits: int,
+        index: Index,
+) -> Reranker:
+    reranking_context = IndexRerankingContext(index)
+    reranker_cascade = [OriginalReranker()]
+    for reranker in reranker_types:
+        if reranker == RerankerType.AXIOMATIC:
+            reranker_cascade.append(
+                AxiomaticReranker(
+                    reranking_context,
+                    AggregatedAxiom([
+                        OriginalAxiom() * (29 / 2),
+                        TFC1(),
+                        TFC3(),
+                        M_TDC(),
+                        LNC1(),
+                        LNC2(),
+                        TF_LNC(),
+                        LB1(),
+                        REG(),
+                        ANTI_REG(),
+                        AND(),
+                        M_AND(),
+                        DIV(),
+                        PROX1(),
+                        PROX2(),
+                        PROX3(),
+                        PROX4(),
+                        PROX5(),
+                        RS_TF(),
+                        RS_TF_IDF(),
+                        RS_BM25(),
+                        RS_PL2(),
+                        RS_QL(),
+                        ArgumentCountAxiom(),
+                        QueryTermsInArgumentAxiom(),
+                        QueryTermPositionInArgumentAxiom(),
+                        AverageSentenceLengthAxiom(),
+                        ComparativeObjectTermsInArgumentAxiom(),
+                        ComparativeObjectTermPositionInArgumentAxiom(),
+                        ArgumentQualityAxiom(),
+                    ]).normalized().cached(),
+                )
+            )
+        elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
+            reranker_cascade.append(AlternatingStanceFairnessReranker())
+        elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE:
+            reranker_cascade.append(BalancedTopKStanceFairnessReranker(5))
+        elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE:
+            reranker_cascade.append(BalancedTopKStanceFairnessReranker(10))
+        else:
+            raise ValueError(f"Unknown reranker: {reranker}")
+    reranker: Reranker = CascadeReranker(reranker_cascade)
+    if rerank_hits is not None:
+        reranker = TopReranker(reranker, rerank_hits)
+    return reranker
+
+
+def _quality_tagger(
+        quality_tagger: QualityTaggerType,
+        huggingface_api_token: Optional[str],
+        debater_api_token: str,
+        cache_path: Optional[Path],
+) -> ArgumentQualityTagger:
+    if quality_tagger == QualityTaggerType.DEBATER:
+        return DebaterArgumentQualityTagger(
+            debater_api_token,
+            cache_path,
+        )
+    elif quality_tagger == QualityTaggerType.HUGGINGFACE_T0PP:
+        return HuggingfaceArgumentQualityTagger(
+            "bigscience/T0pp",
+            huggingface_api_token,
+            cache_path,
+        )
+    else:
+        raise ValueError(f"Unknown quality tagger: {quality_tagger}")
+
+
+def _stance_tagger(
+        stance_tagger_type: StanceTaggerType,
+        stance_threshold: Optional[float],
+        huggingface_api_token: Optional[str],
+        debater_api_token: str,
+        cache_path: Optional[Path],
+) -> ArgumentQualityStanceTagger:
+    stance_tagger: ArgumentQualityStanceTagger
+    if stance_tagger_type == StanceTaggerType.OBJECT:
+        stance_tagger = DebaterArgumentQualityObjectStanceTagger(
+            debater_api_token,
+            cache_path,
+        )
+    elif stance_tagger_type == StanceTaggerType.SENTIMENT:
+        stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
+            debater_api_token,
+            cache_path,
+        )
+    elif stance_tagger_type == StanceTaggerType.T0PP:
+        stance_tagger = HuggingfaceArgumentQualityStanceTagger(
+            "bigscience/T0pp",
+            huggingface_api_token,
+            cache_path,
+        )
+    else:
+        raise ValueError(f"Unknown stance tagger: {stance_tagger_type}")
+    if stance_threshold is not None and stance_threshold > 0:
+        stance_tagger = ThresholdArgumentQualityStanceTagger(
+            stance_tagger,
+            stance_threshold
+        )
+    return stance_tagger
+
+
 class Pipeline:
     documents_store: DocumentsStore
     topics_store: TopicsStore
@@ -82,9 +250,9 @@ class Pipeline:
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
-            query_expander_types: Set[QueryExpanderType],
+            query_expanders: Set[QueryExpanderType],
             retrieval_model: Optional[RetrievalModel],
-            reranker_types: List[RerankerType],
+            rerankers: List[RerankerType],
             rerank_hits: int,
             targer_api_url: str,
             targer_models: Set[str],
@@ -104,146 +272,31 @@ class Pipeline:
             stemmer,
             language,
         )
-        query_expanders = [OriginalQueryExpander()]
-        for query_expander in query_expander_types:
-            if (
-                    query_expander ==
-                    QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS
-            ):
-                query_expanders.append(
-                    EmbeddingComparativeSynonymsQueryExpander(
-                        "glove/medium/glove.twitter.27B.25d.magnitude"
-                    )
-                )
-            elif (
-                    query_expander ==
-                    QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS
-            ):
-                query_expanders.append(
-                    EmbeddingComparativeSynonymsQueryExpander(
-                        "fasttext/medium/wiki-news-300d-1M-subword.magnitude"
-                    )
-                )
-            elif query_expander == QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS:
-                query_expanders.append(
-                    HuggingfaceComparativeSynonymsQueryExpander(
-                        "bigscience/T0pp",
-                        huggingface_api_token,
-                        cache_dir=cache_path,
-                    )
-                )
-            elif (
-                    query_expander ==
-                    QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE
-            ):
-                query_expanders.append(
-                    HuggingfaceDescriptionNarrativeQueryExpander(
-                        "bigscience/T0pp",
-                        huggingface_api_token,
-                        cache_dir=cache_path,
-                    )
-                )
-            elif query_expander == QueryExpanderType.COMPARATIVE_QUESTIONS:
-                query_expanders.append(ComparativeQuestionsQueryExpander())
-            elif query_expander == QueryExpanderType.COMPARATIVE_CLAIMS:
-                query_expanders.append(ComparativeClaimsQueryExpander())
-            else:
-                raise Exception(f"Unknown query expander: {query_expander}")
-        self.query_expander = AggregatedQueryExpander(query_expanders)
+        self.query_expander = _query_expander(
+            query_expanders,
+            huggingface_api_token,
+            cache_path
+        )
         self.searcher = AnseriniSearcher(self.index, retrieval_model, num_hits)
-        reranking_context = IndexRerankingContext(self.index)
-        reranker_cascade = [OriginalReranker()]
-        for reranker in reranker_types:
-            if reranker == RerankerType.AXIOMATIC:
-                reranker_cascade.append(
-                    AxiomaticReranker(
-                        reranking_context,
-                        AggregatedAxiom([
-                            OriginalAxiom() * (29 / 2),
-                            TFC1(),
-                            TFC3(),
-                            M_TDC(),
-                            LNC1(),
-                            LNC2(),
-                            TF_LNC(),
-                            LB1(),
-                            REG(),
-                            ANTI_REG(),
-                            AND(),
-                            M_AND(),
-                            DIV(),
-                            PROX1(),
-                            PROX2(),
-                            PROX3(),
-                            PROX4(),
-                            PROX5(),
-                            RS_TF(),
-                            RS_TF_IDF(),
-                            RS_BM25(),
-                            RS_PL2(),
-                            RS_QL(),
-                            ArgumentCountAxiom(),
-                            QueryTermsInArgumentAxiom(),
-                            QueryTermPositionInArgumentAxiom(),
-                            AverageSentenceLengthAxiom(),
-                            ComparativeObjectTermsInArgumentAxiom(),
-                            ComparativeObjectTermPositionInArgumentAxiom(),
-                            ArgumentQualityAxiom(),
-                        ]).normalized().cached(),
-                    )
-                )
-            elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
-                reranker_cascade.append(AlternatingStanceFairnessReranker())
-            elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE:
-                reranker_cascade.append(BalancedTopKStanceFairnessReranker(5))
-            elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE:
-                reranker_cascade.append(BalancedTopKStanceFairnessReranker(10))
-            else:
-                raise ValueError(f"Unknown reranker: {reranker}")
-        self.reranker = CascadeReranker(reranker_cascade)
-        if rerank_hits is not None:
-            self.reranker = TopReranker(self.reranker, rerank_hits)
+        self.reranker = _reranker(rerankers, rerank_hits, self.index)
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,
             cache_path,
         )
-        if quality_tagger == QualityTaggerType.DEBATER:
-            self.quality_tagger = DebaterArgumentQualityTagger(
-                debater_api_token,
-                cache_path,
-            )
-        elif quality_tagger == QualityTaggerType.HUGGINGFACE_T0PP:
-            self.quality_tagger = HuggingfaceArgumentQualityTagger(
-                "bigscience/T0pp",
-                huggingface_api_token,
-                cache_path,
-            )
-        else:
-            raise ValueError(f"Unknown quality tagger: {stance_tagger}")
-        if stance_tagger == StanceTaggerType.OBJECT:
-            self.stance_tagger = DebaterArgumentQualityObjectStanceTagger(
-                debater_api_token,
-                cache_path,
-            )
-        elif stance_tagger == StanceTaggerType.SENTIMENT:
-            self.stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
-                debater_api_token,
-                cache_path,
-            )
-        elif stance_tagger == StanceTaggerType.T0PP:
-            self.stance_tagger = HuggingfaceArgumentQualityStanceTagger(
-                "bigscience/T0pp",
-                huggingface_api_token,
-                cache_path,
-            )
-        else:
-            raise ValueError(f"Unknown stance tagger: {stance_tagger}")
-        if stance_threshold is not None and stance_threshold > 0:
-            self.stance_tagger = ThresholdArgumentQualityStanceTagger(
-                self.stance_tagger,
-                stance_threshold
-            )
+        self.quality_tagger = _quality_tagger(
+            quality_tagger,
+            huggingface_api_token,
+            debater_api_token,
+            cache_path
+        )
+        self.stance_tagger = _stance_tagger(
+            stance_tagger,
+            stance_threshold,
+            huggingface_api_token,
+            debater_api_token,
+            cache_path
+        )
 
     def _search(self, query: Query) -> List[RankedDocument]:
         logger.info("Expanding query.")
