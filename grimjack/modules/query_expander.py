@@ -58,7 +58,8 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
             " ".join(sequence)
             for sequence in product(*token_synonyms)
         ]
-        queries.remove(query.title)
+        if query.title in queries:
+            queries.remove(query.title)
         return queries
 
     @abstractmethod
