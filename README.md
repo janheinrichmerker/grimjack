@@ -85,8 +85,8 @@ pipenv run python -m grimjack \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
-  run \
   --num-hits 100 \
+  run \
   data/runs/grimjack-baseline.txt
 ```
 
@@ -102,8 +102,8 @@ pipenv run python -m grimjack \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
-  run \
   --num-hits 100 \
+  run \
   data/runs/grimjack-all-you-need-is-t0.txt
 ```
 
@@ -119,8 +119,8 @@ pipenv run python -m grimjack \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
-  run \
   --num-hits 100 \
+  run \
   data/runs/grimjack-argumentative-axioms.txt
 ```
 
@@ -135,8 +135,8 @@ pipenv run python -m grimjack \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
-  run \
   --num-hits 100 \
+  run \
   data/runs/grimjack-fair-reranking.txt
 ```
 
@@ -156,8 +156,8 @@ pipenv run python -m grimjack \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \
-  run \
   --num-hits 100 \
+  run \
   data/runs/grimjack-argumentative-fair-reranking-with-T0.txt
 ```
 

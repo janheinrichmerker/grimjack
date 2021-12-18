@@ -5,18 +5,14 @@ from typing import List, Optional
 
 from pyserini.search import JQuery, SimpleSearcher
 from pyserini.search.querybuilder import (
-    get_boolean_query_builder,
-    JBooleanClauseOccur
+    get_boolean_query_builder, JBooleanClauseOccur
 )
 
 from grimjack.model import RankedDocument, Query
-from grimjack.modules import Searcher, Index, QueryExpander
+from grimjack.modules import Searcher, Index
 from grimjack.modules.options import RetrievalModel
 from grimjack.utils.jvm import (
-    JBagOfWordsQueryGenerator,
-    JIndexArgs,
-    JIndexCollection,
-    JResult
+    JBagOfWordsQueryGenerator, JIndexArgs, JIndexCollection, JResult
 )
 
 
@@ -45,6 +41,7 @@ def _parse_document(hit: JResult, rank: int) -> RankedDocument:
 class AnseriniSearcher(Searcher):
     index: Index
     retrieval_model: Optional[RetrievalModel]
+    num_hits: int
 
     _bow_query_generator = JBagOfWordsQueryGenerator()
 
@@ -83,23 +80,16 @@ class AnseriniSearcher(Searcher):
 
     def _search(
             self,
-            anserini_query: JQuery,
-            num_hits: int
+            anserini_query: JQuery
     ) -> List[RankedDocument]:
-        hits = self._searcher.search(anserini_query, num_hits)
+        hits = self._searcher.search(anserini_query, self.num_hits)
         return [
             _parse_document(hit, i + 1)
             for i, hit in enumerate(hits)
         ]
 
-    def search(self, query: Query, num_hits: int) -> List[RankedDocument]:
-        anserini_query = self._build_query(query)
-        return self._search(anserini_query, num_hits)
+    def search(self, query: Query) -> List[RankedDocument]:
+        return self._search(self._build_query(query))
 
-    def search_boolean(
-            self,
-            queries: List[Query],
-            num_hits: int
-    ) -> List[RankedDocument]:
-        anserini_query = self._build_boolean_query(queries)
-        return self._search(anserini_query, num_hits)
+    def search_boolean(self, queries: List[Query]) -> List[RankedDocument]:
+        return self._search(self._build_boolean_query(queries))

@@ -93,6 +93,7 @@ class Pipeline:
             debater_api_token: str,
             stance_tagger: StanceTaggerType,
             stance_threshold: Optional[float],
+            num_hits: int,
     ):
         self.documents_store = SimpleDocumentsStore(documents_zip_url)
         self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
@@ -146,7 +147,7 @@ class Pipeline:
             else:
                 raise Exception(f"Unknown query expander: {query_expander}")
         self.query_expander = AggregatedQueryExpander(query_expanders)
-        self.searcher = AnseriniSearcher(self.index, retrieval_model)
+        self.searcher = AnseriniSearcher(self.index, retrieval_model, num_hits)
         reranking_context = IndexRerankingContext(self.index)
         reranker_cascade = [OriginalReranker()]
         for reranker in reranker_types:
@@ -234,11 +235,11 @@ class Pipeline:
                 stance_threshold
             )
 
-    def _search(self, query: Query, num_hits: int) -> List[RankedDocument]:
+    def _search(self, query: Query) -> List[RankedDocument]:
         logger.info("Expanding query.")
         queries = self.query_expander.expand_query(query)
         logger.info("Searching queries.")
-        ranking = self.searcher.search_boolean(queries, num_hits)
+        ranking = self.searcher.search_boolean(queries)
         logger.info("Tagging retrieved arguments.")
         ranking = self.argument_tagger.tag_ranking(ranking)
         logger.info("Tagging retrieved argument quality.")
@@ -249,9 +250,9 @@ class Pipeline:
         ranking = self.reranker.rerank(query, ranking)
         return ranking
 
-    def print_search(self, query: str, num_hits: int):
+    def print_search(self, query: str):
         manual_query = Query(-1, query, None, "", "")
-        results = self._search(manual_query, num_hits)
+        results = self._search(manual_query)
         for document in results:
             print(
                 f"Rank {document.rank:3}: {document.id} "
@@ -259,13 +260,13 @@ class Pipeline:
                 f"\t{document.content}\n\n\n"
             )
 
-    def print_search_all(self, num_hits: int):
+    def print_search_all(self):
         for topic in self.topics_store.topics:
             print(f"Query {topic.id}: {topic.title}\n")
-            self.print_search(topic.title, num_hits)
+            self.print_search(topic.title)
             print("\n\n")
 
-    def run_search_all(self, path: Path, num_hits: int):
+    def run_search_all(self, path: Path):
         with path.open("w") as file:
             topics = tqdm(
                 self.topics_store.topics,
@@ -273,7 +274,7 @@ class Pipeline:
                 unit="queries",
             )
             for topic in topics:
-                results = self._search(topic, num_hits)
+                results = self._search(topic)
                 file.writelines(
                     f"{topic.id} Q0 {document.id} {document.rank} "
                     f"{document.score} {path.stem}\n"
@@ -292,7 +293,7 @@ class Pipeline:
         with TemporaryDirectory() as directory_name:
             directory: Path = Path(directory_name)
             run_file = directory / "run.txt"
-            self.run_search_all(run_file, depth)
+            self.run_search_all(run_file)
             if per_query:
                 result = evaluation.evaluate_per_query(run_file, depth)
                 for query_id, value in result.items():

@@ -270,6 +270,12 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         action="store_const",
         const=None
     )
+    parser.add_argument(
+        "--num-hits", "-k",
+        dest="num_hits",
+        type=positive(int),
+        default=100,
+    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
@@ -291,33 +297,16 @@ def _prepare_parser_print_search(parser: ArgumentParser):
         dest="query",
         type=str,
     )
-    parser.add_argument(
-        "--num-hits", "-k",
-        dest="num_hits",
-        type=positive(int),
-        default=5,
-    )
 
 
-def _prepare_parser_print_search_all(parser: ArgumentParser):
-    parser.add_argument(
-        "--num-hits", "-k",
-        dest="num_hits",
-        type=positive(int),
-        default=5,
-    )
+def _prepare_parser_print_search_all(_: ArgumentParser):
+    pass
 
 
 def _prepare_parser_run_search_all(parser: ArgumentParser):
     parser.add_argument(
         dest="output_file",
         type=Path,
-    )
-    parser.add_argument(
-        "--num-hits", "-k",
-        dest="num_hits",
-        type=positive(int),
-        default=100,
     )
 
 
@@ -456,6 +445,7 @@ def main():
 
     verbose: bool = args.verbose
     quiet: bool = args.quiet
+    num_hits: int = args.num_hits
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
     topics_zip_path: str = args.topics_zip_path
@@ -470,6 +460,8 @@ def main():
     )
     rerankers: List[RerankerType] = _parse_rerankers(args.rerankers)
     rerank_hits: Optional[int] = args.rerank_hits
+    if rerank_hits > num_hits:
+        raise ValueError("Cannot rerank more hits than are being retrieved.")
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
     )
@@ -496,7 +488,7 @@ def main():
     elif quiet:
         logger.setLevel(WARNING)
     else:
-        raise ValueError("Can't log quietly and verbosely at the same time.")
+        raise ValueError("Cannot log quietly and verbosely at the same time.")
 
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
@@ -515,24 +507,26 @@ def main():
         debater_api_token=debater_api_token,
         cache_path=cache_path,
         stance_tagger=stance_calculation,
-        stance_threshold=stance_threshold
+        stance_threshold=stance_threshold,
+        num_hits=num_hits,
     )
 
     if args.command == "search":
         query: str = args.query
-        num_hits: int = args.num_hits
-        pipeline.print_search(query, num_hits)
+        pipeline.print_search(query)
     elif args.command == "search-all":
-        num_hits: int = args.num_hits
-        pipeline.print_search_all(num_hits)
+        pipeline.print_search_all()
     elif args.command in ["run-all", "run"]:
         output_file: Path = args.output_file
-        num_hits: int = args.num_hits
-        pipeline.run_search_all(output_file, num_hits)
+        pipeline.run_search_all(output_file)
     elif args.command in ["evaluate-all", "evaluate", "eval"]:
         metric: Metric = _parse_metric(args.metric)
         qrels: Union[Path, str] = args.qrels
         depth: int = args.depth
+        if depth > num_hits:
+            raise ValueError(
+                "Cannot evaluate more hits than are being retrieved."
+            )
         per_query: bool = args.per_query
         pipeline.evaluate_all(metric, qrels, depth, per_query)
     else:
