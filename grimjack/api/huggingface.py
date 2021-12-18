@@ -69,7 +69,7 @@ class CachedHuggingfaceTextGenerator(ContextManager):
         return self.generate(text)
 
     def __post_init__(self):
-        cache_subdir = self.cache_dir / f"huggingface-{self.model}"
+        cache_subdir = self.cache_dir / "huggingface" / self.model
         self._cache = Cache(str(cache_subdir.absolute()))
 
     def __exit__(self, exc_type, exc_value, traceback):

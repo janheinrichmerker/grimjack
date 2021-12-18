@@ -61,7 +61,7 @@ class CachedDebaterArgumentQualityScorer(ContextManager):
         return self.score(topic, sentence)
 
     def __post_init__(self):
-        cache_subdir = self.cache_dir / "debater-argument-quality"
+        cache_subdir = self.cache_dir / "debater" / "quality"
         self._cache = Cache(str(cache_subdir.absolute()))
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -115,7 +115,7 @@ class CachedDebaterArgumentStanceScorer(ContextManager):
         return self.score(topic, sentence)
 
     def __post_init__(self):
-        cache_subdir = self.cache_dir / "debater-argument-stance"
+        cache_subdir = self.cache_dir / "debater" / "stance"
         self._cache = Cache(str(cache_subdir.absolute()))
 
     def __exit__(self, exc_type, exc_value, traceback):
