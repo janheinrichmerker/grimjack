@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from random import randint
 from typing import List
 
+from grimjack import logger
 from grimjack.model import RankedDocument, Query
 from grimjack.model.axiom import Axiom
 from grimjack.model.stance import ArgumentQualityStanceRankedDocument
@@ -51,6 +52,7 @@ class AxiomaticReranker(Reranker):
         vertices_right = []
 
         # Select random pivot.
+        logger.debug("Selecting reranking pivot.")
         pivot = vertices[randint(0, len(vertices) - 1)]
 
         for vertex in vertices:
