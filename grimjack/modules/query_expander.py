@@ -75,8 +75,8 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
         pass
 
 
-class ComparativeQuestionsQueryExpander(QueryTitleExpander, ABC):
-    def expand_query(self, query: Query) -> List[Query]:
+class ComparativeQuestionsQueryExpander(QueryTitleExpander):
+    def expand_query_title(self, query: Query) -> List[str]:
         if query.comparative_objects is None:
             raise ValueError(
                 f"Exactly two comparative objects are required "
@@ -84,26 +84,15 @@ class ComparativeQuestionsQueryExpander(QueryTitleExpander, ABC):
                 f"but none were given for query {query.title}."
             )
         object_a, object_b = query.comparative_objects
-        out = [
+        return [
             f"pros and cons {object_a} or {object_b}",
             f"should I buy {object_a} or {object_b}",
             f"do you prefer {object_a} or {object_b}"
         ]
-        queries = [
-            Query(
-                query.id,
-                new_query,
-                query.comparative_objects,
-                query.description,
-                query.narrative
-            )
-            for new_query in out
-        ]
-        return queries
 
 
-class ComparativeClaimsQueryExpander(QueryTitleExpander, ABC):
-    def expand_query(self, query: Query) -> List[Query]:
+class ComparativeClaimsQueryExpander(QueryTitleExpander):
+    def expand_query_title(self, query: Query) -> List[str]:
         if query.comparative_objects is None:
             raise ValueError(
                 f"Exactly two comparative objects are required "
@@ -111,23 +100,13 @@ class ComparativeClaimsQueryExpander(QueryTitleExpander, ABC):
                 f"but none were given for query {query.title}."
             )
         object_a, object_b = query.comparative_objects
-        claim_1 = f"{object_a} is better than {object_b}"
-        claim_2 = f"{object_a} is worse than {object_b}"
-        claim_3 = f"{object_b} is better than {object_a}"
-        claim_4 = f"{object_b} is worse than {object_a}"
-        claim_5 = f"{object_a} is as good as {object_b}"
-        claims = [claim_1, claim_2, claim_3, claim_4, claim_5]
-        queries = [
-            Query(
-                query.id,
-                new_query,
-                query.comparative_objects,
-                query.description,
-                query.narrative
-            )
-            for new_query in claims
+        return [
+            f"{object_a} is better than {object_b}",
+            f"{object_a} is worse than {object_b}",
+            f"{object_b} is better than {object_a}",
+            f"{object_b} is worse than {object_a}",
+            f"{object_a} is as good as {object_b}"
         ]
-        return queries
 
 
 @dataclass
