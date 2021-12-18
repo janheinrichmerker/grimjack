@@ -1,8 +1,10 @@
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
+from logging import INFO, WARNING
 from os import getcwd
 from pathlib import Path
 from typing import Optional, Union, Set, List
 
+from grimjack import logger
 from grimjack.constants import (
     DEFAULT_DOCUMENTS_ZIP_URL, DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_ZIP_PATH,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH, DEFAULT_DEBATER_API_TOKEN_PATH,
@@ -92,6 +94,18 @@ def positive(numeric_type):
 
 
 def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
+    parser.add_argument(
+        "--verbose", "-v",
+        dest="verbose",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--quiet", "-q",
+        dest="quiet",
+        action="store_true",
+        default=False,
+    )
     parser.add_argument(
         "--documents-zip-url", "--documents-url", "-d",
         dest="documents_zip_url",
@@ -440,6 +454,8 @@ def main():
     _prepare_parser(parser)
     args: Namespace = parser.parse_args()
 
+    verbose: bool = args.verbose
+    quiet: bool = args.quiet
     documents_zip_url: str = args.documents_zip_url
     topics_zip_url: str = args.topics_zip_url
     topics_zip_path: str = args.topics_zip_path
@@ -472,6 +488,12 @@ def main():
         args.stance_tagger
     )
     stance_threshold: Optional[float] = args.stance_threshold
+
+    if verbose:
+        logger.setLevel(INFO)
+    if quiet:
+        logger.setLevel(WARNING)
+
     pipeline = Pipeline(
         documents_zip_url=documents_zip_url,
         topics_zip_url=topics_zip_url,
