@@ -30,8 +30,9 @@ def _download_unzip_if_needed(url: str, download_dir: Path, name: str):
     """
     if download_dir.exists():
         return  # Already downloaded.
-    print(
-        f"Downloading and unzipping {name} from {url} to {download_dir}.")
+    logger.info(
+        f"Downloading and unzipping {name} from {url} to {download_dir}."
+    )
     if url.endswith(".zip"):
         save_unzip(url, str(download_dir), delete_after=True)
     elif url.endswith(".gz"):
@@ -52,7 +53,7 @@ def _download_if_needed(url: str, file_path: Path):
     if file_path.exists():
         return  # Already downloaded.
 
-    print(f"Downloading from {url} to {file_path}.")
+    logger.info(f"Downloading from {url} to {file_path}.")
     file_path.parent.mkdir()
     save(url, str(file_path.absolute()))
 
@@ -86,7 +87,7 @@ def _parse_objects(xml: Element) -> Tuple[str, str]:
         raise RuntimeError(
             f"Expected exactly 2 comparative objects "
             f"but got {len(objects)}."
-                           )
+        )
     object_a, object_b = [obj.strip() for obj in objects]
     return object_a, object_b
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from subprocess import run
 from typing import Optional
 
+from grimjack import logger
 from grimjack.constants import INDEX_DIR
 from grimjack.modules import Index, DocumentsStore
 from grimjack.modules.options import Stemmer
@@ -63,7 +64,7 @@ class AnseriniIndex(Index):
         """
         if index_dir.exists():
             return  # Already indexed.
-        print(f"Indexing {name} from {input_dir} to {index_dir}.")
+        logger.info(f"Indexing {name} from {input_dir} to {index_dir}.")
         index_dir.mkdir()
         index_command = [
             "python", "-m", "pyserini.index",
