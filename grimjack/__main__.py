@@ -2,7 +2,7 @@ from argparse import ArgumentParser, Namespace, ArgumentTypeError
 from logging import INFO, WARNING, DEBUG
 from os import getcwd
 from pathlib import Path
-from typing import Optional, Union, Set, List
+from typing import Optional, Union, Set, List, Dict, Callable
 
 from grimjack import logger
 from grimjack.constants import (
@@ -12,80 +12,86 @@ from grimjack.constants import (
     DEFAULT_TOUCHE_2021_QRELS_URL
 )
 from grimjack.modules.options import (
-    RetrievalModel, RerankerType, Metric, StanceTaggerType, QualityTaggerType
+    RetrievalModel, RerankerType, Metric, StanceTaggerType, QualityTaggerType,
+    Stemmer, QueryExpanderType
 )
-from grimjack.pipeline import Pipeline, Stemmer, QueryExpanderType
+from grimjack.pipeline import Pipeline
 
-_STEMMERS = {
-    "porter": Stemmer.PORTER,
-    "p": Stemmer.PORTER,
-    "krovetz": Stemmer.KROVETZ,
-    "k": Stemmer.KROVETZ,
+_STEMMERS: Dict[str, Callable[[], Stemmer]] = {
+    "porter": lambda: Stemmer.PORTER,
+    "p": lambda: Stemmer.PORTER,
+    "krovetz": lambda: Stemmer.KROVETZ,
+    "k": lambda: Stemmer.KROVETZ,
 }
 
-_QUERY_EXPANDER_TYPES = {
-    "original": QueryExpanderType.ORIGINAL,
+_QUERY_EXPANDER_TYPES: Dict[str, Callable[[], QueryExpanderType]] = {
+    "original": lambda: QueryExpanderType.ORIGINAL,
     "glove-twitter-comparative-synonyms":
-        QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
+        lambda: QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
     "glove-twitter-synonyms":
-        QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
+        lambda: QueryExpanderType.GLOVE_TWITTER_COMPARATIVE_SYNONYMS,
     "fast-text-wiki-news-comparative-synonyms":
-        QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
+        lambda: QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
     "fast-text-wiki-news-synonyms":
-        QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
-    "t0pp-comparative-synonyms": QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
-    "t0pp-synonyms": QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
-    "t0pp-description-narrative": QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE,
-    "comparative-questions":
-        QueryExpanderType.COMPARATIVE_QUESTIONS,
-    "comparative-claims": QueryExpanderType.COMPARATIVE_CLAIMS,
+        lambda: QueryExpanderType.FAST_TEXT_WIKI_NEWS_COMPARATIVE_SYNONYMS,
+    "t0pp-comparative-synonyms":
+        lambda: QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
+    "t0pp-synonyms": lambda: QueryExpanderType.T0PP_COMPARATIVE_SYNONYMS,
+    "t0pp-description-narrative":
+        lambda: QueryExpanderType.T0PP_DESCRIPTION_NARRATIVE,
+    "comparative-questions": lambda: QueryExpanderType.COMPARATIVE_QUESTIONS,
+    "comparative-claims": lambda: QueryExpanderType.COMPARATIVE_CLAIMS,
 }
 
-_RETRIEVAL_MODELS = {
-    "bm25": RetrievalModel.BM25,
-    "query-likelihood-dirichlet": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
-    "query-likelihood": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
-    "dirichlet": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
-    "qld": RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+_RETRIEVAL_MODELS: Dict[str, Callable[[], RetrievalModel]] = {
+    "bm25": lambda: RetrievalModel.BM25,
+    "query-likelihood-dirichlet":
+        lambda: RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "query-likelihood": lambda: RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "dirichlet": lambda: RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
+    "qld": lambda: RetrievalModel.QUERY_LIKELIHOOD_DIRICHLET,
 }
 
-_RERANKER_TYPES = {
-    "axiomatic": RerankerType.AXIOMATIC,
-    "axiom": RerankerType.AXIOMATIC,
-    "a": RerankerType.AXIOMATIC,
-    "fairness-alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
-    "alternating-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
-    "alt-stance": RerankerType.FAIRNESS_ALTERNATING_STANCE,
+_RERANKER_TYPES: Dict[str, Callable[[], RerankerType]] = {
+    "axiomatic": lambda: RerankerType.AXIOMATIC,
+    "axiom": lambda: RerankerType.AXIOMATIC,
+    "a": lambda: RerankerType.AXIOMATIC,
+    "fairness-alternating-stance":
+        lambda: RerankerType.FAIRNESS_ALTERNATING_STANCE,
+    "alternating-stance": lambda: RerankerType.FAIRNESS_ALTERNATING_STANCE,
+    "alt-stance": lambda: RerankerType.FAIRNESS_ALTERNATING_STANCE,
     "fairness-balanced-top-10-stance":
-        RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
-    "balanced-top-10-stance": RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
+        lambda: RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
+    "balanced-top-10-stance":
+        lambda: RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE,
     "fairness-balanced-top-5-stance":
-        RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
-    "balanced-top-5-stance": RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
+        lambda: RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
+    "balanced-top-5-stance":
+        lambda: RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
 }
 
-_METRICS = {
-    "ndcg": Metric.NDCG,
-    "precision": Metric.PRECISION,
-    "prec": Metric.PRECISION,
-    "p": Metric.PRECISION,
-    "map": Metric.MAP,
-    "bpref": Metric.BPREF,
+_METRICS: Dict[str, Callable[[], Metric]] = {
+    "ndcg": lambda: Metric.NDCG,
+    "precision": lambda: Metric.PRECISION,
+    "prec": lambda: Metric.PRECISION,
+    "p": lambda: Metric.PRECISION,
+    "map": lambda: Metric.MAP,
+    "bpref": lambda: Metric.BPREF,
 }
 
-_QUALITY_TAGGER_TYPES = {
-    "debater": QualityTaggerType.DEBATER,
-    "t0pp": QualityTaggerType.HUGGINGFACE_T0PP,
+_QUALITY_TAGGER_TYPES: Dict[str, Callable[[], QualityTaggerType]] = {
+    "debater": lambda: QualityTaggerType.DEBATER,
+    "t0pp": lambda: QualityTaggerType.HUGGINGFACE_T0PP,
 }
 
-_STANCE_TAGGER_TYPES = {
-    "object": StanceTaggerType.OBJECT,
-    "obj": StanceTaggerType.OBJECT,
-    "difference": StanceTaggerType.OBJECT,
-    "diff": StanceTaggerType.OBJECT,
-    "sentiment": StanceTaggerType.SENTIMENT,
-    "sent": StanceTaggerType.SENTIMENT,
-    "t0pp": StanceTaggerType.T0PP,
+_STANCE_TAGGER_TYPES: Dict[str, Callable[[], StanceTaggerType]] = {
+    "object": lambda: StanceTaggerType.OBJECT,
+    "obj": lambda: StanceTaggerType.OBJECT,
+    "difference": lambda: StanceTaggerType.OBJECT,
+    "diff": lambda: StanceTaggerType.OBJECT,
+    "sentiment": lambda: StanceTaggerType.SENTIMENT,
+    "sent": lambda: StanceTaggerType.SENTIMENT,
+    "t0pp": lambda: StanceTaggerType.T0PP,
 }
 
 
@@ -377,7 +383,7 @@ def _parse_stemmer(stemmer: str) -> Optional[Stemmer]:
     if stemmer is None:
         return None
     elif stemmer in _STEMMERS.keys():
-        return _STEMMERS[stemmer]
+        return _STEMMERS[stemmer]()
     else:
         raise Exception(f"Unknown stemmer: {stemmer}")
 
@@ -386,7 +392,7 @@ def _parse_query_expander(query_expander: str) -> Optional[QueryExpanderType]:
     if query_expander is None:
         return None
     elif query_expander in _QUERY_EXPANDER_TYPES.keys():
-        return _QUERY_EXPANDER_TYPES[query_expander]
+        return _QUERY_EXPANDER_TYPES[query_expander]()
     else:
         raise Exception(f"Unknown query expander: {query_expander}")
 
@@ -404,7 +410,7 @@ def _parse_retrieval_model(retrieval_model: str) -> Optional[RetrievalModel]:
     if retrieval_model is None:
         return None
     elif retrieval_model in _RETRIEVAL_MODELS.keys():
-        return _RETRIEVAL_MODELS[retrieval_model]
+        return _RETRIEVAL_MODELS[retrieval_model]()
     else:
         raise Exception(f"Unknown query expansion: {retrieval_model}")
 
@@ -423,7 +429,7 @@ def _parse_reranker(reranker: str) -> Optional[RerankerType]:
     if reranker is None:
         return None
     elif reranker in _RERANKER_TYPES.keys():
-        return _RERANKER_TYPES[reranker]
+        return _RERANKER_TYPES[reranker]()
     else:
         raise Exception(f"Unknown reranker: {reranker}")
 
@@ -439,21 +445,21 @@ def _parse_rerankers(
 
 def _parse_metric(metric: str) -> Metric:
     if metric in _METRICS.keys():
-        return _METRICS[metric]
+        return _METRICS[metric]()
     else:
         raise Exception(f"Unknown metric: {metric}")
 
 
 def _parse_quality_tagger(quality_tagger: str) -> QualityTaggerType:
     if quality_tagger in _QUALITY_TAGGER_TYPES.keys():
-        return _QUALITY_TAGGER_TYPES[quality_tagger]
+        return _QUALITY_TAGGER_TYPES[quality_tagger]()
     else:
         raise Exception(f"Unknown quality tagger: {quality_tagger}")
 
 
 def _parse_stance_tagger(stance_tagger: str) -> StanceTaggerType:
     if stance_tagger in _STANCE_TAGGER_TYPES.keys():
-        return _STANCE_TAGGER_TYPES[stance_tagger]
+        return _STANCE_TAGGER_TYPES[stance_tagger]()
     else:
         raise Exception(f"Unknown stance tagger: {stance_tagger}")
 
