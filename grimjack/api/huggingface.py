@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 from hashlib import md5
+from itertools import repeat
 from json import dumps, loads
 from pathlib import Path
+from time import sleep
 from typing import ContextManager, Optional, List
 
 from diskcache import Cache
@@ -10,9 +12,21 @@ from requests import post, HTTPError
 from tqdm import tqdm
 from websockets import connect
 
+from grimjack import logger
+
 
 def md5_hash(text: str) -> str:
     return md5(text.encode()).hexdigest()
+
+
+def _sleep_with_progress(seconds: int):
+    progress = tqdm(
+        repeat(None, seconds),
+        desc="Waiting before next Huggingface API request",
+        unit="s",
+    )
+    for _ in progress:
+        sleep(1)
 
 
 @dataclass
@@ -83,6 +97,12 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 json=payload
             )
             if response.status_code // 100 != 2:
+                if response.status_code == 429:
+                    logger.warning(
+                        f"Hit Huggingface rate limit for model {self.model}."
+                    )
+                    logger.info(f"Waiting 1h for the next request.")
+                    _sleep_with_progress(1 * 60 * 60)
                 raise HTTPError(
                     f"Failed to generate text '{text}' with Huggingface API. "
                     f"Check if you are authenticated. "
