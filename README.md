@@ -162,6 +162,8 @@ pipenv run python -m grimjack \
   data/runs/grimjack-argumentative-fair-reranking-with-T0.txt
 ```
 
+### 6. Fine tune based on Touché 2020/2021 qrels
+
 ## Testing
 
 After [installing](#installation) all dependencies, you can run all unit tests:
