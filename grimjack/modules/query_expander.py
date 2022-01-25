@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Collection, Set, Tuple, Optional
 
 from nltk import word_tokenize, pos_tag
-from pymagnitude import Magnitude
 
 from grimjack import logger
 from grimjack.api.huggingface import CachedHuggingfaceTextGenerator
@@ -119,6 +118,9 @@ class EmbeddingComparativeSynonymsQueryExpander(
     @cached_property
     def _embeddings(self):
         logger.info(f"Loading embeddings from {self.embeddings_path}.")
+        from spacy.cli import download
+        download("en")
+        from pymagnitude import Magnitude
         return Magnitude(self.embeddings_path)
 
     def synonyms(self, token: str) -> Set[str]:
