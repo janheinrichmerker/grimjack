@@ -6,23 +6,7 @@ from tqdm import tqdm
 
 from grimjack import logger
 from grimjack.model import RankedDocument, Query
-from grimjack.model.axiom import OriginalAxiom, AggregatedAxiom
-from grimjack.model.axiom.argumentative import (
-    AverageSentenceLengthAxiom, QueryTermPositionInArgumentAxiom,
-    QueryTermsInArgumentAxiom, ArgumentCountAxiom,
-    ComparativeObjectTermsInArgumentAxiom,
-    ComparativeObjectTermPositionInArgumentAxiom, ArgumentQualityAxiom
-)
-from grimjack.model.axiom.length_norm import TF_LNC, LNC2, LNC1
-from grimjack.model.axiom.lower_bound import LB1
-from grimjack.model.axiom.proximity import PROX5, PROX4, PROX3, PROX2, PROX1
-from grimjack.model.axiom.query_aspects import (
-    DIV, M_AND, AND, ANTI_REG, REG
-)
-from grimjack.model.axiom.retrieval_score import (
-    RS_TF, RS_TF_IDF, RS_BM25, RS_PL2, RS_QL
-)
-from grimjack.model.axiom.term_frequency import M_TDC, TFC3, TFC1
+from grimjack.model.axiom import OriginalAxiom, AggregatedAxiom, Axiom
 from grimjack.modules import (
     ArgumentQualityStanceTagger, DocumentsStore, TopicsStore,
     Index, QueryExpander, Searcher, Reranker,
@@ -120,6 +104,7 @@ def _reranker(
         reranker_types: List[RerankerType],
         rerank_hits: int,
         index: Index,
+        axioms: List[Axiom],
 ) -> Reranker:
     reranking_context = IndexRerankingContext(index)
     reranker_cascade = [OriginalReranker()]
@@ -129,36 +114,8 @@ def _reranker(
                 AxiomaticReranker(
                     reranking_context,
                     AggregatedAxiom([
-                        OriginalAxiom() * (29 / 2),
-                        TFC1(),
-                        TFC3(),
-                        M_TDC(),
-                        LNC1(),
-                        LNC2(),
-                        TF_LNC(),
-                        LB1(),
-                        REG(),
-                        ANTI_REG(),
-                        AND(),
-                        M_AND(),
-                        DIV(),
-                        PROX1(),
-                        PROX2(),
-                        PROX3(),
-                        PROX4(),
-                        PROX5(),
-                        RS_TF(),
-                        RS_TF_IDF(),
-                        RS_BM25(),
-                        RS_PL2(),
-                        RS_QL(),
-                        ArgumentCountAxiom(),
-                        QueryTermsInArgumentAxiom(),
-                        QueryTermPositionInArgumentAxiom(),
-                        AverageSentenceLengthAxiom(),
-                        ComparativeObjectTermsInArgumentAxiom(),
-                        ComparativeObjectTermPositionInArgumentAxiom(),
-                        ArgumentQualityAxiom(),
+                        OriginalAxiom() * len(axioms),
+                        *axioms,
                     ]).normalized().cached(),
                 )
             )
@@ -254,6 +211,7 @@ class Pipeline:
             retrieval_model: Optional[RetrievalModel],
             rerankers: List[RerankerType],
             rerank_hits: int,
+            axioms: List[Axiom],
             targer_api_url: str,
             targer_models: Set[str],
             cache_path: Optional[Path],
@@ -278,7 +236,7 @@ class Pipeline:
             cache_path
         )
         self.searcher = AnseriniSearcher(self.index, retrieval_model, num_hits)
-        self.reranker = _reranker(rerankers, rerank_hits, self.index)
+        self.reranker = _reranker(rerankers, rerank_hits, self.index, axioms)
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,

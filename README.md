@@ -117,6 +117,7 @@ pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --reranker axiomatic \
   --rerank-hits 20 \
+  --argumentative-axioms \
   --targer-model tag-ibm-fasttext \
   --stance-tagger sentiment \
   --stance-threshold 0.5 \

@@ -11,6 +11,21 @@ from grimjack.constants import (
     DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
     DEFAULT_TOUCHE_2021_QRELS_URL
 )
+from grimjack.model.axiom import Axiom
+from grimjack.model.axiom.argumentative import (
+    ArgumentCountAxiom, ArgumentQualityAxiom,
+    ComparativeObjectTermPositionInArgumentAxiom,
+    ComparativeObjectTermsInArgumentAxiom, AverageSentenceLengthAxiom,
+    QueryTermPositionInArgumentAxiom, QueryTermsInArgumentAxiom
+)
+from grimjack.model.axiom.length_norm import LNC1, LNC2, TF_LNC
+from grimjack.model.axiom.lower_bound import LB1
+from grimjack.model.axiom.proximity import PROX1, PROX2, PROX3, PROX4, PROX5
+from grimjack.model.axiom.query_aspects import REG, ANTI_REG, AND, M_AND, DIV
+from grimjack.model.axiom.retrieval_score import (
+    RS_TF, RS_TF_IDF, RS_BM25, RS_PL2, RS_QL
+)
+from grimjack.model.axiom.term_frequency import TFC1, TFC3, M_TDC
 from grimjack.modules.options import (
     RetrievalModel, RerankerType, Metric, StanceTaggerType, QualityTaggerType,
     Stemmer, QueryExpanderType
@@ -92,6 +107,38 @@ _STANCE_TAGGER_TYPES: Dict[str, Callable[[], StanceTaggerType]] = {
     "sentiment": lambda: StanceTaggerType.SENTIMENT,
     "sent": lambda: StanceTaggerType.SENTIMENT,
     "t0pp": lambda: StanceTaggerType.T0PP,
+}
+
+_AXIOMS: Dict[str, Callable[[], Axiom]] = {
+    "TFC1": lambda: TFC1(),
+    "TFC3": lambda: TFC3(),
+    "M_TDC": lambda: M_TDC(),
+    "LNC1": lambda: LNC1(),
+    "LNC2": lambda: LNC2(),
+    "TF_LNC": lambda: TF_LNC(),
+    "LB1": lambda: LB1(),
+    "REG": lambda: REG(),
+    "ANTI_REG": lambda: ANTI_REG(),
+    "AND": lambda: AND(),
+    "M_AND": lambda: M_AND(),
+    "DIV": lambda: DIV(),
+    "PROX1": lambda: PROX1(),
+    "PROX2": lambda: PROX2(),
+    "PROX3": lambda: PROX3(),
+    "PROX4": lambda: PROX4(),
+    "PROX5": lambda: PROX5(),
+    "RS_TF": lambda: RS_TF(),
+    "RS_TF_IDF": lambda: RS_TF_IDF(),
+    "RS_BM25": lambda: RS_BM25(),
+    "RS_PL2": lambda: RS_PL2(),
+    "RS_QL": lambda: RS_QL(),
+    "ArgUC": lambda: ArgumentCountAxiom(),
+    "QTArg": lambda: QueryTermsInArgumentAxiom(),
+    "QTPArg": lambda: QueryTermPositionInArgumentAxiom(),
+    "aSL": lambda: AverageSentenceLengthAxiom(),
+    "CompArg": lambda: ComparativeObjectTermsInArgumentAxiom(),
+    "CompPArg": lambda: ComparativeObjectTermPositionInArgumentAxiom(),
+    "ArgQ": lambda: ArgumentQualityAxiom(),
 }
 
 
@@ -225,6 +272,27 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="rerank_hits",
         action="store_const",
         const=None
+    )
+    parser.add_argument(
+        "--axiom", "-a",
+        dest="axioms",
+        type=str,
+        choices=_AXIOMS.keys(),
+        default=[],
+        action="append"
+    )
+    parser.add_argument(
+        "--argumentative-axioms",
+        dest="axioms",
+        action="store_const",
+        const=["ArgUC", "QTArg", "QTPArg", "aSL", "CompArg", "CompPArg",
+               "ArgQ"]
+    )
+    parser.add_argument(
+        "--no-axioms", "--no-axiom",
+        dest="axioms",
+        action="store_const",
+        const=[]
     )
     parser.add_argument(
         "--targer-api-url", "--api-url",
@@ -443,6 +511,24 @@ def _parse_rerankers(
     ]
 
 
+def _parse_axiom(axiom: str) -> Optional[Axiom]:
+    if axiom is None:
+        return None
+    elif axiom in _AXIOMS.keys():
+        return _AXIOMS[axiom]()
+    else:
+        raise Exception(f"Unknown axiom: {axiom}")
+
+
+def _parse_axioms(
+        axioms: List[str]
+) -> List[Axiom]:
+    return [
+        _parse_axiom(query_expansion)
+        for query_expansion in axioms
+    ]
+
+
 def _parse_metric(metric: str) -> Metric:
     if metric in _METRICS.keys():
         return _METRICS[metric]()
@@ -488,6 +574,7 @@ def main():
     rerank_hits: Optional[int] = args.rerank_hits
     if rerank_hits > num_hits:
         raise ValueError("Cannot rerank more hits than are being retrieved.")
+    axioms: List[Axiom] = _parse_axioms(args.axioms)
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
     )
@@ -531,6 +618,7 @@ def main():
         huggingface_api_token=hugging_face_api_token,
         rerankers=rerankers,
         rerank_hits=rerank_hits,
+        axioms=axioms,
         targer_api_url=targer_api_url,
         targer_models=targer_models,
         debater_api_token=debater_api_token,
