@@ -24,10 +24,10 @@ dataclasses-json = "*"
 pandas = "*"
 pymagnitude = "*"
 annoy = "*"  # Needed for pymagnitude
-targer-api = {git = "https://github.com/heinrichreimer/targer-api.git"}
 diskcache = "*"
 websockets = "*"
 pillow = ">=9.0.0"
+targer-api = "*"
 
 [dev-packages]
 

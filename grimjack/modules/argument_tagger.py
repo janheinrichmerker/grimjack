@@ -3,7 +3,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Optional, Set
 
-from targer.api import fetch_arguments
+from targer_api import analyze_text
 
 from grimjack import logger
 from grimjack.model import RankedDocument
@@ -33,7 +33,7 @@ class TargerArgumentTagger(ArgumentTagger):
         logger.debug(
             f"Fetching arguments for document {document.id} from TARGER API."
         )
-        arguments = fetch_arguments(
+        arguments = analyze_text(
             document.content,
             self.models,
             self.targer_api_url,
