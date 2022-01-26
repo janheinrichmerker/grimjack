@@ -2,8 +2,8 @@ from statistics import mean
 from typing import List
 
 from nltk import WordNetLemmatizer, sent_tokenize, word_tokenize
-from targer.model import (
-    TargerArgumentSentences, TargerArgumentLabel, TargerArgumentTag
+from targer_api.model import (
+    ArgumentSentences, ArgumentLabel, ArgumentTag
 )
 
 from grimjack.model import RankedDocument, Query
@@ -23,20 +23,20 @@ def _lemmatize(word: str):
     return _word_net_lemmatizer.lemmatize(word).lower()
 
 
-def _count_arguments(sentences: TargerArgumentSentences) -> int:
+def _count_arguments(sentences: ArgumentSentences) -> int:
     return _count_claims(sentences) + _count_premises(sentences)
 
 
-def _count_premises(sentences: TargerArgumentSentences) -> int:
+def _count_premises(sentences: ArgumentSentences) -> int:
     count: int = 0
     for sentence in sentences:
         for tag in sentence:
-            if tag.label == TargerArgumentLabel.P_B and tag.probability > 0.5:
+            if tag.label == ArgumentLabel.P_B and tag.probability > 0.5:
                 count += 1
     return count
 
 
-def _count_claims(sentences: TargerArgumentSentences) -> int:
+def _count_claims(sentences: ArgumentSentences) -> int:
     last_tag_was_claim: bool = False
     count: int = 0
     for sentence in sentences:
@@ -53,30 +53,30 @@ def _count_claims(sentences: TargerArgumentSentences) -> int:
     return count
 
 
-def _is_claim(tag: TargerArgumentTag) -> bool:
+def _is_claim(tag: ArgumentTag) -> bool:
     return (
-            tag.label == TargerArgumentLabel.C_B or
-            tag.label == TargerArgumentLabel.C_I or
-            tag.label == TargerArgumentLabel.MC_B or
-            tag.label == TargerArgumentLabel.MC_I
+            tag.label == ArgumentLabel.C_B or
+            tag.label == ArgumentLabel.C_I or
+            tag.label == ArgumentLabel.MC_B or
+            tag.label == ArgumentLabel.MC_I
     )
 
 
-def _is_premise(tag: TargerArgumentTag) -> bool:
+def _is_premise(tag: ArgumentTag) -> bool:
     return (
-            tag.label == TargerArgumentLabel.P_B or
-            tag.label == TargerArgumentLabel.P_I or
-            tag.label == TargerArgumentLabel.MP_B or
-            tag.label == TargerArgumentLabel.MP_I
+            tag.label == ArgumentLabel.P_B or
+            tag.label == ArgumentLabel.P_I or
+            tag.label == ArgumentLabel.MP_B or
+            tag.label == ArgumentLabel.MP_I
     )
 
 
-def _is_claim_or_premise(tag: TargerArgumentTag) -> bool:
+def _is_claim_or_premise(tag: ArgumentTag) -> bool:
     return _is_claim(tag) or _is_premise(tag)
 
 
 def _count_terms(
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         terms: List[str]
 ):
     term_count = 0
@@ -95,14 +95,14 @@ def _count_terms(
 
 def _count_query_terms(
         context: RerankingContext,
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         query: Query
 ):
     return _count_terms(sentences, context.terms(query.title))
 
 
 def _term_position_in_argument(
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         terms: List[str]
 ):
     term_arg_pos: List[int] = []
@@ -114,7 +114,7 @@ def _term_position_in_argument(
         for tag in tags:
             if (
                     normalized_term == _lemmatize(tag.token) and
-                    tag.label != TargerArgumentLabel.O and
+                    tag.label != ArgumentLabel.O and
                     tag.probability > 0.5
             ):
                 term_arg_pos.append(count)
@@ -129,7 +129,7 @@ def _term_position_in_argument(
 
 def _query_term_position_in_argument(
         context: RerankingContext,
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         query: Query
 ):
     return _term_position_in_argument(sentences, context.terms(query.title))
@@ -146,7 +146,7 @@ def _sentence_length(document: RankedDocument) -> float:
 
 def _count_comparative_object_terms(
         context: RerankingContext,
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         query: Query
 ):
     terms = [
@@ -159,7 +159,7 @@ def _count_comparative_object_terms(
 
 def _comparative_object_term_position_in_argument(
         context: RerankingContext,
-        sentences: TargerArgumentSentences,
+        sentences: ArgumentSentences,
         query: Query
 ):
     terms = [

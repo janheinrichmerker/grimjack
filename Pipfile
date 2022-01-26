@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyserini = "*"
+pyserini = "==0.14.0"
 dload = "*"
 pytest = "*"
 nltk = "*"
@@ -24,10 +24,11 @@ dataclasses-json = "*"
 pandas = "*"
 pymagnitude = "*"
 annoy = "*"  # Needed for pymagnitude
-targer-api = {git = "https://github.com/heinrichreimer/targer-api.git"}
+targer-api = "*"
 diskcache = "*"
 websockets = "*"
 pillow = ">=9.0.0"
+spacy = "==2.3.7"
 
 [dev-packages]
 
