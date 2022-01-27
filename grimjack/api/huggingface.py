@@ -101,7 +101,7 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                     logger.warning(
                         f"Hit Huggingface rate limit for model {self.model}."
                     )
-                    logger.info(f"Waiting 1h for the next request.")
+                    logger.info("Waiting 1h for the next request.")
                     _sleep_with_progress(1 * 60 * 60)
                 raise HTTPError(
                     f"Failed to generate text '{text}' with Huggingface API. "
