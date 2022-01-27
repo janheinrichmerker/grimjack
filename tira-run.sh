@@ -7,8 +7,8 @@ run_file_name="run.txt"
 
 # Parse script options (paths and tag).
 if [ $# -lt 3 ]; then
-    echo "Usage: $0 input_dir output_dir run_tag [options...]"
-    exit 1
+  echo "Usage: $0 input_dir output_dir run_tag [options...]"
+  exit 1
 fi
 input_dir=$1
 output_dir=$2
@@ -21,7 +21,7 @@ input_documents_file="$input_dir/$documents_file_name"
 output_run_file="$output_dir/$run_file_name"
 
 # Install project dependencies.
-#pipenv install
+pipenv install
 
 # Generate internal run file.
 pipenv run python -m grimjack \
