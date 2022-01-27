@@ -11,6 +11,5 @@ apt-get -y update
 apt-get -y install git openjdk-11-jdk python3.9 python3.9-venv python3-pip
 
 # Install Python dependencies.
-python3.9 -m ensurepip --upgrade
 pip3 install --upgrade pip
 pip3 install pipenv
