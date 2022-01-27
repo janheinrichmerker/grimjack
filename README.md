@@ -170,7 +170,9 @@ pipenv run python -m grimjack \
 After [installing](#installation) all dependencies, you can run all unit tests:
 
 ```shell script
-pipenv run pytest
+pipenv run flake8 grimjack
+pipenv run pylint -E grimjack
+pipenv run pytest grimjack
 ```
 
 ## Docker
