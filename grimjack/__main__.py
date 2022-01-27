@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
-from logging import INFO, WARNING, DEBUG
+from logging import INFO, WARNING, ERROR
 from os import getcwd
 from pathlib import Path
 from typing import Optional, Union, Set, List, Dict, Callable
@@ -568,11 +568,11 @@ def main():
     stance_threshold: Optional[float] = args.stance_threshold
 
     if not verbose and not quiet:
-        logger.setLevel(INFO)
-    elif verbose:
-        logger.setLevel(DEBUG)
-    elif quiet:
         logger.setLevel(WARNING)
+    elif verbose:
+        logger.setLevel(INFO)
+    elif quiet:
+        logger.setLevel(ERROR)
     else:
         raise ValueError("Cannot log quietly and verbosely at the same time.")
 
