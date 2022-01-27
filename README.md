@@ -52,7 +52,7 @@ the [shared task description](https://webis.de/events/touche-22/shared-task-2.ht
 To evaluate the search pipeline for all topics, run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack evaluate-all
+pipenv run python -m grimjack evaluate
 ```
 
 This will print the evaluation metric (default: nDCG@10) to the console.

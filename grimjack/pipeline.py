@@ -292,7 +292,7 @@ class Pipeline:
             topics = tqdm(
                 self.topics_store.topics,
                 desc="Searching",
-                unit="queries",
+                unit="query",
             )
             for topic in topics:
                 results = self._search(topic)
@@ -318,6 +318,12 @@ class Pipeline:
             if per_query:
                 result = evaluation.evaluate_per_query(run_file, depth)
                 for query_id, value in result.items():
-                    print(f"{query_id:4d}: {value}")
+                    print(
+                        f"{metric.name}@{depth} for query {query_id:4d}: "
+                        f"{value}"
+                    )
             else:
-                print(evaluation.evaluate(run_file, depth))
+                print(
+                    f"{metric.name}@{depth}: "
+                    f"{evaluation.evaluate(run_file, depth)}"
+                )
