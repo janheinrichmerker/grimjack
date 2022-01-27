@@ -18,14 +18,6 @@ from grimjack.model.axiom.argumentative import (
     ComparativeObjectTermsInArgumentAxiom, AverageSentenceLengthAxiom,
     QueryTermPositionInArgumentAxiom, QueryTermsInArgumentAxiom
 )
-from grimjack.model.axiom.length_norm import LNC1, LNC2, TF_LNC
-from grimjack.model.axiom.lower_bound import LB1
-from grimjack.model.axiom.proximity import PROX1, PROX2, PROX3, PROX4, PROX5
-from grimjack.model.axiom.query_aspects import REG, ANTI_REG, AND, M_AND, DIV
-from grimjack.model.axiom.retrieval_score import (
-    RS_TF, RS_TF_IDF, RS_BM25, RS_PL2, RS_QL
-)
-from grimjack.model.axiom.term_frequency import TFC1, TFC3, M_TDC
 from grimjack.modules.options import (
     RetrievalModel, RerankerType, Metric, StanceTaggerType, QualityTaggerType,
     Stemmer, QueryExpanderType
