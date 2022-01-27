@@ -19,7 +19,7 @@ tqdm = "*"
 trectools = "*"
 faiss-cpu = "*"  # Needed for pyserini >= 0.14.0
 torch = "*"  # Needed for pyserini >= 0.14.0
-debater-python-api = {path='./lib/debater_python_api-3.5.8.tar.xz'}
+debater-python-api = { path = './lib/debater_python_api-3.5.8.tar.xz' }
 dataclasses-json = "*"
 pandas = "*"
 pymagnitude = "*"
@@ -29,6 +29,7 @@ websockets = "*"
 pillow = ">=9.0.0"
 targer-api = "*"
 spacy = ">=2.3,==2.*"
+ir-axioms = { git = "https://ajjxp:UWy-paMuvJfv_hso5Ta3@git.webis.de/code-research/web-search/ir_axioms.git@1606549a09f16af9f9430257bd17dbc4ad27b73a", editable = true }
 
 [dev-packages]
 
