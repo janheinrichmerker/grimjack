@@ -554,7 +554,12 @@ def main():
     rerankers: List[RerankerType] = _parse_rerankers(args.rerankers)
     rerank_hits: Optional[int] = args.rerank_hits
     if rerank_hits > num_hits:
-        raise ValueError("Cannot rerank more hits than are being retrieved.")
+        logger.warning(
+            f"Cannot rerank {rerank_hits} hits "
+            f"when only {num_hits} are being retrieved."
+        )
+        logger.info(f"Limiting reranking to {num_hits} hits.")
+        rerank_hits = num_hits
     axioms: List[Axiom] = _parse_axioms(args.axioms)
     hugging_face_api_token = _parse_api_token(
         args.huggingface_api_token
