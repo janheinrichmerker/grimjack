@@ -113,6 +113,8 @@ jobs:
       - name: "📄 Parse Docker metadata"
         id: meta
         uses: docker/metadata-action@v3
+        with:
+          images: ${{ github.repository }}
       - name: "🏗️ Build Docker image"
         uses: docker/build-push-action@v2
         with:
