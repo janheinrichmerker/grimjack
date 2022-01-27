@@ -54,7 +54,7 @@ jobs:
       - name: "🧰 Install dependencies"
         run: pipenv install --deploy
       - name: "🔍 Check Python code format"
-        run: flake8 targer_api examples tests
+        run: pipenv run flake8 targer_api examples tests
   python-lint:
     name: "🔍 Python Lint"
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
       - name: "🧰 Install dependencies"
         run: pipenv install --deploy
       - name: "🔍 Lint Python code"
-        run: pylint -E targer_api examples tests
+        run: pipenv run pylint -E targer_api examples tests
   python-unit-tests:
     name: "🧪 Python tests"
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
       - name: "🧰 Install dependencies"
         run: pipenv install --deploy
       - name: "🧪 Test Python code"
-        run: pytest targer_api examples tests --cov --cov-report=term --cov-report=xml
+        run: pipenv run pytest targer_api examples tests --cov --cov-report=term --cov-report=xml
       - name: "📤 Upload test coverage"
         uses: actions/upload-artifact@v2
         with:
@@ -124,11 +124,7 @@ jobs:
           file: Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
-          labels: |
-            ${{ steps.meta.outputs.labels }}
-            org.opencontainers.image.documentation=https://github.com/${{ github.repository }}
-            org.opencontainers.image.title=Grimjack
-            org.opencontainers.image.description=Argumentative passage search engine.
+          labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=image.tar
       - name: "📤 Upload Docker image"
         uses: actions/upload-artifact@v2
