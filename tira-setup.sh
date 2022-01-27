@@ -7,9 +7,15 @@ if [[ $UID != 0 ]]; then
 fi
 
 # Install System dependencies.
-apt-get -y update
-apt-get -y install git openjdk-11-jdk python3.9 python3.9-venv python3-pip
+apt-get -y update && apt-get -y install \
+  git \
+  openjdk-11-jdk \
+  python3.9 \
+  python3.9-venv \
+  python3-pip \
+  python3-dev
 
 # Install Python dependencies.
-pip3 install --upgrade pip
-pip3 install pipenv
+pip3 install --upgrade \
+  pip \
+  pipenv
