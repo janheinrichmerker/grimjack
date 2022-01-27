@@ -301,8 +301,9 @@ class Pipeline:
             for topic in topics:
                 results = self._search(topic)
                 file.writelines(
-                    f"{topic.id} Q0 {document.id} {document.rank} "
-                    f"{document.score} {path.stem}\n"
+                    f"{topic.id} {document.average_stance_label.value} "
+                    f"{document.id} {document.rank} {document.score} "
+                    f"{path.stem}\n"
                     for document in results
                 )
 
