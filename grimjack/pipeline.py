@@ -318,7 +318,7 @@ class Pipeline:
         with TemporaryDirectory() as directory_name:
             directory: Path = Path(directory_name)
             run_file = directory / "run.txt"
-            self.run_search_all(run_file)
+            self.run_search_all(run_file, None)
             if per_query:
                 result = evaluation.evaluate_per_query(run_file, depth)
                 for query_id, value in result.items():
