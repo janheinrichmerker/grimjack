@@ -36,9 +36,15 @@ def _download_decompress_if_needed(
     decompress it if needed and return the path to the file.
     For the special case that the source is itse;
     """
-    maybe_path = source if isinstance(source, Path) else Path(source)
-    if maybe_path.exists():
-        assert maybe_path.is_file()
+    source_path = source if isinstance(source, Path) else Path(source)
+    if source_path.exists():
+        assert source_path.is_file()
+        if source_path.suffix in [".zip", ".gz"]:
+            return _download_decompress_if_needed(
+                source.absolute().as_uri(),
+                download_dir,
+                name,
+            )
         return source
     elif download_dir.exists():
         # Already downloaded, return first (and only) file.
