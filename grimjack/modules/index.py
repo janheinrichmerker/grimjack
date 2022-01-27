@@ -63,6 +63,7 @@ class AnseriniIndex(Index):
         Index settings are passed from the pipeline to Anserini.
         """
         if index_dir.exists():
+            logger.debug(f"Index in {index_dir} already exists.")
             return  # Already indexed.
         logger.info(f"Indexing {name} from {input_dir} to {index_dir}.")
         index_dir.mkdir()
