@@ -10,7 +10,7 @@ from typing import ContextManager, Optional, List
 from diskcache import Cache
 from requests import post, HTTPError
 from tqdm import tqdm
-from websockets import connect
+from websockets.legacy.client import connect
 
 from grimjack import logger
 
