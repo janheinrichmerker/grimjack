@@ -4,9 +4,9 @@ on:
   push:
 
 jobs:
-  build-latex-paper:
-    name: "🏗️ Build LaTeX paper"
-    runs-on: ubuntu-20.04
+  latex-paper:
+    name: "📄 LaTeX paper"
+    runs-on: ubuntu-latest
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
@@ -19,10 +19,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: paper/sample-1col.pdf
-          name: Paper
-  build-latex-talk:
-    name: "🏗️ Build LaTeX talk"
-    runs-on: ubuntu-20.04
+          name: latex-paper
+  latex-talk:
+    name: "📄 LaTeX talk"
+    runs-on: ubuntu-latest
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
@@ -35,48 +35,81 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: talk/talk.pdf
-          name: Talk
-  test-python:
-    name: "🧪 Test Python code"
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash -l {0}
+          name: latex-talk
+  python-code-format:
+    name: "🔍 Python code format"
+    runs-on: ubuntu-latest
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
       - name: "🧰 Install Python"
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
+          cache: pipenv
       - name: "🧰 Install pipx"
         run: pip install --user pipx
       - name: "🧰 Install Pipenv"
         run: pipx install pipenv
       - name: "🧰 Install dependencies"
         run: pipenv install --deploy
-      - name: "🧪 Check Python code format"
-        run: pipenv run flake8
-      - name: "🧪 Lint Python code"
-        run: pipenv run pylint -E grimjack
+      - name: "🔍 Check Python code format"
+        run: flake8 targer_api examples tests
+  python-lint:
+    name: "🔍 Python Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🧰 Install Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          cache: pipenv
+      - name: "🧰 Install pipx"
+        run: pip install --user pipx
+      - name: "🧰 Install Pipenv"
+        run: pipx install pipenv
+      - name: "🧰 Install dependencies"
+        run: pipenv install --deploy
+      - name: "🔍 Lint Python code"
+        run: pylint -E targer_api examples tests
+  python-unit-tests:
+    name: "🧪 Python tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🧰 Install Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          cache: pipenv
+      - name: "🧰 Install pipx"
+        run: pip install --user pipx
+      - name: "🧰 Install Pipenv"
+        run: pipx install pipenv
+      - name: "🧰 Install dependencies"
+        run: pipenv install --deploy
       - name: "🧪 Test Python code"
-        run: pipenv run pytest --cov --cov-report=term --cov-report=xml || true
+        run: pytest targer_api examples tests --cov --cov-report=term --cov-report=xml
       - name: "📤 Upload test coverage"
         uses: actions/upload-artifact@v2
         with:
           path: coverage.xml
-          name: Python test coverage
+          name: python-test-coverage
       - name: "📤 Publish test coverage"
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-  build-docker:
+        uses: codecov/codecov-action@v1
+  docker-build:
     name: "🚀 Build Docker image"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: "📥 Check-out"
         uses: actions/checkout@v2
+      - name: "🧰 Set up QEMU"
+        uses: docker/setup-qemu-action@v1
+      - name: "🧰 Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v1
       - name: "📄 Parse Docker metadata"
         id: meta
         uses: crazy-max/ghaction-docker-meta@v1
@@ -84,10 +117,6 @@ jobs:
           images: ${{ github.repository }}
           tag-match: "v(.*)"
           tag-match-group: 1
-      - name: "🧰 Set up QEMU"
-        uses: docker/setup-qemu-action@v1
-      - name: "🧰 Set up Docker Buildx"
-        uses: docker/setup-buildx-action@v1
       - name: "🚀 Build & push Docker image to GitHub Packages"
         uses: docker/build-push-action@v2
         with:
@@ -99,6 +128,58 @@ jobs:
             ${{ steps.meta.outputs.labels }}
             org.opencontainers.image.documentation=https://github.com/${{ github.repository }}
             org.opencontainers.image.title=Grimjack
-            org.opencontainers.image.description=TODO
+            org.opencontainers.image.description=Argumentative passage search engine.
+          outputs: type=docker,dest=image.tar
+      - name: "📤 Upload Docker image"
+        uses: actions/upload-artifact@v2
+        with:
+          path: image.tar
+          name: docker-image
+  release:
+    name: "🚀 Create GitHub release"
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+      - latex-paper
+      - latex-talk
+      - python-code-format
+      - python-lint
+      - python-unit-tests
+      - docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "📥 Download paper"
+        uses: actions/download-artifact@v2
+        with:
+          path: sample-1col.pdf
+          name: latex-paper
+      - name: "📥 Download talk"
+        uses: actions/download-artifact@v2
+        with:
+          path: talk.pdf
+          name: latex-talk
+      - name: "📥 Download test coverage"
+        uses: actions/download-artifact@v2
+        with:
+          path: coverage.xml
+          name: python-test-coverage
+      - name: "📥 Download Docker image"
+        uses: actions/download-artifact@v2
+        with:
+          path: image.tar
+          name: docker-image
+      - name: "🚀 Create GitHub release"
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get-version.outputs.tag }}
+          files: |
+            sample-1col.pdf
+            talk.pdf
+            coverage.xml
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
+          generate_release_notes: true
         
  
