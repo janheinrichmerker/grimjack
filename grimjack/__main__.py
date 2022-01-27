@@ -366,6 +366,13 @@ def _prepare_parser_print_search_all(_: ArgumentParser):
 
 def _prepare_parser_run_search_all(parser: ArgumentParser):
     parser.add_argument(
+        "--tag",
+        dest="tag",
+        type=str,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
         dest="output_file",
         type=Path,
     )
@@ -609,7 +616,8 @@ def main():
         pipeline.print_search_all()
     elif args.command in ["run-all", "run"]:
         output_file: Path = args.output_file
-        pipeline.run_search_all(output_file)
+        tag: Optional[str] = args.tag
+        pipeline.run_search_all(output_file, tag)
     elif args.command in ["evaluate-all", "evaluate", "eval"]:
         metric: Metric = _parse_metric(args.metric)
         qrels_source: Union[Path, str] = args.qrels_source

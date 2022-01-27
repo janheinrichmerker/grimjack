@@ -290,7 +290,8 @@ class Pipeline:
             self.print_search(topic.title)
             print("\n\n")
 
-    def run_search_all(self, path: Path):
+    def run_search_all(self, path: Path, tag: Optional[str]):
+        tag: str = tag if tag is not None else path.stem
         with path.open("w") as file:
             topics = tqdm(
                 self.topics_store.topics,
@@ -301,8 +302,7 @@ class Pipeline:
                 results = self._search(topic)
                 file.writelines(
                     f"{topic.id} {document.average_stance_label.value} "
-                    f"{document.id} {document.rank} {document.score} "
-                    f"{path.stem}\n"
+                    f"{document.id} {document.rank} {document.score} {tag}\n"
                     for document in results
                 )
 
