@@ -6,7 +6,7 @@ from typing import Optional, Union, Set, List, Dict, Callable
 
 from grimjack import logger
 from grimjack.constants import (
-    DEFAULT_DOCUMENTS_ZIP_URL, DEFAULT_TOPICS_ZIP_URL, DEFAULT_TOPICS_ZIP_PATH,
+    DEFAULT_DOCUMENTS_URL, DEFAULT_TOPICS_URL,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH, DEFAULT_DEBATER_API_TOKEN_PATH,
     DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
     DEFAULT_TOUCHE_2021_QRELS_URL
@@ -136,22 +136,26 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         default=False,
     )
     parser.add_argument(
-        "--documents-zip-url", "--documents-url", "-d",
-        dest="documents_zip_url",
+        "--documents", "--documents-url", "--documents-zip-url", "-d",
+        dest="documents_source",
         type=str,
-        default=DEFAULT_DOCUMENTS_ZIP_URL,
+        default=DEFAULT_DOCUMENTS_URL,
     )
     parser.add_argument(
-        "--topics-zip-url", "--topics-url", "-t",
-        dest="topics_zip_url",
-        type=str,
-        default=DEFAULT_TOPICS_ZIP_URL,
+        "--documents-path", "--documents-file", "--documents-file-path",
+        dest="documents_source",
+        type=Path,
     )
     parser.add_argument(
-        "--topics-zip-path", "--topics-path", "--topics-file-path",
-        dest="topics_zip_path",
+        "--topics", "--topics-url", "--topics-zip-url", "-t",
+        dest="topics_source",
         type=str,
-        default=DEFAULT_TOPICS_ZIP_PATH,
+        default=DEFAULT_TOPICS_URL,
+    )
+    parser.add_argument(
+        "--topics-path", "--topics-file", "--topics-file-path",
+        dest="topics_source",
+        type=Path,
     )
     parser.add_argument(
         "--stopwords",
@@ -382,25 +386,26 @@ def _prepare_parser_evaluate_all(parser: ArgumentParser):
         default=10,
     )
     parser.add_argument(
-        "--qrels-url",
-        dest="qrels",
+        "--qrels", "--qrel", "--qrels-url", "--qrel-url",
+        dest="qrels_source",
         type=str,
         default=DEFAULT_TOUCHE_2021_QRELS_URL,
     )
     parser.add_argument(
-        "--qrels-file-path", "--qrels-file", "--qrels-path",
-        dest="qrels",
+        "--qrels-file-path", "--qrel-file-path", "--qrels-file", "--qrel-file",
+        "--qrels-path", "--qrel-path",
+        dest="qrels_source",
         type=Path,
     )
     parser.add_argument(
         "--touche-2020", "--touche20", "--2020", "--20",
-        dest="qrels",
+        dest="qrels_source",
         action="store_const",
         const=DEFAULT_TOUCHE_2020_QRELS_URL
     )
     parser.add_argument(
         "--touche-2021", "--touche21", "--2021", "--21",
-        dest="qrels",
+        dest="qrels_source",
         action="store_const",
         const=DEFAULT_TOUCHE_2021_QRELS_URL
     )
@@ -528,9 +533,8 @@ def main():
     verbose: bool = args.verbose
     quiet: bool = args.quiet
     num_hits: int = args.num_hits
-    documents_zip_url: str = args.documents_zip_url
-    topics_zip_url: str = args.topics_zip_url
-    topics_zip_path: str = args.topics_zip_path
+    documents_source: Union[Path, str] = args.documents_source
+    topics_source: Union[Path, str] = args.topics_source
     stopwords_file: Optional[Path] = args.stopwords_file
     stemmer: Optional[Stemmer] = _parse_stemmer(args.stemmer)
     language: str = args.language
@@ -577,9 +581,8 @@ def main():
         raise ValueError("Cannot log quietly and verbosely at the same time.")
 
     pipeline = Pipeline(
-        documents_zip_url=documents_zip_url,
-        topics_zip_url=topics_zip_url,
-        topics_zip_path=topics_zip_path,
+        documents_source=documents_source,
+        topics_source=topics_source,
         stopwords_file=stopwords_file,
         stemmer=stemmer,
         language=language,
@@ -609,14 +612,14 @@ def main():
         pipeline.run_search_all(output_file)
     elif args.command in ["evaluate-all", "evaluate", "eval"]:
         metric: Metric = _parse_metric(args.metric)
-        qrels: Union[Path, str] = args.qrels
+        qrels_source: Union[Path, str] = args.qrels_source
         depth: int = args.depth
         if depth > num_hits:
             raise ValueError(
                 "Cannot evaluate more hits than are being retrieved."
             )
         per_query: bool = args.per_query
-        pipeline.evaluate_all(metric, qrels, depth, per_query)
+        pipeline.evaluate_all(metric, qrels_source, depth, per_query)
     else:
         parser.print_help()
 

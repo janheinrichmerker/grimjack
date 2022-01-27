@@ -16,58 +16,66 @@ from grimjack.model import Query
 from grimjack.modules import DocumentsStore, TopicsStore, QrelsStore
 
 
-def _hash_url(url: str) -> str:
+def _hash_source(source: Union[str, Path]) -> str:
     """
-    Unique MD5 hash representing the URL.
+    Unique MD5 hash representing the source URL or path.
     """
-    return md5(url.encode()).hexdigest()
+    if isinstance(source, Path):
+        return _hash_source(str(source.absolute()))
+    return md5(source.encode()).hexdigest()
 
 
-def _download_unzip_if_needed(url: str, download_dir: Path, name: str):
+def _download_decompress_if_needed(
+        source: Union[str, Path],
+        download_dir: Path,
+        name: str
+) -> Path:
     """
-    Download and extract a ZIP or GZIP folder
-    if it doesn't already exist in the download directory.
+    Download and extract a zipped, gzipped or uncompressed file
+    if it doesn't already exist in the download directory,
+    decompress it if needed and return the path to the file.
+    For the special case that the source is itse;
     """
-    if download_dir.exists():
-        return  # Already downloaded.
-    logger.info(
-        f"Downloading and unzipping {name} from {url} to {download_dir}."
-    )
-    if url.endswith(".zip"):
-        save_unzip(url, str(download_dir), delete_after=True)
-    elif url.endswith(".gz"):
+    maybe_path = source if isinstance(source, Path) else Path(source)
+    if maybe_path.exists():
+        assert maybe_path.is_file()
+        return source
+    elif download_dir.exists():
+        # Already downloaded, return first (and only) file.
+        assert sum(1 for _ in download_dir.iterdir()) == 1
+        return next(download_dir.iterdir())
+    elif source.endswith(".zip"):
+        logger.info(
+            f"Downloading and unzipping {name} "
+            f"from {source} to {download_dir}."
+        )
+        save_unzip(source, str(download_dir), delete_after=True)
+        # Return first (and only) file.
+        assert sum(1 for _ in download_dir.iterdir()) == 1
+        return next(download_dir.iterdir())
+    elif source.endswith(".gz"):
+        logger.info(
+            f"Downloading and ungzipping {name} "
+            f"from {source} to {download_dir}."
+        )
         download_dir.mkdir()
-        output_file = download_dir / url.split("/")[-1].removesuffix(".gz")
-        with urlopen(url) as response:
+        output_file = download_dir / basename(source).removesuffix(".gz")
+        with urlopen(source) as response:
             with GzipFile(fileobj=response) as uncompressed:
                 with output_file.open("wb") as file:
                     file.write(uncompressed.read())
+        return output_file
     else:
-        ValueError("Unknown download data format.")
-
-
-def _download_if_needed(url: str, file_path: Path):
-    """
-    Download a file if it doesn't already exist.
-    """
-    if file_path.exists():
-        return  # Already downloaded.
-
-    logger.info(f"Downloading from {url} to {file_path}.")
-    file_path.parent.mkdir()
-    save(url, str(file_path.absolute()))
+        logger.info(f"Downloading {name} from {source} to {download_dir}.")
+        download_dir.mkdir()
+        output_file = download_dir / basename(source)
+        save(source, str(output_file.absolute()))
+        return output_file
 
 
 @dataclass(unsafe_hash=True)
 class SimpleDocumentsStore(DocumentsStore):
-    documents_zip_url: str
-
-    @property
-    def _documents_zip_url_hash(self) -> str:
-        """
-        Unique MD5 hash representing the download URL.
-        """
-        return _hash_url(self.documents_zip_url)
+    documents_source: Union[str, Path]
 
     @property
     def documents_dir(self) -> Path:
@@ -75,9 +83,12 @@ class SimpleDocumentsStore(DocumentsStore):
         Path to the downloaded documents.
         Will download documents if needed.
         """
-        download_dir = DOCUMENTS_DIR / self._documents_zip_url_hash
-        _download_unzip_if_needed(
-            self.documents_zip_url, download_dir, "documents")
+        download_dir = DOCUMENTS_DIR / _hash_source(self.documents_source)
+        _download_decompress_if_needed(
+            self.documents_source,
+            download_dir,
+            "documents"
+        )
         return download_dir
 
 
@@ -133,25 +144,7 @@ def _parse_topics(tree: ElementTree) -> List[Query]:
 
 @dataclass
 class TrecTopicsStore(TopicsStore):
-    topics_zip_url: str
-    topics_zip_path: str
-
-    @property
-    def _topics_zip_url_hash(self) -> str:
-        """
-        Unique MD5 hash representing the download URL.
-        """
-        return _hash_url(self.topics_zip_url)
-
-    @property
-    def topics_dir(self) -> Path:
-        """
-        Path to the downloaded topics.
-        Will download topics if needed.
-        """
-        download_dir = TOPICS_DIR / self._topics_zip_url_hash
-        _download_unzip_if_needed(self.topics_zip_url, download_dir, "topics")
-        return download_dir
+    topics_source: str
 
     @property
     def topics_file(self) -> Path:
@@ -159,7 +152,12 @@ class TrecTopicsStore(TopicsStore):
         Path to the downloaded topics file.
         Will download topics if needed.
         """
-        return self.topics_dir / self.topics_zip_path
+        download_dir = TOPICS_DIR / _hash_source(self.topics_source)
+        return _download_decompress_if_needed(
+            self.topics_source,
+            download_dir,
+            "topics"
+        )
 
     @property
     def topics(self) -> List[Query]:
@@ -169,24 +167,16 @@ class TrecTopicsStore(TopicsStore):
 
 @dataclass
 class TrecQrelsStore(QrelsStore):
-    qrels_url_or_path: Union[str, Path]
-
-    @property
-    def _qrels_url_hash(self) -> str:
-        url_or_path = self.qrels_url_or_path
-        assert isinstance(url_or_path, str)
-        return _hash_url(url_or_path)
+    qrels_source: Union[str, Path]
 
     @property
     def qrels_file(self) -> Path:
-        url_or_path = self.qrels_url_or_path
-        if isinstance(url_or_path, Path):
-            return url_or_path
-
-        file_name = basename(url_or_path)
-        file_path = QRELS_DIR / self._qrels_url_hash / file_name
-        _download_if_needed(url_or_path, file_path)
-        return file_path
+        download_dir = QRELS_DIR / _hash_source(self.qrels_source)
+        return _download_decompress_if_needed(
+            self.qrels_source,
+            download_dir,
+            "topics"
+        )
 
     @property
     def qrels(self) -> TrecQrel:

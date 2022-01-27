@@ -17,18 +17,13 @@ _BASE_DIRS = [
 for path in _BASE_DIRS:
     path.mkdir(parents=True, exist_ok=True)
 
-# DEFAULT_DOCUMENTS_ZIP_URL = (
-#     "https://files.webis.de/corpora/corpora-webis/corpus-touche-task2-22/"
-#     "touche-task2-passages-version-001.zip"
-# )
-DEFAULT_DOCUMENTS_ZIP_URL = (
+DEFAULT_DOCUMENTS_URL = (
     "https://files.webis.de/corpora/corpora-webis/corpus-touche-task2-22/"
     "touche-task2-passages-version-002.jsonl.gz"
 )
-DEFAULT_TOPICS_ZIP_URL = (
+DEFAULT_TOPICS_URL = (
     "https://webis.de/events/touche-22/data/topics-task2-2022.zip"
 )
-DEFAULT_TOPICS_ZIP_PATH = "topics-task2.xml"
 DEFAULT_TOUCHE_2020_QRELS_URL = (
     "https://webis.de/events/touche-20/"
     "touche2020-task2-relevance-withbaseline.qrels"

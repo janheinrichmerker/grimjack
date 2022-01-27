@@ -202,9 +202,8 @@ class Pipeline:
 
     def __init__(
             self,
-            documents_zip_url: str,
-            topics_zip_url: str,
-            topics_zip_path: str,
+            documents_source: Union[str, Path],
+            topics_source: Union[str, Path],
             stopwords_file: Optional[Path],
             stemmer: Optional[Stemmer],
             language: str,
@@ -223,8 +222,8 @@ class Pipeline:
             stance_threshold: Optional[float],
             num_hits: int,
     ):
-        self.documents_store = SimpleDocumentsStore(documents_zip_url)
-        self.topics_store = TrecTopicsStore(topics_zip_url, topics_zip_path)
+        self.documents_store = SimpleDocumentsStore(documents_source)
+        self.topics_store = TrecTopicsStore(topics_source)
         self.index = AnseriniIndex(
             self.documents_store,
             stopwords_file,
@@ -310,11 +309,11 @@ class Pipeline:
     def evaluate_all(
             self,
             metric: Metric,
-            qrels_url_or_path: Union[Path, str],
+            qrels_source: Union[Path, str],
             depth: int,
             per_query: bool = False,
     ):
-        qrels_store = TrecQrelsStore(qrels_url_or_path)
+        qrels_store = TrecQrelsStore(qrels_source)
         evaluation = TrecEvaluation(qrels_store, metric)
         with TemporaryDirectory() as directory_name:
             directory: Path = Path(directory_name)
