@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyserini = "*"
+pyserini = ">=0.14.0,==0.14.*"
 dload = "*"
 pytest = "*"
 nltk = "*"
@@ -28,6 +28,7 @@ diskcache = "*"
 websockets = "*"
 pillow = ">=9.0.0"
 targer-api = "*"
+spacy = ">=2.3,==2.*"
 
 [dev-packages]
 
