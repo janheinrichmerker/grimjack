@@ -161,8 +161,8 @@ class Reranker(ABC):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         pass
 
 

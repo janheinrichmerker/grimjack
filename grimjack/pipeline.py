@@ -5,8 +5,9 @@ from typing import Optional, List, Set, Union
 from tqdm import tqdm
 
 from grimjack import logger
-from grimjack.model import RankedDocument, Query
+from grimjack.model import Query
 from grimjack.model.axiom import OriginalAxiom, AggregatedAxiom, Axiom
+from grimjack.model.stance import ArgumentQualityStanceRankedDocument
 from grimjack.modules import (
     ArgumentQualityStanceTagger, DocumentsStore, TopicsStore,
     Index, QueryExpander, Searcher, Reranker,
@@ -256,7 +257,10 @@ class Pipeline:
             cache_path
         )
 
-    def _search(self, query: Query) -> List[RankedDocument]:
+    def _search(
+            self,
+            query: Query
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         logger.info("Expanding query.")
         queries = self.query_expander.expand_query(query)
         logger.info("Searching queries.")

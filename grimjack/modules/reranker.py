@@ -20,15 +20,20 @@ class OriginalReranker(Reranker):
         return ranking
 
 
-def _reset_score(ranking: List[RankedDocument]) -> List[RankedDocument]:
+def _reset_score(
+        ranking: List[ArgumentQualityStanceRankedDocument]
+                 ) -> List[ArgumentQualityStanceRankedDocument]:
     length = len(ranking)
     return [
-        RankedDocument(
+        ArgumentQualityStanceRankedDocument(
             id=document.id,
             content=document.content,
             fields=document.fields,
             score=length - i,
             rank=i + 1,
+            arguments=document.arguments,
+            qualities=document.qualities,
+            stances=document.stances,
         )
         for i, document in enumerate(ranking)
     ]
@@ -43,8 +48,8 @@ class AxiomaticReranker(Reranker):
             self,
             context: RerankingContext,
             query: Query,
-            vertices: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            vertices: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         if len(vertices) == 0:
             return []
 
@@ -91,8 +96,8 @@ class AxiomaticReranker(Reranker):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         ranking = ranking.copy()
         ranking = self.kwiksort(self.context, query, ranking)
         ranking = _reset_score(ranking)
@@ -107,8 +112,8 @@ class TopReranker(Reranker):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         assert 0 <= self.k
         k = min(self.k, len(ranking))
 
@@ -117,14 +122,17 @@ class TopReranker(Reranker):
 
         # Rerank top-k documents.
         reranked = [
-            RankedDocument(
-                document.id,
-                document.content,
-                document.fields,
+            ArgumentQualityStanceRankedDocument(
+                id=document.id,
+                content=document.content,
+                fields=document.fields,
                 # Add maximum original score to ensure that reranked documents
                 # stay above non-reranked documents.
-                document.score + max_score,
-                document.rank,
+                score=document.score + max_score,
+                rank=document.rank,
+                arguments=document.arguments,
+                qualities=document.qualities,
+                stances=document.stances,
             )
             for document in self.reranker.rerank(query, ranking[:k])
         ]
@@ -149,8 +157,8 @@ class AlternatingStanceFairnessReranker(Reranker):
 
     @staticmethod
     def _alternate_stance(
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         old_ranking = ranking.copy()
         new_ranking = []
 
@@ -198,8 +206,8 @@ class AlternatingStanceFairnessReranker(Reranker):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         ranking = self._alternate_stance(ranking)
         ranking = _reset_score(ranking)
         return ranking
@@ -212,8 +220,8 @@ class CascadeReranker(Reranker):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         for reranker in self.rerankers:
             ranking = reranker.rerank(query, ranking)
         return ranking
@@ -225,8 +233,8 @@ class BalancedTopKStanceFairnessReranker(Reranker):
 
     def _balanced_top_k_stance(
             self,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         ranking = ranking.copy()
 
         def count_pro_a() -> int:
@@ -300,8 +308,8 @@ class BalancedTopKStanceFairnessReranker(Reranker):
     def rerank(
             self,
             query: Query,
-            ranking: List[RankedDocument]
-    ) -> List[RankedDocument]:
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
         ranking = self._balanced_top_k_stance(ranking)
         ranking = _reset_score(ranking)
         return ranking
