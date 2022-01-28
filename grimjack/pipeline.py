@@ -222,6 +222,9 @@ class Pipeline:
             stance_threshold: Optional[float],
             num_hits: int,
     ):
+        if cache_path is not None:
+            cache_path.mkdir(exist_ok=True)
+
         self.documents_store = SimpleDocumentsStore(documents_source)
         self.topics_store = TrecTopicsStore(topics_source)
         self.index = AnseriniIndex(
