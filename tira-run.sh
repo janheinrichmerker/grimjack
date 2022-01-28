@@ -21,8 +21,7 @@ input_documents_file="$input_dir/$documents_file_name"
 output_run_file="$output_dir/$run_file_name"
 
 # Install project dependencies.
-pipenv --rm
-pipenv install --deploy --sequential
+pipenv install --deploy
 
 # Generate internal run file.
 pipenv run python -m grimjack \
