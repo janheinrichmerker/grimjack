@@ -22,7 +22,7 @@ output_run_file="$output_dir/$run_file_name"
 
 # Install project dependencies.
 pipenv --rm
-pipenv install --deploy --sequential --verbose
+pipenv install --deploy --sequential
 
 # Generate internal run file.
 pipenv run python -m grimjack \

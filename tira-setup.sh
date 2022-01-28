@@ -13,7 +13,7 @@ apt-get -y update && apt-get -y install \
   python3.9 \
   python3.9-venv \
   python3-pip \
-  python3-dev
+  python3.9-dev
 
 # Install Python dependencies.
 pip3 install --upgrade \
