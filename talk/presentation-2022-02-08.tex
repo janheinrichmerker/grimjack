@@ -1,0 +1,148 @@
+\documentclass[english]{mlutalk}
+% \documentclass[english,handout]{mlutalk}
+
+\title{Grimjack at Touché 2022}
+\subtitle{Advanced IR, Winter Semester 2021/22}
+\author{Johannes Huck \and Jan Heinrich Reimer}
+\institute{Martin Luther University Halle-Wittenberg}
+\date{\today}
+\titlegraphic{\includegraphics[width=3cm]{figures/mlu-halle}}
+
+\addbibresource{../literature/literature.bib}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{biblatex}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphics,graphicx}
+
+\newcommand{\TF}{\mbox{TF}\xspace}
+\newcommand{\TFIDF}{\mbox{TF/IDF}\xspace}
+\newcommand{\todocite}{{\smaller\color{red}[CITE]}\xspace}
+\newcommand{\todo}[1]{{\smaller\color{red}[#1]}}
+
+\lstset{%
+  basicstyle=\ttfamily,
+  breaklines=true
+}
+
+\begin{document}
+
+\titleframe
+
+\begin{frame}{Task at hand}  
+  \begin{itemize}
+    \item Task 2 of Touché: Argument Retrieval
+    \item Argument Retrieval for Comparative Questions
+    \item Task: Retrieve relevant passages to answer comparative questions and detect their stance w.r.t the objects
+    \item Data: > 1 million text passages  
+  \end{itemize}
+  \begin{figure}
+      \centering
+      \includegraphics[height=5cm, width=8cm]{figures/touche.jpeg}
+      % Source: https://mobile.twitter.com/webis_de/status/1468529926026534913?cxt=HHwWgoC97fyLouEoAAAA
+  \end{figure}
+\end{frame}
+
+\begin{frame}{General approach}
+  \begin{itemize}
+    \item Programmed in Python
+    \begin{itemize}
+        \item Easy to use
+        \item High readability
+        \item Many IR libabries avaiable 
+    \end{itemize}
+    \item Three modules: Search, Search-all and Evaluate-all
+    \item Pipeline consists of
+    \begin{itemize}
+        \item Query expander
+        \item Initial Retrieval
+        \item Argument quality and stance tagging
+        \item Reranking
+    \end{itemize}
+    \item Each pipeline step can be activated/deactivated
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Pipeline}
+    %insert Pipeline here
+\end{frame}
+
+\begin{frame}{Query Expander}
+    \begin{itemize}
+        \item Expanding queries with synonyms of comparative objects
+        \item Two Different approaches
+        \begin{itemize}
+            \item Based on embeddings with glove
+            \item Based on language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}
+            \item We ask "What are synonyms of the word <token> ?" 
+        \end{itemize}
+        \item With T0 also new queries from narrative and description
+        \item We ask "Extract a query: <text>"
+        \item Combining all new queries with OR
+        \item Retrieving ranked list of passages with this new query 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Argument quality tagging}
+    \begin{itemize}
+        \item Extracting arguments with TARGER~\cite{ChernodubOHBHBP2019}
+        \item For each argument we want to know the quality w.r.t. the topic
+        \item We use the IBM Debater API~\cite{ToledoG2019} to get the argument quality
+        \item Returns a score between 0 and 1
+        \item 0 means lowest quality and 1 highest quality
+    \end{itemize}
+    \begin{block}{Example}
+        Arg: Cars should only provide assisted driving, not complete autonomy\\
+        Topic: We should further explore the development of autonomous vehicles\\
+        Score: 0.7256
+    \end{block}
+\end{frame}
+
+\begin{frame}{Argument stance tagging}
+    \begin{itemize}
+        \item Next we want to know the stance w.r.t. the topic
+        \item Two different approaches
+        \begin{itemize}
+            \item Based on IBM Debater API~\cite{BarHaimBDSS2017}
+            \item Based on T0
+            \item We ask "Is this sentence positive or negative with respect to <comparative\_object>? <sentence>"
+        \end{itemize}
+        \item It is also possible to expand with sentiments
+        \item Calculating the multi target stance
+        \begin{itemize}
+            \item Calculate the difference between objects
+            \item Use a threshold
+            \item Convert T0s output to numbers
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Reranking}
+    \begin{itemize}
+        \item Foo
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Final Remarks}
+    \begin{itemize}
+        \item Approach is very flexible 
+        \item We investigate influence of components w.r.t the retrieval score
+        \item Stance classification may be better with Roberta approach
+        \item We cannot distinguish between neutral and no stance
+        \item We investigate how reranking influences the retrieval score
+        \item T0 solves a lot of IR Task
+        \item Is it possible to only use T0 for retrieval?
+    \end{itemize}
+    \thankyou
+\end{frame}
+
+\appendix
+\section{\appendixname}
+
+\bibliographyframe
+
+\end{document}
