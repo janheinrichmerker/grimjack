@@ -157,7 +157,7 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 
     @staticmethod
     def _input(token: str) -> str:
-        return f"What are synonyms of the word \"{token}\"?"
+        return f"What are synonyms of the word '{token}'?"
 
     def preload_synonyms(self, tokens: Set[str]) -> None:
         with self._generator() as generator:
@@ -195,7 +195,9 @@ class HuggingfaceDescriptionNarrativeQueryExpander(QueryTitleExpander):
 
     @staticmethod
     def _input(text: str) -> str:
-        return f"Extract a query: {text}"
+        return (
+            f"{text}\n\nExtract a natural search query from this description."
+        )
 
     def expand_query_title(self, query: Query) -> List[str]:
         inputs = {
