@@ -163,12 +163,12 @@ def _stance_tagger(
         cache_path: Optional[Path],
 ) -> ArgumentQualityStanceTagger:
     stance_tagger: ArgumentQualityStanceTagger
-    if stance_tagger_type == StanceTaggerType.OBJECT:
+    if stance_tagger_type == StanceTaggerType.DEBATER_OBJECT:
         stance_tagger = DebaterArgumentQualityObjectStanceTagger(
             debater_api_token,
             cache_path,
         )
-    elif stance_tagger_type == StanceTaggerType.SENTIMENT:
+    elif stance_tagger_type == StanceTaggerType.DEBATER_SENTIMENT:
         stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
             debater_api_token,
             cache_path,

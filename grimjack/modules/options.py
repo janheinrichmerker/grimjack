@@ -41,6 +41,6 @@ class QualityTaggerType(Enum):
 
 
 class StanceTaggerType(Enum):
-    OBJECT = 1
-    SENTIMENT = 2
+    DEBATER_OBJECT = 1
+    DEBATER_SENTIMENT = 2
     T0PP = 3

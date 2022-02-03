@@ -92,12 +92,10 @@ _QUALITY_TAGGER_TYPES: Dict[str, Callable[[], QualityTaggerType]] = {
 }
 
 _STANCE_TAGGER_TYPES: Dict[str, Callable[[], StanceTaggerType]] = {
-    "object": lambda: StanceTaggerType.OBJECT,
-    "obj": lambda: StanceTaggerType.OBJECT,
-    "difference": lambda: StanceTaggerType.OBJECT,
-    "diff": lambda: StanceTaggerType.OBJECT,
-    "sentiment": lambda: StanceTaggerType.SENTIMENT,
-    "sent": lambda: StanceTaggerType.SENTIMENT,
+    "debater-object": lambda: StanceTaggerType.DEBATER_OBJECT,
+    "object": lambda: StanceTaggerType.DEBATER_OBJECT,
+    "debater-sentiment": lambda: StanceTaggerType.DEBATER_SENTIMENT,
+    "sentiment": lambda: StanceTaggerType.DEBATER_SENTIMENT,
     "t0pp": lambda: StanceTaggerType.T0PP,
 }
 
