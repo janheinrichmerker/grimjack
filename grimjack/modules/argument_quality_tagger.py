@@ -99,8 +99,10 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
     @staticmethod
     def _task(sentence: str) -> str:
         return (
-            f"{sentence} How readable and consistent is this sentence? "
-            f"very readable, readable, unreadable"
+            f"{sentence}. "
+            f"How would you rate the readability and consistency "
+            f"in this sentence? "
+            f"very good, good, bad, very bad"
         )
 
     def _quality(
@@ -110,12 +112,14 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
     ) -> float:
         task = self._task(sentence)
         answer = generator.generate(task).strip().lower()
-        if answer == "very readable":
+        if "very good" in answer:
             return 1
-        elif answer == "readable":
-            return 0.75
-        elif answer == "unreadable":
+        elif "very bad" in answer:
             return 0
+        elif "good" in answer:
+            return 0.75
+        elif "bad" in answer:
+            return 0.25
         else:
             return 0.5
 
