@@ -235,26 +235,27 @@ class BalancedTopKStanceFairnessReranker(Reranker):
             self,
             ranking: List[ArgumentQualityStanceRankedDocument]
     ) -> List[ArgumentQualityStanceRankedDocument]:
+        assert 0 <= self.k
+        k = min(self.k, len(ranking))
+
         ranking = ranking.copy()
 
         def count_pro_a() -> int:
             return sum(
-                1 for document in ranking[:self.k]
+                1 for document in ranking[:k]
                 if _stance(document) > 0
             )
 
         def count_pro_b() -> int:
             return sum(
-                1 for document in ranking[:self.k]
+                1 for document in ranking[:k]
                 if _stance(document) < 0
             )
 
-        diff_pro_a_pro_b: int = count_pro_a() - count_pro_b()
-
-        while abs(diff_pro_a_pro_b) > 1:
+        while abs(count_pro_a() - count_pro_b()) > 1:
             # The top-k ranking is currently imbalanced.
 
-            if diff_pro_a_pro_b > 0:
+            if count_pro_a() - count_pro_b() > 0:
                 # There are currently more documents pro A.
                 # Find first pro B document after rank k and
                 # move the last pro A document from the top-k ranking
@@ -262,12 +263,12 @@ class BalancedTopKStanceFairnessReranker(Reranker):
                 # If no such document is found, we can't balance the ranking.
                 index_a = next((
                     i
-                    for i in range(self.k + 1)
+                    for i in range(k + 1)
                     if _stance(ranking[i]) > 0
                 ), None)
                 index_b = next((
                     i
-                    for i in range(self.k + 1, len(ranking))
+                    for i in range(k + 1, len(ranking))
                     if _stance(ranking[i]) < 0
                 ), None)
                 if index_a is None or index_b is None:
@@ -285,12 +286,12 @@ class BalancedTopKStanceFairnessReranker(Reranker):
                 # we can't balance the ranking, so return the current ranking.
                 index_b = next((
                     i
-                    for i in range(self.k + 1)
+                    for i in range(k + 1)
                     if _stance(ranking[i]) < 0
                 ), None)
                 index_a = next((
                     i
-                    for i in range(self.k + 1, len(ranking))
+                    for i in range(k + 1, len(ranking))
                     if _stance(ranking[i]) > 0
                 ), None)
                 if index_b is None or index_a is None:
