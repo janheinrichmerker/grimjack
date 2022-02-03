@@ -137,7 +137,7 @@ pipenv run python -m grimjack \
   --reranker subjective-first \
   --reranker alternating-stance \
   run \
-  data/runs/grimjack-fair-reranking.txt
+  data/runs/grimjack-fair-reranking-argumentative-axioms.txt
 ```
 
 #### 4. All you need is T0
@@ -188,7 +188,7 @@ pipenv run python -m grimjack \
   --reranker subjective-first \
   --reranker alternating-stance \
   run \
-  data/runs/grimjack-argumentative-fair-reranking-with-T0.txt
+  data/runs/grimjack-fair-argumentative-reranking-with-t0.txt
 ```
 
 ### 6. Fine tune based on Touché 2020/2021 qrels
