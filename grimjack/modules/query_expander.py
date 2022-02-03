@@ -213,7 +213,7 @@ class AggregatedQueryExpander(QueryExpander):
 
     def expand_query(self, query: Query) -> List[Query]:
         return list(
-            chain(*[
+            chain.from_iterable([
                 query_expander.expand_query(query)
                 for query_expander in self.query_expanders
             ])
