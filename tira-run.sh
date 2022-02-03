@@ -28,7 +28,6 @@ pipenv run python -m grimjack \
   --topics-path "$input_topic_file" \
   --documents-path "$input_documents_file" \
   "$@" \
-  --num-hits 20 \
   --verbose \
   run \
   --tag "$run_tag" \
