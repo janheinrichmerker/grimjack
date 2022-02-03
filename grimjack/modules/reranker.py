@@ -22,7 +22,7 @@ class OriginalReranker(Reranker):
 
 def _reset_score(
         ranking: List[ArgumentQualityStanceRankedDocument]
-                 ) -> List[ArgumentQualityStanceRankedDocument]:
+) -> List[ArgumentQualityStanceRankedDocument]:
     length = len(ranking)
     return [
         ArgumentQualityStanceRankedDocument(
@@ -311,5 +311,33 @@ class BalancedTopKStanceFairnessReranker(Reranker):
             ranking: List[ArgumentQualityStanceRankedDocument]
     ) -> List[ArgumentQualityStanceRankedDocument]:
         ranking = self._balanced_top_k_stance(ranking)
+        ranking = _reset_score(ranking)
+        return ranking
+
+
+class SubjectiveFirstReranker(Reranker):
+
+    @staticmethod
+    def _neutral_last(
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
+        subjective = [
+            document
+            for document in ranking
+            if _stance(document) != 0
+        ]
+        neutral = [
+            document
+            for document in ranking
+            if _stance(document) == 0
+        ]
+        return [*subjective, *neutral]
+
+    def rerank(
+            self,
+            query: Query,
+            ranking: List[ArgumentQualityStanceRankedDocument]
+    ) -> List[ArgumentQualityStanceRankedDocument]:
+        ranking = self._neutral_last(ranking)
         ranking = _reset_score(ranking)
         return ranking

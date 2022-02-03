@@ -75,6 +75,7 @@ _RERANKER_TYPES: Dict[str, Callable[[], RerankerType]] = {
         lambda: RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
     "balanced-top-5-stance":
         lambda: RerankerType.FAIRNESS_BALANCED_TOP_5_STANCE,
+    "subjective-first": lambda: RerankerType.SUBJECTIVE_FIRST,
 }
 
 _METRICS: Dict[str, Callable[[], Metric]] = {
