@@ -50,13 +50,17 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
         tokens: List[str] = word_tokenize(query.title)
         pos_tokens: List[Tuple[str, str]] = pos_tag(tokens)
 
-        self.preload_synonyms(set(tokens))
+        self.preload_synonyms({
+            token
+            for token, pos in pos_tokens
+            if pos in self._COMPARATIVE_TAGS
+        })
 
         token_synonyms: List[Set[str]] = [
             {token} | self.synonyms(token)
             if pos in self._COMPARATIVE_TAGS
             else {token}
-            for i, (token, pos) in enumerate(pos_tokens)
+            for token, pos in pos_tokens
         ]
         queries: list[str] = [
             " ".join(sequence)
