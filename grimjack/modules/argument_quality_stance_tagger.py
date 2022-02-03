@@ -159,10 +159,17 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             yield generator
 
     @staticmethod
-    def _task(comparative_object: str, sentence: str) -> str:
+    def _task_pro(comparative_object: str, sentence: str) -> str:
         return (
-            f"Is this sentence positive or negative "
-            f"with respect to \"{comparative_object}\"? {sentence}"
+            f"{sentence}\n\n"
+            f"Is this sentence pro {comparative_object}? yes or no"
+        )
+
+    @staticmethod
+    def _task_con(comparative_object: str, sentence: str) -> str:
+        return (
+            f"{sentence}\n\n"
+            f"Is this sentence against {comparative_object}? yes or no"
         )
 
     def _stance_single_target(
@@ -171,11 +178,21 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             comparative_object: str,
             sentence: str
     ) -> float:
-        task = self._task(comparative_object, sentence)
-        answer = generator.generate(task).strip().lower()
-        if answer == "positive":
+        task_pro = self._task_pro(comparative_object, sentence)
+        answer_pro = generator.generate(task_pro).strip().lower()
+        task_con = self._task_con(comparative_object, sentence)
+        answer_con = generator.generate(task_con).strip().lower()
+        is_pro = (
+                ("yes" in answer_pro or "pro" in answer_pro) and
+                "no" not in answer_pro
+        )
+        is_con = (
+                ("yes" in answer_con or "con" in answer_con) and
+                "no" not in answer_con
+        )
+        if is_pro and not is_con:
             return 1
-        elif answer == "negative":
+        elif is_con and not is_pro:
             return -1
         else:
             return 0
@@ -197,26 +214,19 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             query: Query,
             document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
-        sentences = sent_tokenize(document.content)
 
         stances: List[ArgumentStanceSentence]
         if query.comparative_objects is None:
-            stances = [
-                ArgumentStanceSentence(sentence, 0)
-                for sentence in sentences
-            ]
+            stances = [ArgumentStanceSentence(document.content, 0)]
         else:
-            stances = [
-                ArgumentStanceSentence(
-                    sentence,
-                    self._stance_multi_target(
-                        generator,
-                        query,
-                        sentence
-                    )
+            stances = [ArgumentStanceSentence(
+                document.content,
+                self._stance_multi_target(
+                    generator,
+                    query,
+                    document.content
                 )
-                for sentence in sentences
-            ]
+            )]
 
         return ArgumentQualityStanceRankedDocument(
             id=document.id,
@@ -236,14 +246,17 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
     ) -> List[ArgumentQualityStanceRankedDocument]:
         tasks = []
         if query.comparative_objects is not None:
-            download_nltk_dependencies("punkt")
-            object_a, object_b = query.comparative_objects
-            tasks = [
-                self._task(comparative_object, sentence)
-                for comparative_object in (object_a, object_b)
+            tasks_pro = [
+                self._task_pro(comparative_object, document.content)
+                for comparative_object in query.comparative_objects
                 for document in ranking
-                for sentence in sent_tokenize(document.content)
             ]
+            tasks_con = [
+                self._task_con(comparative_object, document.content)
+                for comparative_object in query.comparative_objects
+                for document in ranking
+            ]
+            tasks = [*tasks_pro, *tasks_con]
         with self._generator() as generator:
             generator.preload(tasks)
             return [
@@ -256,7 +269,6 @@ class HuggingfaceArgumentQualityStanceTagger(ArgumentQualityStanceTagger):
             query: Query,
             document: ArgumentQualityRankedDocument
     ) -> ArgumentQualityStanceRankedDocument:
-        download_nltk_dependencies("punkt")
         with self._generator() as generator:
             return self._tag_document(generator, query, document)
 
