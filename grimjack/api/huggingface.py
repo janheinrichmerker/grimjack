@@ -70,7 +70,6 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 await socket.send(dumps(payload))
                 data = await socket.recv()
                 response_json = loads(data)
-                print(response_json)
                 generated_text: str = response_json["outputs"]
                 self._cache[md5_hash(text)] = generated_text
 

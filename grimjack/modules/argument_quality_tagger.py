@@ -110,7 +110,6 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
     ) -> float:
         task = self._task(sentence)
         answer = generator.generate(task).strip().lower()
-        print(answer)
         if answer == "very readable":
             return 1
         elif answer == "readable":
