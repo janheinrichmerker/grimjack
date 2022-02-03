@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 from hashlib import md5
-from itertools import repeat
 from json import dumps, loads
 from pathlib import Path
 from time import sleep
@@ -106,9 +105,7 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 _sleep_with_progress(1 * 60 * 60)
                 return self._fetch_single_request(text)
             elif response.status_code == 429:
-                logger.warning(
-                    f"Huggingface server error."
-                )
+                logger.warning("Huggingface server error.")
                 logger.info("Retrying in 1m.")
                 _sleep_with_progress(1 * 60)
                 return self._fetch_single_request(text)
