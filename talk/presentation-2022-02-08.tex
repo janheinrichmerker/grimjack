@@ -42,8 +42,10 @@
   \end{itemize}
   \begin{figure}
       \centering
-      \includegraphics[height=5cm, width=8cm]{figures/touche.jpeg}
-      % Source: https://mobile.twitter.com/webis_de/status/1468529926026534913?cxt=HHwWgoC97fyLouEoAAAA
+      \includegraphics[height=4.8cm, width=8cm]{figures/touche.jpeg}\\
+      \begin{footnotesize}
+        \url{https://mobile.twitter.com/webis_de/status/1468529926026534913?cxt=HHwWgoC97fyLouEoAAAA}
+      \end{footnotesize}  
   \end{figure}
 \end{frame}
 
@@ -53,25 +55,29 @@
     \begin{itemize}
         \item Easy to use
         \item High readability
-        \item Many IR libabries avaiable 
+        \item Many IR libabries available
     \end{itemize}
     \item Three modules: Search, Search-all and Evaluate-all
     \item Pipeline consists of
     \begin{itemize}
-        \item Query expander
+        \item Query-Expander and Query-Combiner
         \item Initial Retrieval
         \item Argument quality and stance tagging
         \item Reranking
     \end{itemize}
     \item Each pipeline step can be activated/deactivated
+    \item Indexing and initial retrieval via pyserini~\cite{LinMLYPN2021}
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Pipeline}
-    %insert Pipeline here
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.25]{figures/pipeline.png}
+    \end{figure}
 \end{frame}
 
-\begin{frame}{Query Expander}
+\begin{frame}{Query-Expander and Query-Combiner}
     \begin{itemize}
         \item Expanding queries with synonyms of comparative objects
         \item Two Different approaches
@@ -91,8 +97,14 @@
     \begin{itemize}
         \item Extracting arguments with TARGER~\cite{ChernodubOHBHBP2019}
         \item For each argument we want to know the quality w.r.t. the topic
-        \item We use the IBM Debater API~\cite{ToledoG2019} to get the argument quality
-        \item Returns a score between 0 and 1
+        \item Two different approaches
+        \begin{itemize}
+            \item Based IBM Debater API~\cite{ToledoG2019}
+            \item Based on T0
+            \item We ask "<sentence>
+            How would you rate the readability and consistency in this sentence? very good, good, bad, very bad"
+        \end{itemize}
+        \item IBM API returns a score between 0 and 1
         \item 0 means lowest quality and 1 highest quality
     \end{itemize}
     \begin{block}{Example}
@@ -112,11 +124,12 @@
             \item We ask "Is this sentence positive or negative with respect to <comparative\_object>? <sentence>"
         \end{itemize}
         \item It is also possible to expand with sentiments
+        \item Both approaches only work for single target stance
         \item Calculating the multi target stance
         \begin{itemize}
             \item Calculate the difference between objects
             \item Use a threshold
-            \item Convert T0s output to numbers
+            \item Convert T0s output into a numerical representation
         \end{itemize}
     \end{itemize}
 \end{frame}
