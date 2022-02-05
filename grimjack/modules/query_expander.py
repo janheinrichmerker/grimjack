@@ -50,13 +50,17 @@ class ComparativeSynonymsQueryExpander(QueryTitleExpander, ABC):
         tokens: List[str] = word_tokenize(query.title)
         pos_tokens: List[Tuple[str, str]] = pos_tag(tokens)
 
-        self.preload_synonyms(set(tokens))
+        self.preload_synonyms({
+            token
+            for token, pos in pos_tokens
+            if pos in self._COMPARATIVE_TAGS
+        })
 
         token_synonyms: List[Set[str]] = [
             {token} | self.synonyms(token)
             if pos in self._COMPARATIVE_TAGS
             else {token}
-            for i, (token, pos) in enumerate(pos_tokens)
+            for token, pos in pos_tokens
         ]
         queries: list[str] = [
             " ".join(sequence)
@@ -153,7 +157,7 @@ class HuggingfaceComparativeSynonymsQueryExpander(
 
     @staticmethod
     def _input(token: str) -> str:
-        return f"What are synonyms of the word \"{token}\"?"
+        return f"What are synonyms of the word '{token}'?"
 
     def preload_synonyms(self, tokens: Set[str]) -> None:
         with self._generator() as generator:
@@ -191,7 +195,9 @@ class HuggingfaceDescriptionNarrativeQueryExpander(QueryTitleExpander):
 
     @staticmethod
     def _input(text: str) -> str:
-        return f"Extract a query: {text}"
+        return (
+            f"{text}\n\nExtract a natural search query from this description."
+        )
 
     def expand_query_title(self, query: Query) -> List[str]:
         inputs = {
@@ -213,7 +219,7 @@ class AggregatedQueryExpander(QueryExpander):
 
     def expand_query(self, query: Query) -> List[Query]:
         return list(
-            chain(*[
+            chain.from_iterable([
                 query_expander.expand_query(query)
                 for query_expander in self.query_expanders
             ])

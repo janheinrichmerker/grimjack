@@ -26,6 +26,7 @@ class RerankerType(Enum):
     FAIRNESS_ALTERNATING_STANCE = 2
     FAIRNESS_BALANCED_TOP_5_STANCE = 3
     FAIRNESS_BALANCED_TOP_10_STANCE = 4
+    SUBJECTIVE_FIRST = 5
 
 
 class Metric(Enum):
@@ -41,6 +42,6 @@ class QualityTaggerType(Enum):
 
 
 class StanceTaggerType(Enum):
-    OBJECT = 1
-    SENTIMENT = 2
+    DEBATER_OBJECT = 1
+    DEBATER_SENTIMENT = 2
     T0PP = 3

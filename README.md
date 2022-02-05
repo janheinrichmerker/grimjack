@@ -79,88 +79,116 @@ The following examples correspond to the runs we submit to the
 
 #### 1. Baseline
 
+Retrieve 20 documents by Dirichlet query likelihood for the unmodified query, 
+tag arguments using the IBM fastText TARGER model,
+tag argument quality using the IBM Debater API,
+tag argument stance by comparing sentiments for each object using the IBM Debater API,
+treating stance as neutral if under a threshold of 0.5.
+
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --targer-model tag-ibm-fasttext \
-  --stance-tagger sentiment \
-  --stance-threshold 0.5 \
-  --num-hits 100 \
+  --quality-tagger debater \
+  --stance-tagger debater-sentiment \
+  --stance-threshold 0.125 \
+  --num-hits 20 \
   run \
   data/runs/grimjack-baseline.txt
 ```
 
-#### 2. All you need is T0
+#### 2. Argumentative Axioms
 
-TODO
+Rerank top-10 documents from the baseline result 
+based on preferences from argumentative axioms.
 
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --query-expander t0pp-synonyms \
-  --query-expander t0pp-description-narrative \
   --targer-model tag-ibm-fasttext \
-  --quality-tagger t0pp \
-  --stance-tagger t0pp \
-  --stance-threshold 0.5 \
-  --num-hits 100 \
-  run \
-  data/runs/grimjack-all-you-need-is-t0.txt
-```
-
-#### 3. Argumentative Axioms
-
-TODO
-
-```shell
-pipenv run python -m grimjack \
-  --retrieval-model query-likelihood-dirichlet \
+  --quality-tagger debater \
+  --stance-tagger debater-sentiment \
+  --stance-threshold 0.125 \
+  --num-hits 20 \
+  --rerank-hits 10 \
   --reranker axiomatic \
-  --rerank-hits 20 \
   --argumentative-axioms \
-  --targer-model tag-ibm-fasttext \
-  --stance-tagger sentiment \
-  --stance-threshold 0.5 \
-  --num-hits 100 \
   run \
   data/runs/grimjack-argumentative-axioms.txt
 ```
 
-#### 4. Fair Reranking
+#### 3. Fair Reranking after Argumentative Axioms
 
-TODO
+With the argumentative axiomatic ranking,
+move subjective documents (non-neutral stance) to the top,
+and then ensure that document's stances alternate.
 
 ```shell
 pipenv run python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
-  --reranker balanced-top-5-stance \
   --targer-model tag-ibm-fasttext \
-  --stance-tagger sentiment \
-  --stance-threshold 0.5 \
-  --num-hits 100 \
+  --quality-tagger debater \
+  --stance-tagger debater-sentiment \
+  --stance-threshold 0.125 \
+  --num-hits 20 \
+  --rerank-hits 10 \
+  --reranker axiomatic \
+  --argumentative-axioms \
+  --reranker subjective-first \
+  --reranker alternating-stance \
   run \
-  data/runs/grimjack-fair-reranking.txt
+  data/runs/grimjack-fair-reranking-argumentative-axioms.txt
+```
+
+#### 4. All you need is T0
+
+Expand the query by extracting queries from the description and narrative using T0, 
+expand the query with T0 synonyms for each comparative object,
+then retrieve like with the baseline,
+tag argument quality using T0, tag argument stance using T0.
+
+```shell
+pipenv run python -m grimjack \
+  --query-expander t0pp-description-narrative \
+  --query-expander t0pp-comparative-synonyms \
+  --retrieval-model query-likelihood-dirichlet \
+  --targer-model tag-ibm-fasttext \
+  --quality-tagger t0pp \
+  --stance-tagger t0pp \
+  --stance-threshold 0.125 \
+  --num-hits 20 \
+  run \
+  data/runs/grimjack-all-you-need-is-t0.txt
 ```
 
 #### 5. Argumentative Fair Reranking with T0
 
-TODO
+Expand the query by extracting queries from the description and narrative using T0, 
+expand the query with T0 and fastText synonyms for each comparative object,
+then retrieve like with the baseline,
+rerank top-10 documents from the baseline result 
+based on preferences from argumentative axioms,
+move subjective documents (non-neutral stance) to the top,
+and then ensure that document's stances alternate.
 
 ```shell
 pipenv run python -m grimjack \
-  --retrieval-model query-likelihood-dirichlet \
-  --query-expander fast-text-wiki-news-synonyms \
-  --query-expander t0pp-synonyms \
   --query-expander t0pp-description-narrative \
-  --reranker axiomatic \
-  --reranker balanced-top-5-stance \
-  --rerank-hits 20 \
+  --query-expander t0pp-synonyms \
+  --query-expander fast-text-wiki-news-synonyms \
+  --retrieval-model query-likelihood-dirichlet \
   --targer-model tag-ibm-fasttext \
-  --stance-tagger sentiment \
-  --stance-threshold 0.5 \
-  --num-hits 100 \
+  --quality-tagger debater \
+  --stance-tagger debater-sentiment \
+  --stance-threshold 0.125 \
+  --num-hits 20 \
+  --rerank-hits 10 \
+  --reranker axiomatic \
+  --argumentative-axioms \
+  --reranker subjective-first \
+  --reranker alternating-stance \
   run \
-  data/runs/grimjack-argumentative-fair-reranking-with-T0.txt
+  data/runs/grimjack-fair-argumentative-reranking-with-t0.txt
 ```
 
 ### 6. Fine tune based on Touché 2020/2021 qrels

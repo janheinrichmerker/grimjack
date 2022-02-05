@@ -39,7 +39,7 @@ from grimjack.modules.query_expander import (
 from grimjack.modules.reranker import (
     OriginalReranker, AxiomaticReranker, TopReranker,
     AlternatingStanceFairnessReranker, CascadeReranker,
-    BalancedTopKStanceFairnessReranker
+    BalancedTopKStanceFairnessReranker, SubjectiveFirstReranker
 )
 from grimjack.modules.reranking_context import IndexRerankingContext
 from grimjack.modules.searcher import AnseriniSearcher
@@ -126,6 +126,8 @@ def _reranker(
             reranker_cascade.append(BalancedTopKStanceFairnessReranker(5))
         elif reranker == RerankerType.FAIRNESS_BALANCED_TOP_10_STANCE:
             reranker_cascade.append(BalancedTopKStanceFairnessReranker(10))
+        elif reranker == RerankerType.SUBJECTIVE_FIRST:
+            reranker_cascade.append(SubjectiveFirstReranker())
         else:
             raise ValueError(f"Unknown reranker: {reranker}")
     reranker: Reranker = CascadeReranker(reranker_cascade)
@@ -163,12 +165,12 @@ def _stance_tagger(
         cache_path: Optional[Path],
 ) -> ArgumentQualityStanceTagger:
     stance_tagger: ArgumentQualityStanceTagger
-    if stance_tagger_type == StanceTaggerType.OBJECT:
+    if stance_tagger_type == StanceTaggerType.DEBATER_OBJECT:
         stance_tagger = DebaterArgumentQualityObjectStanceTagger(
             debater_api_token,
             cache_path,
         )
-    elif stance_tagger_type == StanceTaggerType.SENTIMENT:
+    elif stance_tagger_type == StanceTaggerType.DEBATER_SENTIMENT:
         stance_tagger = DebaterArgumentQualitySentimentStanceTagger(
             debater_api_token,
             cache_path,

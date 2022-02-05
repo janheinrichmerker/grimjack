@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 from hashlib import md5
-from itertools import repeat
 from json import dumps, loads
 from pathlib import Path
 from time import sleep
@@ -21,9 +20,8 @@ def md5_hash(text: str) -> str:
 
 def _sleep_with_progress(seconds: int):
     progress = tqdm(
-        repeat(None, seconds),
-        desc="Waiting before next Huggingface API request",
-        unit="s",
+        range(seconds),
+        desc="Waiting"
     )
     for _ in progress:
         sleep(1)
@@ -70,7 +68,6 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 await socket.send(dumps(payload))
                 data = await socket.recv()
                 response_json = loads(data)
-                print(response_json)
                 generated_text: str = response_json["outputs"]
                 self._cache[md5_hash(text)] = generated_text
 
@@ -90,28 +87,38 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 desc="Generating texts with Huggingface API",
                 unit="texts"
         ):
-            payload = {"inputs": text}
-            response = post(
-                url=self._api_url_request,
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json=payload
-            )
-            if response.status_code // 100 != 2:
-                if response.status_code == 429:
-                    logger.warning(
-                        f"Hit Huggingface rate limit for model {self.model}."
-                    )
-                    logger.info("Waiting 1h for the next request.")
-                    _sleep_with_progress(1 * 60 * 60)
+            self._fetch_single_request(text)
+
+    def _fetch_single_request(self, text: str) -> None:
+        payload = {"inputs": text}
+        response = post(
+            url=self._api_url_request,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json=payload
+        )
+        if response.status_code // 100 != 2:
+            if response.status_code == 429:
+                logger.warning(
+                    f"Hit Huggingface rate limit for model {self.model}."
+                )
+                logger.info("Retrying in 1h.")
+                _sleep_with_progress(1 * 60 * 60)
+                return self._fetch_single_request(text)
+            elif response.status_code == 429:
+                logger.warning("Huggingface server error.")
+                logger.info("Retrying in 1m.")
+                _sleep_with_progress(1 * 60)
+                return self._fetch_single_request(text)
+            else:
                 raise HTTPError(
                     f"Failed to generate text '{text}' with Huggingface API. "
                     f"Check if you are authenticated. "
                     f"Got response {response.status_code} {response.reason}",
                     response=response,
                 )
-            response_json = response.json()
-            generated_text: str = response_json[0]["generated_text"]
-            self._cache[md5_hash(text)] = generated_text
+        response_json = response.json()
+        generated_text: str = response_json[0]["generated_text"]
+        self._cache[md5_hash(text)] = generated_text
 
     def preload(self, texts: List[str]) -> None:
         # run(self._preload_socket(texts))

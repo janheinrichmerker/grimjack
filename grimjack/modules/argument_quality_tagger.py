@@ -99,8 +99,10 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
     @staticmethod
     def _task(sentence: str) -> str:
         return (
-            f"{sentence} How readable and consistent is this sentence? "
-            f"very readable, readable, unreadable"
+            f"{sentence}. "
+            f"How would you rate the readability and consistency "
+            f"in this sentence? "
+            f"very good, good, bad, very bad"
         )
 
     def _quality(
@@ -110,13 +112,14 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
     ) -> float:
         task = self._task(sentence)
         answer = generator.generate(task).strip().lower()
-        print(answer)
-        if answer == "very readable":
+        if "very good" in answer:
             return 1
-        elif answer == "readable":
-            return 0.75
-        elif answer == "unreadable":
+        elif "very bad" in answer:
             return 0
+        elif "good" in answer:
+            return 0.75
+        elif "bad" in answer:
+            return 0.25
         else:
             return 0.5
 
@@ -126,25 +129,17 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
-        sentences = sent_tokenize(document.content)
-
         qualities: List[ArgumentQualitySentence]
         if query.comparative_objects is None:
-            qualities = [
-                ArgumentQualitySentence(sentence, 0)
-                for sentence in sentences
-            ]
+            qualities = [ArgumentQualitySentence(document.content, 0)]
         else:
-            qualities = [
-                ArgumentQualitySentence(
-                    sentence,
-                    self._quality(
-                        generator,
-                        sentence
-                    )
+            qualities = [ArgumentQualitySentence(
+                document.content,
+                self._quality(
+                    generator,
+                    document.content
                 )
-                for sentence in sentences
-            ]
+            )]
 
         return ArgumentQualityRankedDocument(
             id=document.id,
@@ -161,11 +156,9 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
             query: Query,
             ranking: List[ArgumentRankedDocument]
     ) -> List[ArgumentQualityRankedDocument]:
-        download_nltk_dependencies("punkt")
         tasks = [
-            self._task(sentence)
+            self._task(document.content)
             for document in ranking
-            for sentence in sent_tokenize(document.content)
         ]
         with self._generator() as generator:
             generator.preload(tasks)
@@ -179,6 +172,5 @@ class HuggingfaceArgumentQualityTagger(ArgumentQualityTagger):
             query: Query,
             document: ArgumentRankedDocument
     ) -> ArgumentQualityRankedDocument:
-        download_nltk_dependencies("punkt")
         with self._generator() as generator:
             return self._tag_document(generator, query, document)
