@@ -57,7 +57,7 @@
         \item High readability
         \item Many IR libabries available
     \end{itemize}
-    \item Three modules: Search, Search-all and Evaluate-all
+    \item Three modules: Search, Run file  and Evaluate
     \item Pipeline consists of
     \begin{itemize}
         \item Query-Expander and Query-Combiner
@@ -65,7 +65,6 @@
         \item Argument quality and stance tagging
         \item Reranking
     \end{itemize}
-    \item Each pipeline step can be activated/deactivated
     \item Indexing and initial retrieval via pyserini~\cite{LinMLYPN2021}
   \end{itemize}
 \end{frame}
@@ -87,7 +86,7 @@
             \item We ask "What are synonyms of the word <token> ?" 
         \end{itemize}
         \item With T0 also new queries from narrative and description
-        \item We ask "Extract a query: <text>"
+        \item We ask "<text> Extract a natural search query from this description."
         \item Combining all new queries with OR
         \item Retrieving ranked list of passages with this new query 
     \end{itemize}
@@ -121,7 +120,7 @@
         \begin{itemize}
             \item Based on IBM Debater API~\cite{BarHaimBDSS2017}
             \item Based on T0
-            \item We ask "Is this sentence positive or negative with respect to <comparative\_object>? <sentence>"
+            \item We ask "<sentence> Is this sentence pro/against <comparative\_object>? yes or no"
         \end{itemize}
         \item It is also possible to expand with sentiments
         \item Both approaches only work for single target stance
