@@ -100,7 +100,7 @@
             \item We ask "<sentence>
             How would you rate the readability and consistency in this sentence? very good, good, bad, very bad"
         \end{itemize}
-        \item IBM API returns a score between 0 and 1
+        \item IBM Debater API returns a score between 0 and 1
         \item 0 means lowest quality and 1 highest quality
     \end{itemize}
     \begin{block}{Example}
@@ -130,10 +130,43 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Reranking}
+\begin{frame}{Axiomatic Reranking}
+  \begin{itemize}
+    \item Compute preferences between documents (\(\triangleq\) axioms)
+    \item Multiple axioms vote against the original ranking
+    \item Rerank with KwikSort~\cite{hagen:2016d}
+  \end{itemize}
+  \begin{block}{Argumentative Axioms}
+    \begin{description}
+      \item[ArgUC] Prefer more argumentative units~\cite{bondarenko:2018}
+      \item[QTArg] Prefer more query terms in argumentative units~\cite{bondarenko:2018}
+      \item[QTPArg] Prefer earlier query terms in argumentative units~\cite{bondarenko:2018}
+      \item[aSL] Prefer sentences with 12--20 words~\cite{bondarenkoaxiomatic}
+      \item[CompArg] Prefer more comparative objects in argumentative units
+      \item[CompPArg] Prefer earlier comparative objects in argumentative units
+      \item[ArgQ] Prefer higher argument quality
+    \end{description}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Fairness Reranking}
+  \begin{itemize}
+    \item Idea: prefer subjective arguments over neutral arguments \\
+    but guarantee fair exposure for each stance (pro/con)
+    \item Alternating stance
     \begin{itemize}
-        \item Foo
+      \item Three filtered lists by stance: first, second, neutral/other
+      \item Alternately select from first/second list
+      \item Fallback to neutral list if first/second list is empty
     \end{itemize}
+    \item Balanced top-\(k\) stance
+    \begin{itemize}
+      \item Count number of documents pro first or pro second in top-\(k\) ranking
+      \item If difference~\(>1\): \\
+      Move last pro first document from top-\(k\) ranking \\
+      after the first pro second document after top-\(k\) ranking
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Final Remarks}
