@@ -80,10 +80,10 @@
         \begin{itemize}
             \item Based on embeddings with glove
             \item Based on language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}
-            \item We ask "What are synonyms of the word <token> ?" 
+            \item We ask: \textttsmall{What are synonyms of the word <token> ?}
         \end{itemize}
         \item With T0 also new queries from narrative and description
-        \item We ask "<text> Extract a natural search query from this description."
+        \item We ask: \textttsmall{<text> Extract a natural search query from this description.}
         \item Combining all new queries with OR
         \item Retrieving ranked list of passages with this new query 
     \end{itemize}
@@ -97,8 +97,7 @@
         \begin{itemize}
             \item Based IBM Debater API~\cite{ToledoG2019}
             \item Based on T0
-            \item We ask "<sentence>
-            How would you rate the readability and consistency in this sentence? very good, good, bad, very bad"
+            \item We ask: \textttsmall{<sentence> How would you rate the readability and consistency in this sentence? very good, good, bad, very bad}
         \end{itemize}
         \item IBM Debater API returns a score between 0 and 1
         \item 0 means lowest quality and 1 highest quality
@@ -117,7 +116,7 @@
         \begin{itemize}
             \item Based on IBM Debater API~\cite{BarHaimBDSS2017}
             \item Based on T0
-            \item We ask "<sentence> Is this sentence pro/against <comparative\_object>? yes or no"
+            \item We ask: \textttsmall{<sentence> Is this sentence pro/against <comparative\_object>? yes or no}
         \end{itemize}
         \item It is also possible to expand with sentiments
         \item Both approaches only work for single target stance
@@ -162,18 +161,28 @@
     \item Balanced top-\(k\) stance
     \begin{itemize}
       \item Count number of documents pro first or pro second in top-\(k\) ranking
-      \item If difference~\(>1\): \\
+      \item If first~-~second~\(>1\): \\
       Move last pro first document from top-\(k\) ranking \\
       after the first pro second document after top-\(k\) ranking
     \end{itemize}
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Evaluation}
+    \begin{itemize}
+      \item Use Qrels from Touché 2020/2021
+      \item Problem: recent years used whole documents, we're retrieving passages
+      \item If a document is relevant all of its passages are relevant
+      \item Map passage IDs to document IDs, only 13\,\% have judgements
+      \item Underestimates performance
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Final Remarks}
     \begin{itemize}
-        \item Approach is very flexible 
+        \item Approach is very flexible
         \item We investigate influence of components w.r.t the retrieval score
-        \item Stance classification may be better with Roberta approach
+        \item Stance classification may be better with RoBERTa approach
         \item We cannot distinguish between neutral and no stance
         \item We investigate how reranking influences the retrieval score
         \item T0 solves a lot of IR tasks
