@@ -35,34 +35,34 @@
     \item Task 2 of Touché: Argument Retrieval
     \item Argument Retrieval for Comparative Questions
     \item Task: Retrieve relevant passages to answer comparative questions and detect their stance w.r.t the objects
-    \item Data: > 1 million text passages  
+    \item Data: > 1 million text passages from the ClueWeb
   \end{itemize}
   \begin{figure}
       \centering
       \includegraphics[height=4.8cm, width=8cm]{figures/touche}\\
-      \begin{footnotesize}
-        \url{https://mobile.twitter.com/webis_de/status/1468529926026534913?cxt=HHwWgoC97fyLouEoAAAA}
-      \end{footnotesize}  
+      \begin{tiny}
+        \url{https://twitter.com/webis_de/status/1468529926026534913}
+      \end{tiny}
   \end{figure}
 \end{frame}
 
 \begin{frame}{General approach}
   \begin{itemize}
-    \item Programmed in Python
+    \item Python interface
     \begin{itemize}
         \item Easy to use
         \item High readability
-        \item Many IR libabries available
+        \item Many IR libraries available
     \end{itemize}
-    \item Three modules: Search, Run file  and Evaluate
+    \item Three modules: search, run file (batch retrieval) and evaluation
     \item Pipeline consists of
     \begin{itemize}
-        \item Query-Expander and Query-Combiner
-        \item Initial Retrieval
+        \item Query-expander and Query-combiner
+        \item Initial retrieval
         \item Argument quality and stance tagging
         \item Reranking
     \end{itemize}
-    \item Indexing and initial retrieval via pyserini~\cite{LinMLYPN2021}
+    \item Indexing and initial retrieval via Pyserini~\cite{LinMLYPN2021}
   \end{itemize}
 \end{frame}
 
@@ -76,23 +76,23 @@
 \begin{frame}{Query-Expander and Query-Combiner}
     \begin{itemize}
         \item Expanding queries with synonyms of comparative objects
-        \item Two Different approaches
+        \item Two different approaches
         \begin{itemize}
-            \item Based on embeddings with glove
-            \item Based on language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}
+            \item Based on embeddings with GloVe
+            \item Based on T0 language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}
             \item We ask: \textttsmall{What are synonyms of the word <token> ?}
         \end{itemize}
-        \item With T0 also new queries from narrative and description
+        \item With T0 extract new queries from narrative and description
         \item We ask: \textttsmall{<text> Extract a natural search query from this description.}
-        \item Combining all new queries with OR
-        \item Retrieving ranked list of passages with this new query 
+        \item Combine all new queries with OR
+        \item Retrieve ranked list of passages with this new query
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Argument quality tagging}
     \begin{itemize}
-        \item Extracting arguments with TARGER~\cite{ChernodubOHBHBP2019}
-        \item For each argument we want to know the quality w.r.t. the topic
+        \item Extract arguments with TARGER~\cite{ChernodubOHBHBP2019}
+        \item For each argument we want to know the quality w.r.t the topic
         \item Two different approaches
         \begin{itemize}
             \item Based IBM Debater API~\cite{ToledoG2019}
@@ -111,7 +111,7 @@
 
 \begin{frame}{Argument stance tagging}
     \begin{itemize}
-        \item Next we want to know the stance w.r.t. the topic
+        \item Next we want to know the stance w.r.t the topic
         \item Two different approaches
         \begin{itemize}
             \item Based on IBM Debater API~\cite{BarHaimBDSS2017}
@@ -181,12 +181,12 @@
 \begin{frame}{Final Remarks}
     \begin{itemize}
         \item Approach is very flexible
-        \item We investigate influence of components w.r.t the retrieval score
+        \item Influence of different components w.r.t the retrieval score
         \item Stance classification may be better with RoBERTa approach
         \item We cannot distinguish between neutral and no stance
-        \item We investigate how reranking influences the retrieval score
-        \item T0 solves a lot of IR tasks
-        \item Is it possible to only use T0 for retrieval?
+        \item New argumentative axioms
+        \item T0 solves a lot of IR tasks, \\
+        but is T0 \emph{all} you need for retrieval?
     \end{itemize}
     \thankyou
 \end{frame}
