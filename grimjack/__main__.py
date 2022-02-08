@@ -316,7 +316,7 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         dest="stance_tagger",
         type=str,
         choices=_STANCE_TAGGER_TYPES.keys(),
-        default="obj"
+        default="object"
     )
     parser.add_argument(
         "--stance-threshold",
