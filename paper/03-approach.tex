@@ -9,6 +9,7 @@
     \end{figure}
 
     \subsection{Query Reformulation and Query Combiner}
+        In this component we (a) replaced the comparative objects with synonyms and (b) used the additional information narrative and description  provided by the organizers of the shared task to generate additional queries. Using synonyms will allow us to increase the recall of our initial retrieval step by retrieving passages that contain terms similiar to the terms from the original query but would not be retrieved when using only the original query. With an higher recall we will be able to find more relevant passages which we will rerank in our last step to improve the precision of our approach. To find synonyms we used two different methods. The first method uses word embeddings and the second one uses the language model T0.    
     \subsection{Retrieval of passages}
     \subsection{Argument quality and stance tagging}
     \subsection{Axiomatic Reranker}
