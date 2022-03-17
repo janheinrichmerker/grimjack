@@ -1,67 +1,47 @@
-%% The first command in your LaTeX source must be the \documentclass command.
-%%
-%% Options:
-%% twocolumn : Two column layout.
-%% hf: enable header and footer.
-\documentclass[
-% twocolumn,
-% hf,
-]{ceurart}
+\documentclass{ceurart}
 
-%%
-%% One can fix some overfulls
-% \sloppy
-
-%%
-%% Minted listings support 
-%% Need pygment <http://pygments.org/> <http://pypi.python.org/pypi/Pygments>
-% \usepackage{minted}
-%% auto break lines
-% \setminted{breaklines=true}
-%%
-%% end of the preamble, start of the body of the document source.
 \usepackage{booktabs}
+
 \begin{document}
 
-%%
-%% Rights management information.
-%% CC-BY is default license.
 \copyrightyear{2022}
-\copyrightclause{Copyright for this paper by its authors.
-	Use permitted under Creative Commons License Attribution 4.0
-	International (CC BY 4.0).}
+\copyrightclause{%
+  Copyright for this paper by its authors.
+	Use permitted under Creative Commons License Attribution~4.0
+	International~(CC~BY~4.0).%
+}
+\conference{%
+  CLEF~2021 -- 
+  Conference and Labs of the Evaluation Forum, 
+	September~5--8,~2022,
+  Bologna, Italy%
+}
 
-%%
-%% This command is for the conference information
-\conference{CLEF 2021 -- Conference and Labs of the Evaluation Forum, 
-	September 5--8, 2022, Bologna, Italy}
+\title{%
+  Grimjack at Touché 2022:\\
+  Answering Comparative Questions with Axiomatic Reranking and Query Reformulation%
+}
+\title[mode=sub]{%
+  Notebook for the Touché Lab on Argument Retrieval at CLEF~2022%
+}
 
-%%
-%% The "title" command
-%% Do not remove the subtitle Notebook for the Touch{\'e} Lab on Argument Retrieval at CLEF 2021
-\title{Grimjack at Touché 2022:\\ Answering of Comparative Questions with Query Reformulation and Axiomatic Reranking}
-\title[mode=sub]{Notebook for the Touch{\'e} Lab on Argument Retrieval at CLEF 2022}
-
-%%
-%% The "author" command and its associated commands are used to define
-%% the authors and their affiliations.
-\author[1]{Jan Heinrich Reimer}[%
-email=jan.reimer@student.uni-halle.de,
-url=https://github.com/heinrichreimer,
+\author[1]{Jan Heinrich Reimer}[
+  orcid=0000-0003-1992-8696,
+  email=jan.reimer@student.uni-halle.de,
+  url=https://heinrichreimer.com,
 ]
-\address[1]{Martin-Luther-University Halle-Wittenberg,
-Universitätsplatz 10, Halle, 06108, Germany}
-
-\author[1]{Johannes Huck}[%
-email=johannes.huck@student.uni-halle.de,
-url=https://github.com/johannes-huck,
+\author[1]{Johannes Huck}[
+  email=johannes.huck@student.uni-halle.de,
+  url=https://github.com/johannes-huck,
 ]
+
+\address[1]{%
+  Martin-Luther-Universität Halle-Wittenberg,
+  06099~Halle~(Saale), Germany
+}
 
 \input{00-abstract.tex}
 
-%%
-%% This command processes the author and affiliation and title
-%% information and builds the first part of the formatted document.
 \maketitle
 
 \input{01-introduction.tex}
@@ -73,6 +53,3 @@ url=https://github.com/johannes-huck,
 \bibliography{../literature/literature.bib}
 
 \end{document}
-
-%%
-%% End of file
