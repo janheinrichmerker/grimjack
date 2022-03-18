@@ -25,7 +25,7 @@ Our first method uses the GloVe~\cite{PenningtonSM2014} embeddings to determine 
 We use different datasets for the GloVe embeddings which originate from different domains to evaluate which datasets computes the best synonyms for our approach.
 We experimented with datasets from Wikipedia and Twitter with different sizes.
 The second method to obtain synonyms is based on the language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the model the following question: \texttt{What are synonyms of the word <token> ?} where \texttt{<token>} is the comparative object\todo{s}.
+We ask the model the following question: \query{What are synonyms of the word <token> ?} where \query{<token>} is the comparative object\todo{s}.
 The language model will return an answer string with one or more synonyms for the specified token.
 Both methods return synonyms for the comparative objects and the new queries will be the original query where the comparative objects have been replaced by these synonyms.
 So we will have the original query and the replaced ones.
@@ -33,7 +33,7 @@ So we will have the original query and the replaced ones.
 Another method to generate additional queries is to incorporate the information provided by the narrative and description fields from the topics for the shared task.
 Here we can find information about the actual information need and which passages are relevant for the query. So we use this information to generate new queries because this is valuable information about which passages to retrieve.
 To generate new queries we again use the language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the model the following question: \texttt{<text>. Extract a natural search query from this description.} where \texttt{<text>} is either the topic's narrative or description.
+We ask the model the following question: \query{<text>. Extract a natural search query from this description.} where \query{<text>} is either the topic's narrative or description.
 This results in an answer string of the language model which contains a query extracted from the provided text. \todo{Examples for generated queries.}
 
 The query combiner takes the original query, every new computed query from the query reformulation step, and the new queries from the narrative and description fields as inputs and builds an OR-query.
@@ -70,8 +70,8 @@ The API then determines how good the quality of each argument with regards to th
 We will get back a quality score ranging from 0 to 1 from the API where 0 means very poor argument quality and 1 means very good argument quality.
 \citet{ToledoG2019} describe in their paper which dataset and which methods have been used to develop the argument quality classifier.
 A second method to obtain the argument quality is to use T0.
-We can ask T0 the following question: \texttt{<sentence>. How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \texttt{<sentence>} is one sentence of a passage.
-This results in \texttt{very good}, \texttt{good}, \texttt{bad}, or \texttt{very bad} depending on the decision of T0 regarding the argument quality.
+We can ask T0 the following question: \query{<sentence>. How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \query{<sentence>} is one sentence of a passage.
+This results in \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on the decision of T0 regarding the argument quality.
 We then map the output of T0 to numeric values to ensure a consistent quality calculation.
 Very bad will get the value 0, bad the value 0.25, good the value 0.75, and very good the value 1. \todo{Move to table.}
 
@@ -87,8 +87,8 @@ We cannot only use the comparative objects but also sentiments like comparative 
 We can then build the mean of several stance classifications instead of just one for each comparative object.
 It is also possible to work with thresholds to determine when the difference is too low to be counted for or against then we will register the stance as neutral.
 \citet{BarHaimBDSS2017} describe which dataset and which methods have been used to develop the argument quality classifier.
-For the second method via T0 we ask: \texttt{<sentence> Is this sentence pro <comparative\_object>? yes or no} and \texttt{<sentence> Is this sentence against <comparative\_object>? yes or no} where \texttt{<sentence>} is one sentence of the passage.
-This results in two answers \texttt{yes} or \texttt{no} which we will map as follows: \todo{Describe T0 stance values.}
+For the second method via T0 we ask: \query{<sentence> Is this sentence pro <comparative\_object>? yes or no} and \query{<sentence> Is this sentence against <comparative\_object>? yes or no} where \query{<sentence>} is one sentence of the passage.
+This results in two answers \query{yes} or \query{no} which we will map as follows: \todo{Describe T0 stance values.}
 We can then compute the stance analogous to the version via the IBM Debater API.
 
 \subsection{Axiomatic Reranker}
