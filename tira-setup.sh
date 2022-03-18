@@ -19,3 +19,6 @@ apt-get -y update && apt-get -y install \
 pip3 install --upgrade \
   pip \
   pipenv
+
+# Install project dependencies.
+pipenv install --deploy

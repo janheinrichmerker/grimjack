@@ -20,9 +20,6 @@ input_topic_file="$input_dir/$topic_file_name"
 input_documents_file="$input_dir/$documents_file_name"
 output_run_file="$output_dir/$run_file_name"
 
-# Install project dependencies.
-pipenv install --deploy
-
 # Generate internal run file.
 pipenv run python -m grimjack \
   --topics-path "$input_topic_file" \
