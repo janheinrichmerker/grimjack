@@ -1,17 +1,17 @@
 \section{Approach}\label{approach}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/pipeline.png}
+    \caption{Architecture Overview. Dotted lines denote optional steps.}
+    \label{figure-pipeline}
+\end{figure}
+
 In this chapter, we will have a closer look at the different components of our approach.
 In Figure~\ref{figure-pipeline} you can see an overview of our approach.
 As mentioned in Section~\ref{intro}, our approach consists of four components.
 In Figure~\ref{figure-pipeline} there are five components, this is because we implemented an evaluator component to evaluate our results during development.
 For evaluation, we used the topics and the corpus from previous years of Touché~(2021 and 2020).
-
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.4]{figures/pipeline}
-\caption{Architecture Overview. Dotted lines mean optional steps.}
-\label{figure-pipeline}
-\end{figure}
 
 \subsection{Query Reformulation and Query Combiner}\label{reformulation}
 
@@ -43,7 +43,7 @@ Firstly, it is way easier to work with just one query.
 This is because multiple queries will result in multiple result sets which have to be interleaved.
 Interleaving is not trivial and there are multiple interleaving strategies each with its caveats.
 Second, the OR-query will allow us to increase the recall and synonyms which might be not present in the corpus will not result in an empty result set.
-In Figure~\ref{fig:pipeline} you can see that there are dotted lines for the query reformulation and combining step.
+In Figure~\ref{figure-pipeline} you can see that there are dotted lines for the query reformulation and combining step.
 This means that these steps are optional.
 It is possible to use multiple reformulated and expanded new queries from these steps but it is also possible to just use the original query.
 
@@ -68,7 +68,7 @@ The first method is based on the IBM Debater API~\footnote{\url{https://early-ac
 Here we send all sentences from one passage as arguments and the original query as the topic to the API.
 The API then determines how good the quality of each argument with regards to the topic is.
 We will get back a quality score ranging from 0 to 1 from the API where 0 means very poor argument quality and 1 means very good argument quality.
-\citet{ToledoG2019} describe in their paper which dataset and which methods have been used to develop the argument quality classifier.
+\citet{ToledoGCFVLJAS2019} describe which dataset and which methods have been used to develop the argument quality classifier.
 A second method to obtain the argument quality is to use T0.
 We can ask T0 the following question: \query{<sentence>. How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \query{<sentence>} is one sentence of a passage.
 This results in \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on the decision of T0 regarding the argument quality.
@@ -93,18 +93,6 @@ We can then compute the stance analogous to the version via the IBM Debater API.
 
 \subsection{Axiomatic Reranker}
 
-At the end of our pipeline is the axiomatic reranker which will rerank the retrieved passages from our retrieval step (c.f. Section~\ref{retrieval}).
-We use a reranker because in our first pipeline step we increased the recall by using different queries instead of just the original one.
-But a good retrieval result set will be precision focused.
-The reranker will help us to rearrange the passage in a manner so that the best passages will be at the top of the resulting ranking and therefore we will optimize for measurements that lay their focus on the top results rather than the whole set.
-To accomplish this task we will compute preferences between passages via axioms.
-Axioms are rules which will vote for or against the original ranking.
-By computing axioms between pairs of passages, we can observe which passage should be above or below another passage.
-The actual reranking will be done by the algorithm KwikSort~\cite{hagen:2016d}.
-In Table \ref{table-axioms} we list the axioms used in our pipeline.
-
-Additional to this reranker which only relies on axioms we also implemented a fairness reranker whose purpose is to produce fair rankings. Fair here means that pro and con arguments appear balanced while preferring subjective arguments over neutral arguments. For this reranking approach, we implemented two different strategies. The first strategy is called alternating stance. Here we have three lists one with only pro arguments regarding comparative object 1, one with only pro arguments regarding comparative object 2, and one with neutral arguments. We then alternately select from the first two lists. If one or both lists are empty we fall back to the neutral list. The second strategy is called balanced top-k stance. Here we count the passages pro the first comparative object and pro the second comparative object in our top-k ranking. If the difference between the two numbers is greater than 1 we move the last pro first comparative object passage from the top-k ranking after the first pro-second comparative object passage after the top-k ranking.     
-
 \begin{table}
     \caption{Axioms used in our pipeline. Axioms without citations are our own work.}
     \label{table-axioms}
@@ -112,16 +100,28 @@ Additional to this reranker which only relies on axioms we also implemented a fa
         \toprule
         \textbf{Name} & \textbf{Description} \\
         \midrule
-        ArgUC~\cite{bondarenko:2018} & Prefer more argumentative units. \\
-        QTArg~\cite{bondarenko:2018} & Prefer more query terms in argumentative units. \\
-        QTPArg~\cite{bondarenko:2018} & Prefer earlier query terms in argumentative units. \\
-        aSL~\cite{bondarenkoaxiomatic} & Prefer passages with 12–20 words per sentence. \\
+        ArgUC~\cite{BondarenkoHVSPB2018} & Prefer more argumentative units. \\
+        QTArg~\cite{BondarenkoHVSPB2018} & Prefer more query terms in argumentative units. \\
+        QTPArg~\cite{BondarenkoHVSPB2018} & Prefer earlier query terms in argumentative units. \\
+        aSLDoc~\cite{BondarenkoFKHVS2019} & Prefer passages with 12--20 words per sentence. \\
         CompArg & Prefer more comparative objects in argumentative units. \\
         CompPArg & Prefer earlier comparative objects in argumentative units. \\
         ArgQ & Prefer higher argument quality. \\ 
         \bottomrule
     \end{tabular}
 \end{table}
+
+At the end of our pipeline is the axiomatic reranker which will rerank the retrieved passages from our retrieval step (c.f. Section~\ref{retrieval}).
+We use a reranker because in our first pipeline step we increased the recall by using different queries instead of just the original one.
+But a good retrieval result set will be precision focused.
+The reranker will help us to rearrange the passage in a manner so that the best passages will be at the top of the resulting ranking and therefore we will optimize for measurements that lay their focus on the top results rather than the whole set.
+To accomplish this task we will compute preferences between passages via axioms.
+Axioms are rules which will vote for or against the original ranking.
+By computing axioms between pairs of passages, we can observe which passage should be above or below another passage.
+For re-ranking, we use the \iraxioms framework\footnote{\url{https://github.com/webis-de/ir_axioms/}} with the KwikSort algorithm~\cite{HagenVGS2016}.
+In Table \ref{table-axioms} we list the axioms used in our pipeline.
+
+Additional to this reranker which only relies on axioms we also implemented a fairness reranker whose purpose is to produce fair rankings. Fair here means that pro and con arguments appear balanced while preferring subjective arguments over neutral arguments. For this reranking approach, we implemented two different strategies. The first strategy is called alternating stance. Here we have three lists one with only pro arguments regarding comparative object 1, one with only pro arguments regarding comparative object 2, and one with neutral arguments. We then alternately select from the first two lists. If one or both lists are empty we fall back to the neutral list. The second strategy is called balanced top-k stance. Here we count the passages pro the first comparative object and pro the second comparative object in our top-k ranking. If the difference between the two numbers is greater than 1 we move the last pro first comparative object passage from the top-k ranking after the first pro-second comparative object passage after the top-\(k\) ranking.
 
 \subsection{Submitted Runs}
 

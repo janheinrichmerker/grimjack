@@ -1,25 +1,28 @@
 \section{Related Work}
 
+Answering comparative questions 
+The Touché Lab on Argument Retrieval is a
+
 Since the shared task, we participated in is in its third edition this year the most related work has been done in the two previous years.
 So we will have a look at the years 2020 and 2021 of the Touché shared task 2: Answering of Comparative Questions.
 
 \subsection{Touchè 2020: Argument Retrieval}
 
-In 2020 the task was to retrieve documents from the ClueWeb12 corpus to answer comparative questions like \textit{Is X better than Y with respect to Z?}.
+In 2020 the task was to retrieve documents from the ClueWeb12 corpus to answer comparative questions like \query{Is X better than Y with respect to Z?}.
 The resulting documents should contain documents with convincing arguments for or against the comparative questions in contrast to current search engines which may display only one (short) answer.
 For this task, five teams submitted eleven runs.
 We now will have a look at the two best runs: Team Bilbo Baggins and Team Inigo NMontoya~\cite{BondarenkoFBGAPBSWPH2020}
 
 Team Bilbo Baggins has developed a retrieval pipeline with four steps.
 In their first one, they analyze the query and determine entities that compare.
-Then they expand the queries with synonyms and antonyms of the found entities and send those queries to ChatNoir\footnote{\url{https://chatnoir.eu/}}~\todocite.
-\todo{ChatNoir uses BM25F.~\todocite}
+Then they expand the queries with synonyms and antonyms of the found entities and send those queries to ChatNoir\footnote{\url{https://chatnoir.eu/}}~\cite{BevendorffSHP2018}.
+\todo{ChatNoir uses BM25F.~\cite{PotthastHSGMTW2012}}
 In the second step, they conduct argument mining and calculate the document quality by evidence mining and link analysis.
 The third step consists of summing up the collected scores and building relevance, support, and credibility scores.
 In their final step, they build weighting scores and rerank the documents by multiplying the weighting scores with the sum of the aforementioned scores.
 Team Bilbo Baggins scored first place in 2020 with an \nDCG@5 score of 0.580~\cite{AbyeST2020}.
 
-The second place in 2020 (Team Inigo Montoya) queries ChatNoir~\todocite with the original queries and processes the first 20 results further.
+The second place in 2020 (Team Inigo Montoya) queries ChatNoir~\cite{BevendorffSHP2018} with the original queries and processes the first 20 results further.
 These results are sent to TARGER~\cite{ChernodubOHBHBP2019} to determine their premise and claims.
 Arguments from one web page will then be stored in one document.
 These argument documents will then be indexed and queried with Okapi BM25 and the top 20 results will be displayed.
@@ -31,12 +34,12 @@ The task for 2021 was the same as for 2020.
 So participants were asked to retrieve relevant documents from the ClueWeb12 corpus for comparative questions.
 However, the provided topics and therefore the queries have been changed.
 In 2021 there were six submitted runs.
-We now will have a look at the two best runs regarding the \nDCG@5: Team Katana and Team Thor~\cite{BondarenkoFBGAPBSWPH2021}
+We now will have a look at the two best runs regarding the \nDCG@5: Team Katana and Team Thor~\cite{BondarenkoGFBAPBSWPH2021}
 
-Team Katana queries the search engine ChatNoir~\todocite with the provided topics and extracts up to 100 unique documents from the result set.
+Team Katana queries the search engine ChatNoir~\cite{BevendorffSHP2018} with the provided topics and extracts up to 100 unique documents from the result set.
 Then they clean the documents. \todo{How?}
 After that, they rerank the documents by one of their developed models.
-Their models are feature-based machine learning models with features from PyTerrier, specific comparative features, and scores from the ChatNoir system. They developed the following ranking models:
+Their models are feature-based machine learning models with features from PyTerrier, specific comparativetodocite features, and scores from the ChatNoir system. They developed the following ranking models:
 (1) an XGBoost~\todocite approach, (2) a LightGBM~\todocite approach, (3) Random Forests, and (4) a \Bert-based~\todocite ranker.
 Team Katana scored first place with an \nDCG@5 of 0.489~\cite{ChekalinaP2021}.
 

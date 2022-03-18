@@ -1,6 +1,6 @@
 \section{Introduction}\label{intro}
 
-Current information retrieval systems are well able to answer keyword queries and also simple questions but will struggle with comparative questions due to their complex linguistic structure and ambiguous information need.
+Current information retrieval systems are well able to answer keyword queries and also simple questions but struggle with comparative questions due to their complex linguistic structure and ambiguous information need.
 It is also challenging to retrieve a non-biased and balanced result set for comparative questions since not every comparative question will have a balanced set of arguments for and against it.
 When asking such comparative questions users do want to see as many as possible arguments for their question ordered by the strength of the arguments.
 So systems which want to answer such questions must be able to determine argument quality and also their stance to classify which argument is for or against the comparative object.
@@ -14,4 +14,4 @@ The first component is a query reformulation step which combines different queri
 The second component retrieves passages with this new query.
 Our third component determines the argument quality and the stance towards the comparative objects.
 The last component is an axiomatic reranker which incorporates argument quality and other various features to rerank the retrieved passages.
-The mentioned components will be discussed in-depth in chapter \ref{approach}. The approach has been coded in Python and Pyserini\footnote{\url{https://github.com/castorini/pyserini}}~\cite{LinMLYPN2021} has been used to accomplish the indexing step and the retrieval step.
+The mentioned components will be discussed in-depth in Section~\ref{approach}. The approach has been coded in Python and Pyserini\footnote{\url{https://github.com/castorini/pyserini}}~\cite{LinMLYPN2021} has been used to accomplish the indexing step and the retrieval step.
