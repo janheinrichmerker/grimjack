@@ -122,8 +122,12 @@ class EmbeddingComparativeSynonymsQueryExpander(
     @cached_property
     def _embeddings(self):
         logger.info(f"Loading embeddings from {self.embeddings_path}.")
-        from spacy.cli import download
-        download("en")
+        from spacy import load
+        try:
+            load("en_core_web_sm")
+        except IOError:
+            from spacy.cli import download
+            download("en_core_web_sm")
         from pymagnitude import Magnitude
         return Magnitude(self.embeddings_path)
 
