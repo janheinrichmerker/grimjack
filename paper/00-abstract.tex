@@ -1,12 +1,17 @@
 \begin{abstract}
-    In this paper, we (Team Grimjack) propose an approach to answer comparative questions and detect the stance of the resulting passages towards the comparison object. The approach consists of four components: (a) Query Reformulation and Query Combiner, (b) Retrieval of passages (c) Argument quality and stance tagging, and (d) Axiomatic reranking. We show how the language model T0 can be used to accomplish query reformulation and tagging of argument quality and stance. Furthermore, we propose different reranking strategies originating from different user models.      
+  We, Team Grimjack, present \todo{four} approaches for answering comparative questions, submitted to the Touché Lab on Argument Retrieval.
+  Our approaches follow two objectives: ranking argumentative and high-quality documents first, and exposing arguments of different stances towards the compared objects fairly in high ranking positions.
+  We therefore propose a multi-stage retrieval pipeline with query reformulation and merging, baseline retrieval, quality and stance tagging, and different task-specific re-ranking steps.
+  First, we re-rank aiomatically based on argumentative retrieval axioms.
+  Second, we re-rank to ensure fair exposure across argument stances.
+  In all retrieval steps, we use the T0 language model to evaluate whether zero-shot language models can successfully answer comparative questions.
 \end{abstract}
 
 \begin{keywords}
-    Axiomatic Reranking \sep
-    Query Reformulation \sep
-    T0 \sep
-    Argument Quality \sep
-    Argument Stance \sep
-    CEUR-WS
+  Axiomatic Reranking \sep
+  Query Reformulation \sep
+  T0 \sep
+  Argument Quality \sep
+  Argument Stance \sep
+  CEUR-WS
 \end{keywords}
