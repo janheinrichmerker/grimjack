@@ -20,6 +20,11 @@ input_topic_file="$input_dir/$topic_file_name"
 input_documents_file="$input_dir/$documents_file_name"
 output_run_file="$output_dir/$run_file_name"
 
+# List input and output files.
+ls -l "$input_topic_file"
+ls -l "$input_documents_file"
+ls -l "$output_run_file"
+
 # Generate internal run file.
 pipenv run python -m grimjack \
   --topics-path "$input_topic_file" \
