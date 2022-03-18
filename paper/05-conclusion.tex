@@ -1,5 +1,22 @@
 \section{Conclusion}
-    We have seen an approach to tackle the task of answering comparative questions and detecting the stance of the returned passages regarding the comparative objects. Our approach combines query reformulation/expansion techniques with axiomatic reranking and shows two principle ways of determining the argument quality and stance. Our work expands previous work from earlier years of the shared task by using different techniques to expand the original queries and also incorporates the information from the description and narrative field. We also use axiomatic reranking in contrast to reranking based solely on weighting scores.\par
-    We have seen in chapter \ref{evaluation} that query expansion/reformulation and the additional information from the narrative and description field can provide a better search result. But it is also possible that the result gets slightly worse in comparison to not using query expansion/reformulation at all. This is because with these techniques we will alter the search terms used and some synonyms could lead to passages that do not comply with the user's information need. The axiomatic reranking proves to be robust and reliable but sometimes it can not compensate for the errors from the query expansion/reformulation and passages which were relevant will be further down in the ranking.\par 
-    Difficulties arise for our stance classification since we solely rely on external APIs which only provide a single-target stance. Firstly, computing the multi-target stance from a single-target stance proved to be challenging. Second, our approach can not decide between no argument present and neutral stance which is a big caveat. The performance of our classification could be improved by using BERT models or other machine learning-based approaches which can predict a multi-target stance. An interesting question arose during our research: Is it possible to only use the language model T0 to develop an information retrieval pipeline?\par
-    There are many different challenging problems to solve to create an information retrieval pipeline to answer comparative questions. Our approach proposed several possibilities for how to solve them each with its limitations and caveats.
+
+We have seen an approach to tackle the task of answering comparative questions and detecting the stance of the returned passages regarding the comparative objects.
+Our approach combines query reformulation/expansion techniques with axiomatic reranking and shows two principle ways of determining the argument quality and stance.
+Our work expands previous work from earlier years of the shared task by using different techniques to expand the original queries and also incorporates the information from the description and narrative field.
+We also use axiomatic reranking in contrast to reranking based solely on weighting scores.
+
+We have seen in Section~\ref{evaluation} that query expansion/reformulation and the additional information from the narrative and description field can provide a better search result.
+But it is also possible that the result gets slightly worse in comparison to not using query expansion/reformulation at all.
+This is because with these techniques we will alter the search terms used and some synonyms could lead to passages that do not comply with the user's information need.
+The axiomatic reranking proves to be robust and reliable but sometimes it can not compensate for the errors from the query expansion/reformulation and passages which were relevant will be further down in the ranking.
+
+Difficulties arise for our stance classification since we solely rely on external APIs which only provide a single-target stance.
+Firstly, computing the multi-target stance from a single-target stance proved to be challenging.
+Second, our approach can not decide between no argument present and neutral stance which is a big caveat.
+The performance of our classification could be improved by using BERT models or other machine learning-based approaches which can predict a multi-target stance.
+An interesting question arose during our research:
+Is it possible to only use the language model T0 to develop an information retrieval pipeline?
+We look forward to evaluate this question in more detail with relevance judgements provided by the shared task organizers.
+
+There are many different challenging problems to solve to create an information retrieval pipeline to answer comparative questions.
+Our approach proposed several possibilities for how to solve them each with its limitations and caveats.
