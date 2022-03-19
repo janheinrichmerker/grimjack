@@ -1,11 +1,6 @@
 \section{Approach}\label{approach}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{figures/pipeline.png}
-    \caption{Architecture Overview. Dotted lines denote optional steps.}
-    \label{figure-pipeline}
-\end{figure}
+\input{figure-pipeline.tex}
 
 In this chapter, we will have a closer look at the different components of our approach.
 In Figure~\ref{figure-pipeline} you can see an overview of our approach.
@@ -93,23 +88,7 @@ We can then compute the stance analogous to the version via the IBM Debater API.
 
 \subsection{Axiomatic Reranker}
 
-\begin{table}
-    \caption{Axioms used in our pipeline. Axioms without citations are our own work.}
-    \label{table-axioms}
-    \begin{tabular}{ll}
-        \toprule
-        \textbf{Name} & \textbf{Description} \\
-        \midrule
-        ArgUC~\cite{BondarenkoHVSPB2018} & Prefer more argumentative units. \\
-        QTArg~\cite{BondarenkoHVSPB2018} & Prefer more query terms in argumentative units. \\
-        QTPArg~\cite{BondarenkoHVSPB2018} & Prefer earlier query terms in argumentative units. \\
-        aSLDoc~\cite{BondarenkoFKHVS2019} & Prefer passages with 12--20 words per sentence. \\
-        CompArg & Prefer more comparative objects in argumentative units. \\
-        CompPArg & Prefer earlier comparative objects in argumentative units. \\
-        ArgQ & Prefer higher argument quality. \\ 
-        \bottomrule
-    \end{tabular}
-\end{table}
+\input{table-axioms.tex}
 
 At the end of our pipeline is the axiomatic reranker which will rerank the retrieved passages from our retrieval step (c.f. Section~\ref{retrieval}).
 We use a reranker because in our first pipeline step we increased the recall by using different queries instead of just the original one.
