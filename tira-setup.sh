@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Install System dependencies.
-sudo apt-get -y update && apt-get -y install \
+sudo apt-get -y update && sudo apt-get -y install \
   git \
   openjdk-11-jdk \
   python3.9 \
