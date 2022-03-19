@@ -16,9 +16,9 @@ apt-get -y update && apt-get -y install \
   python3.9-dev
 
 # Install Python dependencies.
-pip3 install --upgrade \
-  pip \
-  pipenv
+python3.9 -m pip install --upgrade pip
+python3.9 -m pip install --user pipx
+pipx install pipenv
 
 # Install project dependencies.
 pipenv install --deploy
