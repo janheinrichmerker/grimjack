@@ -1,19 +1,22 @@
 \section{Related Work}
 
-Answering comparative questions 
-The Touché Lab on Argument Retrieval is a
+Comparative questions are very common because they help to support personal decisions we routinely face in everyday life~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
+In search engines, people often ask questions like \query{Is \emph{X} better than \emph{Y} with respect to \emph{Z}?}
+However, such questions usually cannot be concluded with one factual answer, but instead require diverse opinions to give a sufficient, argumentative overview.
+Direct answers are convenient, but lack the diligence required to form rational decisions~\cite{BondarenkoFBGAPBSWPH2020,PotthastHS2020}.
+The Touché Lab on Argument Retrieval is a set of shared tasks held to answer controversial and comparative questions using large-scale web corpora.
+In recent years, participants of the Touché shared task on answering comparative questions were challenged to retrieve relevant and high-quality documents from the ClueWeb~12 web corpus~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
+In~2020, five teams submitted eleven runs to 50~comparative topics.
+For~2021, \citeauthor{BondarenkoGFBAPBSWPH2021} introduced 50~new comparative topics and released the relevance labels from~2020 in order to train subsequent learning-to-rank steps or to tune model hyperparameters.
+Six teams submitted runs to this task.
+In this year's third edition, instead, the goal is to find argumentative and relevant passages extracted from ClueWeb~12 documents~\todocite.
+Also, the task organizers present 50~new topics.
 
-Since the shared task, we participated in is in its third edition this year the most related work has been done in the two previous years.
-So we will have a look at the years 2020 and 2021 of the Touché shared task 2: Answering of Comparative Questions.
+\subsection{Review of Touchè~2020 and~2021 Runs}
 
-\subsection{Touchè 2020: Argument Retrieval}
+Even though this edition's task is based on a different corpus, we analyze the two best runs from~2020 and~2021 as per the evaluated \nDCG@5 metric, to follow their best practices.
 
-In 2020 the task was to retrieve documents from the ClueWeb12 corpus to answer comparative questions like \query{Is X better than Y with respect to Z?}.
-The resulting documents should contain documents with convincing arguments for or against the comparative questions in contrast to current search engines which may display only one (short) answer.
-For this task, five teams submitted eleven runs.
-We now will have a look at the two best runs: Team Bilbo Baggins and Team Inigo NMontoya~\cite{BondarenkoFBGAPBSWPH2020}
-
-Team Bilbo Baggins has developed a retrieval pipeline with four steps.
+Team Bilbo Baggins, first place in 2020, has developed a retrieval pipeline with four steps.
 In their first one, they analyze the query and determine entities that compare.
 Then they expand the queries with synonyms and antonyms of the found entities and send those queries to ChatNoir\footnote{\url{https://chatnoir.eu/}}~\cite{BevendorffSHP2018}.
 \todo{ChatNoir uses BM25F.~\cite{PotthastHSGMTW2012}}
@@ -22,28 +25,20 @@ The third step consists of summing up the collected scores and building relevanc
 In their final step, they build weighting scores and rerank the documents by multiplying the weighting scores with the sum of the aforementioned scores.
 Team Bilbo Baggins scored first place in 2020 with an \nDCG@5 score of 0.580~\cite{AbyeST2020}.
 
-The second place in 2020 (Team Inigo Montoya) queries ChatNoir~\cite{BevendorffSHP2018} with the original queries and processes the first 20 results further.
+Team Inigo Montoya, second place in 2020, queries ChatNoir~\cite{BevendorffSHP2018} with the original queries and processes the first 20 results further.
 These results are sent to TARGER~\cite{ChernodubOHBHBP2019} to determine their premise and claims.
 Arguments from one web page will then be stored in one document.
 These argument documents will then be indexed and queried with Okapi BM25 and the top 20 results will be displayed.
 Team Inigo Montoya scored a \nDCG@5 of 0.567~\cite{Huck2020}.
 
-\subsection{Touchè 2021: Argument Retrieval}
-
-The task for 2021 was the same as for 2020.
-So participants were asked to retrieve relevant documents from the ClueWeb12 corpus for comparative questions.
-However, the provided topics and therefore the queries have been changed.
-In 2021 there were six submitted runs.
-We now will have a look at the two best runs regarding the \nDCG@5: Team Katana and Team Thor~\cite{BondarenkoGFBAPBSWPH2021}
-
-Team Katana queries the search engine ChatNoir~\cite{BevendorffSHP2018} with the provided topics and extracts up to 100 unique documents from the result set.
+Team Katana, first place in 2021, queries the search engine ChatNoir~\cite{BevendorffSHP2018} with the provided topics and extracts up to 100 unique documents from the result set.
 Then they clean the documents. \todo{How?}
 After that, they rerank the documents by one of their developed models.
 Their models are feature-based machine learning models with features from PyTerrier, specific comparativetodocite features, and scores from the ChatNoir system. They developed the following ranking models:
 (1) an XGBoost~\todocite approach, (2) a LightGBM~\todocite approach, (3) Random Forests, and (4) a \Bert-based~\todocite ranker.
 Team Katana scored first place with an \nDCG@5 of 0.489~\cite{ChekalinaP2021}.
 
-Team Thor queries the search engine ChatNoir with an AND-Operator and removes every punctation from the topics and the documents found.
+Team Thor, second place in 2021, queries the search engine ChatNoir with an AND-Operator and removes every punctation from the topics and the documents found.
 Additionally, they remove all boilerplate from the documents to extract the main content.
 Then they create an index with Elasticsearch of the first 110~documents returned by ChatNoir~\todocite.
 After that, they expand the original query with synonyms from WordNet.
@@ -51,6 +46,19 @@ Here for every word synonyms will be calculated.
 Lastly, they query their index with Okapi BM25~(\( b = 0.68;~k_1 = 1.2 \)).
 Team Thor achieved an \nDCG@5 of 0.478~\cite{ShirshakovaW2021}.
 
+\subsection{Zero-Shot Language Models}
+
+Large language models like T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} showcase reasonable zero-shot generalization abilities when training with multitask prompts.
+In many unseen tasks, T0 outperforms even larger models, that have not been trained on different tasks.
+\citet{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} release a pre-trained model,~T0++, that was trained on 62~datasets for 12~tasks, the largest number of datasets of all their released models.
+In their experiments they conclude that training zero-shot models on more and diverse prompts consistently improve generalization on unseen tasks.
+We therefore argue that The T0++~model is the best candidate for the new tasks we encounter in argumentat retrieval and scoring.
+
 \subsection{Axiomatic Information Retrieval}
 
-\todo{Quickly introduce axiomatic information retrieval and cite \iraxioms}
+\citet{HagenVGS2016} first propose to use the \KwikSort algorithm to re-rank results in information retrieval based on retrieval axioms.
+Axioms in information retrieval are constraints that ideal retrieval systems should comply to.
+For instance, \citet{FangTZ2004} argue that if two documents are equally long, the document with more query term occurrences should be ranked higher.
+Complementing such general retrieval axioms, \citet{BondarenkoHVSPB2018} introduce task-specific axioms that are tailored to the domain of argumentative information retrieval.
+The recently released \iraxioms\footnote{\url{https://github.com/webis-de/ir_axioms/}} Python framework facilitates defining own task-specific axioms.
+We therefore develop new argumentative axioms that exploit additional context provided by the shared task organizers, e.g., comparative objects.
