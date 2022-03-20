@@ -14,7 +14,7 @@ In this year's third edition, instead, the goal is to find argumentative and rel
 
 \subsection{Review of Touchè~2020 and~2021 Runs}
 
-Even though this edition's task is based on a different corpus, we analyze the two best runs from~2020 and~2021 as per the evaluated \nDCG@5 metric, to follow their best practices.
+Even though this edition's task is based on a different corpus, we analyze the two best runs from~2020 and~2021 as per the evaluated \nDCG{5} metric, to follow their best practices.
 
 Team Bilbo Baggins, first place in 2020, has developed a retrieval pipeline with four steps.
 In their first one, they analyze the query and determine entities that compare.
@@ -23,20 +23,20 @@ Then they expand the queries with synonyms and antonyms of the found entities an
 In the second step, they conduct argument mining and calculate the document quality by evidence mining and link analysis.
 The third step consists of summing up the collected scores and building relevance, support, and credibility scores.
 In their final step, they build weighting scores and rerank the documents by multiplying the weighting scores with the sum of the aforementioned scores.
-Team Bilbo Baggins scored first place in 2020 with an \nDCG@5 score of 0.580~\cite{AbyeST2020}.
+Team Bilbo Baggins scored first place in 2020 with an \nDCG{5} score of 0.580~\cite{AbyeST2020}.
 
 Team Inigo Montoya, second place in 2020, queries ChatNoir~\cite{BevendorffSHP2018} with the original queries and processes the first 20 results further.
 These results are sent to TARGER~\cite{ChernodubOHBHBP2019} to determine their premise and claims.
 Arguments from one web page will then be stored in one document.
 These argument documents will then be indexed and queried with Okapi BM25 and the top 20 results will be displayed.
-Team Inigo Montoya scored a \nDCG@5 of 0.567~\cite{Huck2020}.
+Team Inigo Montoya scored a \nDCG{5} of 0.567~\cite{Huck2020}.
 
 Team Katana, first place in 2021, queries the search engine ChatNoir~\cite{BevendorffSHP2018} with the provided topics and extracts up to 100 unique documents from the result set.
 Then they clean the documents. \todo{How?}
 After that, they rerank the documents by one of their developed models.
 Their models are feature-based machine learning models with features from PyTerrier, specific comparativetodocite features, and scores from the ChatNoir system. They developed the following ranking models:
 (1) an XGBoost~\todocite approach, (2) a LightGBM~\todocite approach, (3) Random Forests, and (4) a \Bert-based~\todocite ranker.
-Team Katana scored first place with an \nDCG@5 of 0.489~\cite{ChekalinaP2021}.
+Team Katana scored first place with an \nDCG{5} of 0.489~\cite{ChekalinaP2021}.
 
 Team Thor, second place in 2021, queries the search engine ChatNoir with an AND-Operator and removes every punctation from the topics and the documents found.
 Additionally, they remove all boilerplate from the documents to extract the main content.
@@ -44,7 +44,7 @@ Then they create an index with Elasticsearch of the first 110~documents returned
 After that, they expand the original query with synonyms from WordNet.
 Here for every word synonyms will be calculated.
 Lastly, they query their index with Okapi BM25~(\( b = 0.68;~k_1 = 1.2 \)).
-Team Thor achieved an \nDCG@5 of 0.478~\cite{ShirshakovaW2021}.
+Team Thor achieved an \nDCG{5} of 0.478~\cite{ShirshakovaW2021}.
 
 \subsection{Zero-Shot Language Models}
 
