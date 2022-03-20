@@ -83,7 +83,7 @@ Retrieve 20 documents by Dirichlet query likelihood for the unmodified query,
 tag arguments using the IBM fastText TARGER model,
 tag argument quality using the IBM Debater API,
 tag argument stance by comparing sentiments for each object using the IBM Debater API,
-treating stance as neutral if under a threshold of 0.5.
+treating stance as neutral if under a threshold of 0.125.
 
 ```shell
 pipenv run python -m grimjack \
