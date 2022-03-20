@@ -14,11 +14,11 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           working_directory: paper
-          root_file: sample-1col.tex
+          root_file: touche-2022-answering-comparative-questions-with-axiomatic-reranking-and-query-reformulation.tex
       - name: "📤 Upload paper"
         uses: actions/upload-artifact@v2
         with:
-          path: paper/sample-1col.pdf
+          path: paper/touche-2022-answering-comparative-questions-with-axiomatic-reranking-and-query-reformulation.pdf
           name: latex-paper
   latex-talk:
     name: "📄 LaTeX talk"
@@ -156,7 +156,7 @@ jobs:
       - name: "📥 Download paper"
         uses: actions/download-artifact@v2
         with:
-          path: sample-1col.pdf
+          path: touche-2022-answering-comparative-questions-with-axiomatic-reranking-and-query-reformulation.pdf
           name: latex-paper
       - name: "📥 Download talk"
         uses: actions/download-artifact@v2
@@ -178,7 +178,7 @@ jobs:
         with:
           name: Release ${{ steps.get-version.outputs.tag }}
           files: |
-            sample-1col.pdf
+            touche-2022-answering-comparative-questions-with-axiomatic-reranking-and-query-reformulation.pdf
             talk.pdf
             coverage.xml
           fail_on_unmatched_files: true
