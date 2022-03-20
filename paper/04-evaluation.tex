@@ -1,10 +1,14 @@
-\section{Evaluation}\label{evaluation}
+\section{Evaluation}
+\label{evaluation}
 
 \todo{Instead of submitting run files (i.e., data), in the Touché Lab on Argument Retrieval, participants must submit their retrieval systems as working software.}
 We successfully deploy our software on the evaluation platform Tira\footnote{https://tira.io/} that \todo{shortly describe purpose of TIRA}.~\todocite
 Our approach can be found under the name \todo{XXXX}.
 The TIRA system automatically evaluates submitted approaches of all shared task participants and reports the \nDCG@5 score.
 The organizers use this site to ensure a reproducible leaderboard.
+
+\subsection{Manual Review of Top-5 Results}
+
 We will now have a closer look at the performance of our approach by looking at the top-5 retrieved passages for three chosen topics by two of the five submitted runs: 
 (1) without query reformulation/expansion and axiomatic reranking and
 (2) with query reformulation/expansion and axiomatic reranking.
@@ -89,3 +93,6 @@ So we can see that different passages have been retrieved for run 1 and run 2.
 For run 2 we would rank the passages as follows: 1-4-5-3-2.
 
 \todo{Little summary of manual evaluations.}
+
+\subsection{Transferring Relevance Judgements from Touché~2020--2021}
+\label{transfer-relevance-judgements}
