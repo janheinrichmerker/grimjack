@@ -1,17 +1,19 @@
 \section{Introduction}\label{intro}
 
-Current information retrieval systems are well able to answer keyword queries and also simple questions but struggle with comparative questions due to their complex linguistic structure and ambiguous information need.
-It is also challenging to retrieve a non-biased and balanced result set for comparative questions since not every comparative question will have a balanced set of arguments for and against it.
-When asking such comparative questions users do want to see as many as possible arguments for their question ordered by the strength of the arguments.
-So systems which want to answer such questions must be able to determine argument quality and also their stance to classify which argument is for or against the comparative object.
-Answering comparative questions will support users in their everyday lives since those questions arise very often and users might struggle with converting those questions into keyword queries.
-Understanding and answering comparative questions will also have the benefit of being able to recognize the user's information need better than simple keyword queries could accomplish this. 
+Current information retrieval systems are well able to answer keyword queries or simple questions but answering comparative questions is still a challenging task~\cite{BondarenkoGFBAPBSWPH2021}.
+Furthermore, current search engines struggle to fight biases~\cite{ShahB2022}.
+We especially recognize the importance to return fair results for comparative questions since a system that only returns arguments in favor of a single comparative object could severly bias a user's decisions towards that object.
+\citet{BondarenkoFKSGBPBSWPH2022} organize the Touché Lab on Argument Retrieval to find different promising approaches that tackle the task of retrieving arguents to comparative questions from a web-scale collection of passages.
+The retrieved arguments should be of high rethorical an argumentative quality but also relevant to the query.
+Additionaly, in~2022 the participants of the Touché shared task should also tag their resulting passages with their stance towards the comparative objects.
+Answering comparative questions supports users in their everyday lives but users might struggle with converting those natural language questions into keyword queries~\cite{BondarenkoGFBAPBSWPH2021}.
 
-During the winter semester 2021/2022 we have participated in the Shared Task 2 of the CLEF Argument Retrieval 2022~\cite{BondarenkoFKSGBPBSWPH2022}.
-The task was to retrieve relevant passages from a subset of the ClueWeb~12 corpus for 50 provided comparative questions. Furthermore, the stance of the passages regarding the comparative object should be determined.
-To accomplish this task we developed an approach that consists of four components.
-The first component is a query reformulation step which combines different queries into one query.
-The second component retrieves passages with this new query.
-Our third component determines the argument quality and the stance towards the comparative objects.
-The last component is an axiomatic reranker which incorporates argument quality and other various features to rerank the retrieved passages.
-The mentioned components will be discussed in-depth in Section~\ref{approach}. The approach has been coded in Python and Pyserini\footnote{\url{https://github.com/castorini/pyserini}}~\cite{LinMLYPN2021} has been used to accomplish the indexing step and the retrieval step.
+We develop a flexible retrieval pipeline to participate in the Touché shared task on argument retrieval for comparative questions~(c.f. Section~\ref{approach}).
+Our approach is developed with Python and Pyserini~\cite{LinMLYPN2021} as an eaily configurable command line application.
+With query reformulation, expansion and combination we relax the initial query and exploit additional topic context such as description and narrative.
+After retrieving candidate passages using query likelihood with Dirichlet smoothing, we tag each passage's argumentative structure, argument quality and the stance towards the comparative objects.
+To improve relevance and quality on high ranks, we then re-rank results axiomatically using specialized argumentative retrieval axioms, incorporating the previously annotated argument quality.
+Two strategies to balance the passages' stances towards the comarative objects showcase fair re-ranking for arguments.
+
+Even though we were unable to transfer enough relevance judgements fro previous editions of the Touché shared tasks, our manual assessment of three topics shows the potential of expanding queries with synonyms and contextual information~(c.f. Section~\ref{evaluation}).
+Different configurations for our submitted runs should pose examples to discuss current doubts about the usefullness of large zero-shot language models like T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} in the field of argumentative information retrieval~\cite{ShahB2022}.
