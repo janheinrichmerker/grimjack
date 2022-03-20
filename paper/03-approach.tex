@@ -2,34 +2,43 @@
 
 \input{figure-pipeline.tex}
 
-In this chapter, we will have a closer look at the different components of our approach.
-In Figure~\ref{figure-pipeline} you can see an overview of our approach.
-As mentioned in Section~\ref{intro}, our approach consists of four components.
-In Figure~\ref{figure-pipeline} there are five components, this is because we implemented an evaluator component to evaluate our results during development.
-For evaluation, we used the topics and the corpus from previous years of Touché~(2021 and 2020).
+We design the architecture of our argumentative retrieval system as a pipeline of multiple steps that subsequently (re-)rank, annotate, or modify the documents or queries given as inputs. This pipeline is shown in Figure~\ref{figure-pipeline}.
+We identify four core steps as most important to our approach:
+\Ni query expansion, reformulation, and combination,
+\Nii first-stage retrieval,
+\Niii argument quality and stance tagging,
+and \Niv axiomatic reranking and fairness reranking.
 
-\subsection{Query Reformulation and Query Combiner}\label{reformulation}
+Additionally, we add an evaluation component that is not shown in Figure~\ref{figure-pipeline} because it is not needed to retrieve results from our system.
+With this evaluation component we can evaluate our system on topics of previous editions~(i.e.,~2021 and~2020) of the Touché Lab on Argument Retrieval~(c.f.~Section~\ref{transfer-relevance-judgements}).
 
-In this component, we (a) replaced the comparative objects with synonyms and (b) used the additional information narrative and description provided by the organizers of the shared task to generate additional queries.
-Using synonyms will allow us to increase the recall of our initial retrieval step by retrieving passages that contain terms similar to the terms from the original query but would not be retrieved when using only the original query.
-With a higher recall, we will be able to find more relevant passages which we will rerank in our last step to improve the precision of our approach.
-To find synonyms we used two different methods.
-The first method uses word embeddings and the second one uses the language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+\subsection{Query Expansion, Reformulation, and Combination}
+\label{reformulation}
 
-Our first method uses the GloVe~\cite{PenningtonSM2014} embeddings to determine which words have the highest similarity score given the comparative objects.
-We use different datasets for the GloVe embeddings which originate from different domains to evaluate which datasets computes the best synonyms for our approach.
-We experimented with datasets from Wikipedia and Twitter with different sizes.
-The second method to obtain synonyms is based on the language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the model the following question: \query{What are synonyms of the word <token> ?} where \query{<token>} is the comparative object\todo{s}.
-The language model will return an answer string with one or more synonyms for the specified token.
-Both methods return synonyms for the comparative objects and the new queries will be the original query where the comparative objects have been replaced by these synonyms.
-So we will have the original query and the replaced ones.
+In order to increase recall of our first-stage ranker and to include results for very similar yet differently named objects, we first expand and reformulate the original search query.
+Our approaches use two different strategies: \Ni we replace the comparative objects with their synonyms and \Nii we generate additional, new queries using the additional description and narrative information provided by the shared task organizers.
+Expanding the original query with synonyms of comparative objects is motivated by the fact that documents often contain more specific comparisons~(e.g., Ubuntu vs Windows) instead of more broad comparisons~(e.g., Linux vs Windows).
+Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
+We might therefore find relevant documents that would otherwise not match any original query term.
+It is however important to note that increasing recall can result in an decrease in precision which is undesirable in the precision-oriented setting of the shared task.
+However, we later apply re-ranking steps that improve precision by moving irrelevent documents further down the ranking~(c.f.~Section~\ref{reranking}).
 
-Another method to generate additional queries is to incorporate the information provided by the narrative and description fields from the topics for the shared task.
-Here we can find information about the actual information need and which passages are relevant for the query. So we use this information to generate new queries because this is valuable information about which passages to retrieve.
-To generate new queries we again use the language model T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the model the following question: \query{<text>. Extract a natural search query from this description.} where \query{<text>} is either the topic's narrative or description.
-This results in an answer string of the language model which contains a query extracted from the provided text. \todo{Examples for generated queries.}
+We use two different strategies to find synonyms: \Ni word embeddings and \Nii a zero-shot language model.
+In our first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} to find words with the highest cosine similarity to the given comparative objects in the embedding space.
+We manually examine synonyms from fastText embeddings using different domains~(i.e., Wikipedia and Twitter) and find that fastText embeddings trained on the Twitter corpus result in the best synonyms.
+Our second strategy to obtain synonyms is based on the T0++~zero-shot language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+We ask the model to generate an answer to the following task: \query{What are synonyms of the word <token>?} where \query{<token>} is one of the two comparative objects.
+From the text returned by the language model, we then parse synonyms by splitting at commas and remove duplicate synonyms.
+With the synonyms returned by either strategy, we replace the comparative objects to form new queries. All alternative queries and the original query are then combined.
+
+\input{table-generated-queries.tex}
+We complement the queries expanded by replacing synonyms with newly generated queries that incorporate the contextual information provided in description narrative fields from the shared task's topics.
+The description contains important details about the actual information need and the narrative clearly defines which passages are relevant for the query.
+We use this valuable information about which passages to retrieve by generating new queries with the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and providing it with a topic's description or narrative.
+We challenge the T0++ model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>} is either the topic's narrative or description.
+The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
+In Table~\ref{table-generated-queries}, we show examples of generated queries.
+Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++ language model gernerates some interesting new queries for other topics~(e.g., topic~12).
 
 The query combiner takes the original query, every new computed query from the query reformulation step, and the new queries from the narrative and description fields as inputs and builds an OR-query.
 So we will have one query after the first step which contains multiple queries combined with the logical OR operator.
@@ -44,8 +53,9 @@ It is possible to use multiple reformulated and expanded new queries from these 
 
 \subsection{Retrieval of Passages}\label{retrieval}
 
-To retrieve passages we need to build an index first.
-To do this we used the Python library Pyserini~\cite{LinMLYPN2021} which provides an information retrieval tool kit such as indexing and simple retrieval models like Okapi BM25 or the query likelihood model.
+To retrieve passages from the set of passages extracted from ClueWeb~12 by the task organizers, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
+Pyserini allows for experimenting with multiple steps of a retrieval system including indexing and simple retrieval models like Okapi~BM25 or the query likelihood model.
+
 Our index contained the position of index terms, passage vectors, raw passages, stemmed index terms~(Porter stemmer has been used), and stop words had been filtered out by the default Pyserini stopword list.
 We then retrieved passages by using the OR-query generated by our query combiner~(c.f. Section~\ref{reformulation}) and using the query likelihood model with Dirichlet smoothing provided by Pyserini with \( \mu = 1000 \).
 From this first-stage ranker, we retrieve 100 candidate passages for each query.
@@ -87,6 +97,7 @@ This results in two answers \query{yes} or \query{no} which we will map as follo
 We can then compute the stance analogous to the version via the IBM Debater API.
 
 \subsection{Axiomatic Reranker}
+\label{reranking}
 
 \input{table-axioms.tex}
 
