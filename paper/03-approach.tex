@@ -16,7 +16,7 @@ With this evaluation component we can evaluate our system on topics of previous 
 \label{reformulation}
 
 In order to increase recall of our first-stage ranker and to include results for very similar yet differently named objects, we first expand and reformulate the original search query.
-Our approaches use two different strategies: \Ni we replace the comparative objects with their synonyms and \Nii we generate additional, new queries using the additional description and narrative information provided by the shared task organizers.
+Our approaches use two different strategies: \Ni we replace the comparative objects with their synonyms and \Nii we generate additional, new queries using the additional description and narrative information provided by the shared task organizers~\cite{BondarenkoFKSGBPBSWPH2022}.
 Expanding the original query with synonyms of comparative objects is motivated by the fact that documents often contain more specific comparisons~(e.g., Ubuntu vs Windows) instead of more broad comparisons~(e.g., Linux vs Windows).
 Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
 We might therefore find relevant documents that would otherwise not match any original query term.
@@ -57,7 +57,7 @@ Although, the query reformulation, expansion and combination steps are optional,
 
 \subsection{Passages Retrieval}\label{retrieval}
 
-To retrieve passages from the set of passages extracted from ClueWeb~12 by the task organizers, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
+To retrieve passages from the set of passages extracted from ClueWeb~12 by \citet{BondarenkoFKSGBPBSWPH2022}, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
 Pyserini allows for experimenting with multiple steps of a retrieval system including indexing and simple retrieval models like Okapi~BM25 or the query likelihood model.
 In the index, we store index term positions, passage vectors, and raw passage contents.
 Index terms are stemmed using the Porter stemmer~\cite{Porter1980} and stop words are removed as per the default Pyserini stopword list~\cite{LinMLYPN2021}.
@@ -82,7 +82,7 @@ Here we send each sentence from one passage and the original query as the topic 
 The API then determines how good the quality of each argument with regards to the topic is with a \Bert-based regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The model and therefore the API then returns a quality score ranging from 0 to 1 where a classified score of~0 means very poor argument quality and a score of~1 means very good argument quality~\cite{ToledoGCFVLJAS2019}.
 
 As a second method to obtain the argument quality we again use the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the T0++ model to generate a text the following task: \query{<sentence>.~How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
+We ask the T0++ model to generate a text the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
 This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++ model interprets the sentence's argument quality.
 We then map this textual output labels to numeric values as per the mapping shown in Table~\ref{table-quality-mapping}.
 

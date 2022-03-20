@@ -1,16 +1,16 @@
 \section{Related Work}
 
-Comparative questions are very common because they help to support personal decisions we routinely face in everyday life~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
-In search engines, people often ask questions like \query{Is \emph{X} better than \emph{Y} with respect to \emph{Z}?}
+Comparative questions are very common because they help to support personal decisions we routinely face in everyday life~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021,BondarenkoFKSGBPBSWPH2022}.
+In search engines, people often ask questions like \query{Is X better than Y with respect to Z?}
 However, such questions usually cannot be concluded with one factual answer, but instead require diverse opinions to give a sufficient, argumentative overview.
 Direct answers are convenient, but lack the diligence required to form rational decisions~\cite{BondarenkoFBGAPBSWPH2020,PotthastHS2020}.
 The Touché Lab on Argument Retrieval is a set of shared tasks held to answer controversial and comparative questions using large-scale web corpora.
-In recent years, participants of the Touché shared task on answering comparative questions were challenged to retrieve relevant and high-quality documents from the ClueWeb~12 web corpus~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
+In recent years, participants of the Touché shared task on answering comparative questions were challenged to retrieve relevant and high-quality documents from the ClueWeb~12 web corpus~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021,BondarenkoFKSGBPBSWPH2022}.
 In~2020, five teams submitted eleven runs to 50~comparative topics.
 For~2021, \citeauthor{BondarenkoGFBAPBSWPH2021} introduced 50~new comparative topics and released the relevance labels from~2020 in order to train subsequent learning-to-rank steps or to tune model hyperparameters.
 Six teams submitted runs to this task.
-In this year's third edition, instead, the goal is to find argumentative and relevant passages extracted from ClueWeb~12 documents~\todocite.
-Also, the task organizers present 50~new topics.
+In this year's third edition, instead, the goal is to find argumentative and relevant passages extracted from ClueWeb~12 documents~\cite{BondarenkoFKSGBPBSWPH2022}.
+\citeauthor{BondarenkoFKSGBPBSWPH2022} present 50~new topics with title, description, narrative, and comparative objects and release the focused collection of 868\,655~passages extracted from the ClueWeb12.
 
 \subsection{Review of Touchè~2020 and~2021 Runs}
 
@@ -61,4 +61,4 @@ Axioms in information retrieval are constraints that ideal retrieval systems sho
 For instance, \citet{FangTZ2004} argue that if two documents are equally long, the document with more query term occurrences should be ranked higher.
 Complementing such general retrieval axioms, \citet{BondarenkoHVSPB2018} introduce task-specific axioms that are tailored to the domain of argumentative information retrieval.
 The recently released \iraxioms\footnote{\url{https://github.com/webis-de/ir_axioms/}} Python framework facilitates defining own task-specific axioms.
-We therefore develop new argumentative axioms that exploit additional context provided by the shared task organizers, e.g., comparative objects.
+We therefore develop new argumentative axioms that exploit additional context provided by the shared task organizers, e.g., comparative objects~\cite{BondarenkoFKSGBPBSWPH2022}.
