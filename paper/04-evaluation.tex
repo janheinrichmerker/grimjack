@@ -24,16 +24,16 @@ Our third run also uses argumentative re-ranking after the baseline retrieval, l
 \paragraph{All You Need is T0}
 
 With our fourth run, we want to provide an example to the recently criticized trend to use more and more language models in search engines~\cite{ShahB2022}.
-A large language model like T0++ can solve many natural language proessing tasks with high accuracy~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+A large language model like T0++~can solve many natural language proessing tasks with high accuracy~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
 It is therefore tempting to use such a large model in many steps in a search engine, but \citet{ShahB2022} highlight conceptual flaws that question if such an extreme usage of models that we do not fully understand is even desirable when answering real-life questions.
 For the Touché Lab on Argument Retrieval we construct a run that makes use of the language model's zero-shot text generation in as many steps of te pipeline as possible.
-First, we generate and combine queries by reformulating new queries from the description and narrative using T0++ and by replacing synonyms of comparative objects as returned by T0++~(c.f. Section~\ref{reformulation}).
+First, we generate and combine queries by reformulating new queries from the description and narrative using~T0++ and by replacing synonyms of comparative objects as returned by T0++~(c.f. Section~\ref{reformulation}).
 We then retrieve 20~documents by query likelihood, and use T0++ again to tag argument quality and stance~(c.f. Section~\ref{argument-tagging}).
 
 \paragraph{Argumentative Fair Re-ranking with T0}
 
 In our fifth run, we combine many of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query genertion.
-Here, we also formulate new queries from the description and narrative using T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by similarity in the fastText embedding space~(c.f. Section~\ref{reformulation}).
+Here, we also formulate new queries from the description and narrative using~T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by similarity in the fastText embedding space~(c.f. Section~\ref{reformulation}).
 The top-10 results of the 20 passages retrieved using the query likelihood model are then re-ranked based on argumentative axioms and by alternating stance~(c.f. Section~\ref{reranking}).
 
 \subsection{Manual Assessment of Top-5 Results}
@@ -42,7 +42,7 @@ We assess the effectiveness of our approach by looking at the top-5 retrieved pa
 
 \paragraph{Topic~2}
 
-First, we evaluate the topic \textit{Which is better, a laptop or a desktop?}
+First, we evaluate the topic \query{Which is better, a laptop or a desktop?}
 \citet{BondarenkoFKSGBPBSWPH2022} require relevant passages to contain major similarities and dissimilarities of laptops and desktops or at least advantages and disadvantages of specific usage scenarios.
 
 The first returned passage contains arguments for laptops and also for desktops while being subjective and non-biased.
@@ -62,8 +62,8 @@ An explanation might be that using synonyms, in this case, leads to inaccurate s
 \paragraph{Topic~37}
 
 Next we asses results for the topic
-\textit{Is OpenGL better than Direct3D in terms of portability to different platforms?}
-Relevant passages according to \citet{BondarenkoFKSGBPBSWPH2022} should contain information about the portability of OpenGL/Direct3D across different operation systems but should not include ads or simple tutorials for either OpenGL or Direct3D.
+\query{Is OpenGL better than Direct3D in terms of portability to different platforms?}
+Relevant passages should contain information about the portability of OpenGL/Direct3D across different operation systems but should not include ads or simple tutorials for either OpenGL or Direct3D, according to the topic's narrative by \citet{BondarenkoFKSGBPBSWPH2022}.
 
 The first result of the first run talks about 3D-rendering in the Opera browser but does not provide any arguments.
 The second passage is a gaming-related blog post again without arguments.
@@ -81,7 +81,7 @@ The ranking for this topic has slightly improved compared to the baseline withou
 \paragraph{Topic~70}
 
 As a third topic, we discuss result passages retrieved for the topic
-\textit{Which technology performs better: Apple's or Google's?}
+\query{Which technology performs better: Apple's or Google's?}
 \citet{BondarenkoFKSGBPBSWPH2022} require relevant passages to compare both companies in terms of service and products, but relevant passages can also just focus on one company.
 Passages about genric company information are however not relevant.
 

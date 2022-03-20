@@ -39,12 +39,12 @@ With the synonyms returned by either strategy, we replace the comparative object
 
 We complement the queries expanded by replacing synonyms with newly generated queries that incorporate the contextual information provided in description narrative fields from the shared task's topics.
 The description contains important details about the actual information need and the narrative clearly defines which passages are relevant for the query.
-We use this valuable information about which passages to retrieve by generating new queries with the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and providing it with a topic's description or narrative.
+We use this valuable information about which passages to retrieve by generating new queries with the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and providing it with a topic's description or narrative.
 
-We challenge the T0++ model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
+We challenge the T0++~model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
 The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
 In Table~\ref{table-generated-queries}, we show examples of generated queries.
-Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++ language model gernerates some interesting new queries for other topics~(e.g., topic~12).
+Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++~language model gernerates some interesting new queries for other topics~(e.g., topic~12).
 
 \paragraph{Disjunctive Query Combination}
 After the query expansion and query reformulation steps, we need to combine all computed queries and the original query.
@@ -83,16 +83,16 @@ Our first method is based on the IBM Debater API~\footnote{\url{https://early-ac
 Here we send each sentence from one passage and the original query as the topic to the IBM Debater API for argument quality assessment. of Passages
 The API then determines how good the quality of each argument with regards to the topic is with a \Bert-based~\cite{DevlinCLT2019} regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The model and therefore the API then returns a quality score ranging from 0 to 1 where a classified score of~0 means very poor argument quality and a score of~1 means very good argument quality~\cite{ToledoGCFVLJAS2019}.
 
-As a second method to obtain the argument quality we also use the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+As a second method to obtain the argument quality we also use the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
 We ask the zero-shot language model to generate a text the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence?}\hspace{1.5em} \query{very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
-This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++ model interprets the sentence's argument quality.
+This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++~model interprets the sentence's argument quality.
 We then map this textual output labels to numeric values as per the mapping shown in Table~\ref{table-quality-mapping}.
 
 \paragraph{Argument Stance Tagging}
 \input{table-stance-mapping.tex}
 
 Stance detection for each sentence uses the same conceptual approaches but with different inputs and outputs.
-Since both the IBM Debater API~\cite{BarHaimBDSS2017} and our T0++ approach~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} are only capable of calculating a single-target stance~(i.e., for one of the two comparative objects), we combine the two single-target stances into a multi-target stance by taking the difference between the stance towards the first comparative object and the stance towards the second comparative object.
+Since both the IBM Debater API~\cite{BarHaimBDSS2017} and our T0++~approach~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} are only capable of calculating a single-target stance~(i.e., for one of the two comparative objects), we combine the two single-target stances into a multi-target stance by taking the difference between the stance towards the first comparative object and the stance towards the second comparative object.
 We also experimented with different thresholds for the minimal difference between the single-target stances and found a threshold of~0.125 to work well when manually examining some classified examples.
 
 For scoring the single-target argument stance for a sentence with the IBM Debater API, we again send the sentence and a claim built using one of the comparative objects to the IBM Debater API.
@@ -101,7 +101,7 @@ The API then returns a score from from~-1 to~+1 where -1~means the argument is a
 By classifying different claims for each object~(i.e., \query{<object>~is good} and \query{<object>~is the best}), we get an averaged single-target stance for each comparative object.
 
 For the second method using the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} we first experiment with directly asking the model to generate~\query{pro}, \query{con}~or~\query{neutral} classification labels for a comparative object.
-However, we found that the T0++ model would not be able to reliably distinguish between a positive and negative stance towards the comparative object.
+However, we found that the T0++~model would not be able to reliably distinguish between a positive and negative stance towards the comparative object.
 Therefore we instead reformulate the task in two simple questions, one to determine whether the sentence has a positive stance towards the comparative object and one to determine whether it has a negative stance: \query{<sentence> Is this sentence pro <object>? yes or no} and \query{<sentence> Is this sentence against <object>? yes or no} where \query{<sentence>}~is one sentence of the passage and \query{<object>}~is one of the comparative objects.
 This results in two answers~(\query{yes} or~\query{no}) for the positive and negative stance respectively. We combine the two textual answers as shown in Table~\ref{table-stance-mapping} and then combine the single-target stances into a multi-target stance as described above.
 
