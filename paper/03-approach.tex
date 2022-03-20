@@ -10,7 +10,7 @@ We identify four core steps as most important to our approach:
 and \Niv axiomatic reranking and fairness reranking.
 
 Additionally, we add an evaluation component that is not shown in Figure~\ref{figure-pipeline} because it is not needed to retrieve results from our system.
-With this evaluation component we can evaluate our system on topics of previous editions~(i.e.,~2021 and~2020) of the Touché Lab on Argument Retrieval~(c.f.~Section~\ref{transfer-relevance-judgements}).
+With this evaluation component we can evaluate our system on topics of previous editions~(i.e.,~2021 and~2020) of the Touché Lab on Argument Retrieval~(c.f. Section~\ref{transfer-relevance-judgements}).
 
 \subsection{Query Expansion, Reformulation, and Combination}
 \label{reformulation}
@@ -21,7 +21,7 @@ Expanding the original query with synonyms of comparative objects is motivated b
 Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
 We might therefore find relevant documents that would otherwise not match any original query term.
 It is however important to note that increasing recall can result in an decrease in precision which is undesirable in the precision-oriented setting of the shared task.
-However, we later apply re-ranking steps that improve precision by moving irrelevent documents further down the ranking~(c.f.~Section~\ref{reranking}).
+However, we later apply re-ranking steps that improve precision by moving irrelevent documents further down the ranking~(c.f. Section~\ref{reranking}).
 
 \paragraph{Query Expansion with Synonyms}
 
@@ -41,7 +41,7 @@ We complement the queries expanded by replacing synonyms with newly generated qu
 The description contains important details about the actual information need and the narrative clearly defines which passages are relevant for the query.
 We use this valuable information about which passages to retrieve by generating new queries with the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and providing it with a topic's description or narrative.
 
-We challenge the T0++ model with the following task: \query{<text>.~Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
+We challenge the T0++ model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
 The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
 In Table~\ref{table-generated-queries}, we show examples of generated queries.
 Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++ language model gernerates some interesting new queries for other topics~(e.g., topic~12).
@@ -81,10 +81,10 @@ To find the quality score and stance for the whole passage, we average the quali
 We implement two different methods for quality tagging:
 Our first method is based on the IBM Debater API~\footnote{\url{https://early-access-program.debater.res.ibm.com}}~\cite{ToledoGCFVLJAS2019}.
 Here we send each sentence from one passage and the original query as the topic to the IBM Debater API for argument quality assessment. of Passages
-The API then determines how good the quality of each argument with regards to the topic is with a \Bert-based regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The model and therefore the API then returns a quality score ranging from 0 to 1 where a classified score of~0 means very poor argument quality and a score of~1 means very good argument quality~\cite{ToledoGCFVLJAS2019}.
+The API then determines how good the quality of each argument with regards to the topic is with a \Bert-based~\cite{DevlinCLT2019} regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The model and therefore the API then returns a quality score ranging from 0 to 1 where a classified score of~0 means very poor argument quality and a score of~1 means very good argument quality~\cite{ToledoGCFVLJAS2019}.
 
-As a second method to obtain the argument quality we use the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} again.
-We ask the T0++ model to generate a text the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence? very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
+As a second method to obtain the argument quality we also use the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+We ask the zero-shot language model to generate a text the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence?}\hspace{1.5em} \query{very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
 This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++ model interprets the sentence's argument quality.
 We then map this textual output labels to numeric values as per the mapping shown in Table~\ref{table-quality-mapping}.
 
