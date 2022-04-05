@@ -7,7 +7,7 @@ We identify four core steps as most important to our approach:
 \Ni query expansion, reformulation, and combination,
 \Nii first-stage retrieval,
 \Niii argument quality and stance tagging,
-and \Niv axiomatic reranking and fairness reranking.
+and \Niv axiomatic re-ranking and fairness re-ranking.
 
 Additionally, we add an evaluation component that is not shown in Figure~\ref{figure-pipeline} because it is not needed to retrieve results from our system.
 With this evaluation component we can evaluate our system on topics of previous editions~(i.e.,~2021 and~2020) of the Touché Lab on Argument Retrieval~(c.f. Section~\ref{transfer-relevance-judgements}).
@@ -44,16 +44,16 @@ We use this valuable information about which passages to retrieve by generating 
 We challenge the T0++~model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
 The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
 In Table~\ref{table-generated-queries}, we show examples of generated queries.
-Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++~language model gernerates some interesting new queries for other topics~(e.g., topic~12).
+Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++~language model generates some interesting new queries for other topics~(e.g., topic~12).
 
 \paragraph{Disjunctive Query Combination}
 After the query expansion and query reformulation steps, we need to combine all computed queries and the original query.
 We decide to combine all queries in a single query in a logical disjunction, that is by using Pyserini's OR operator.
 Two reasons influence this decision:
-Firstly, retrieving results for just one query is conceptually easier as we don't neet to interleave multiple result sets after the retrieval step.
+Firstly, retrieving results for just one query is conceptually easier as we don't need to interleave multiple result sets after the retrieval step.
 Interleaving is not trivial and it is often challenging to find an interleaving strategy without many caveats.
-Secondly, the logical disjunction increases the system's recall and decrease the chance of empty result sets in the cse that a term is not present in the corpus.
-Although, the query reformulation, expansion and combination steps are optional, meaning that we use these steps only in some runs. In most of our submitted runs, we just use the original query, because the increase in recall might result in a decreasequery in precision that is hard to offset in subsequent re-ranking steps.
+Secondly, the logical disjunction increases the system's recall and decrease the chance of empty result sets in the case that a term is not present in the corpus.
+Although, the query reformulation, expansion and combination steps are optional, meaning that we use these steps only in some runs. In most of our submitted runs, we just use the original query, because the increase in recall might result in a decrease query in precision that is hard to offset in subsequent re-ranking steps.
 
 \subsection{Passages Retrieval}\label{retrieval}
 
@@ -105,29 +105,29 @@ However, we found that the T0++~model would not be able to reliably distinguish 
 Therefore we instead reformulate the task in two simple questions, one to determine whether the sentence has a positive stance towards the comparative object and one to determine whether it has a negative stance: \query{<sentence> Is this sentence pro <object>? yes or no} and \query{<sentence> Is this sentence against <object>? yes or no} where \query{<sentence>}~is one sentence of the passage and \query{<object>}~is one of the comparative objects.
 This results in two answers~(\query{yes} or~\query{no}) for the positive and negative stance respectively. We combine the two textual answers as shown in Table~\ref{table-stance-mapping} and then combine the single-target stances into a multi-target stance as described above.
 
-\subsection{Axiomatic Reranker}
+\subsection{Axiomatic Re-ranker}
 \label{reranking}
 \input{table-axioms.tex}
 
 Because we increase the recall of our retrieval system by expanding and reformulating queries~(c.f. Section~\ref{reformulation}), we re-rank top-10 result passages of our first-stage query likelihood retrieval~(c.f. Section~\ref{retrieval}).
-We seek to improve our system's preciision by re-ranking with two different strategies that should rank passages higher that are more argumentative and higher quality, but also ensure a fair overview of the two conflicting comparative objects: \Ni we re-rank based on argumentative retrieval axioms and \Nii we re-rank based on the passages' stances towards the comparative objects.
+We seek to improve our system's precision by re-ranking with two different strategies that should rank passages higher that are more argumentative and higher quality, but also ensure a fair overview of the two conflicting comparative objects: \Ni we re-rank based on argumentative retrieval axioms and \Nii we re-rank based on the passages' stances towards the comparative objects.
 
 \paragraph{Argumentative Axiomatic Re-ranking}
 
-When only using frequncy-based ranking methods such as BM25 or query likelihood with Dirichlet smoothing, it is difficult to capture the inherent argumentativeness in passages.
+When only using frequency-based ranking methods such as BM25 or query likelihood with Dirichlet smoothing, it is difficult to capture the inherent argumentativeness in passages.
 This argumentativeness, however, is most important for finding relevant and useful opinions on comparative questions~\cite{BondarenkoFKSGBPBSWPH2022}.
 Also, passages in our pipeline are already annotated with argumentative quality and stance.
 Recent approaches for the TREC Common Core and Decision tracks exploit task-specific, argumentative retrieval axioms to ensure argumentativeness in their results~\cite{BondarenkoHVSPB2018,BondarenkoFKHVS2019}.
 Axioms are constraints that define pairwise preferences between documents or passages.
 Because of the promising development in the field of axiomatic information retrieval\footnote{The \iraxioms Python framework was only released shortly before our submission: \url{https://github.com/webis-de/ir_axioms/}}, we re-rank the top-10 passages with the \KwikSort algorithm~\cite{HagenVGS2016}.
 For axiomatic re-ranking, we compute preferences for 7~argumentative axioms listed in Table~\ref{table-axioms}.
-The axioms cover general argumentativeness~(ArgUC), argumentative relevance~(QTArg, QTPArg), comparative relevace~(CompArg, CompPArg), and rethorical and argumentative quality~(aSLDoc, ArgQ).
-We then combine the axioms in a majority voting scheme, i.e., we only keep preferenes where at least~50\,\% of the 7~axioms agree, and fall back to the original ranking order if less than~50\,\% of all axioms agree.
+The axioms cover general argumentativeness~(ArgUC), argumentative relevance~(QTArg, QTPArg), comparative relevance~(CompArg, CompPArg), and rhetorical and argumentative quality~(aSLDoc, ArgQ).
+We then combine the axioms in a majority voting scheme, i.e., we only keep preferences where at least~50\,\% of the 7~axioms agree, and fall back to the original ranking order if less than~50\,\% of all axioms agree.
 Using the \iraxioms library, we then re-rank with the combined axiom.
 
 \paragraph{Fairness Re-ranking}
 
-We also implement a fairness reranker to produce rankings where the two conflicting stances~(pro first compared object and pro second compared object) are nearly equally prominent.
+We also implement a fairness re-ranker to produce rankings where the two conflicting stances~(pro first compared object and pro second compared object) are nearly equally prominent.
 For balancing the argumentative stances, we experiment with two different re-ranking strategies: \Ni alternating stance and \Nii balanced top-\(k\) stance.
 For the alternating stance strategy, we split the result set into three lists: First, with arguments in favor of the first comparative object, second, in favor of the second comparative object, and last, neutral arguments or arguments with no stance.
 We then alternately select passages from the first two lists. If one or both lists are empty, we fall back to the neutral list.

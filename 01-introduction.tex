@@ -1,19 +1,20 @@
 \section{Introduction}\label{intro}
 
-Current information retrieval systems are well able to answer keyword queries or simple questions but answering comparative questions is still a challenging task~\cite{BondarenkoGFBAPBSWPH2021}.
-Furthermore, current search engines struggle to fight biases~\cite{ShahB2022}.
-We especially recognize the importance to return fair results for comparative questions since a system that only returns arguments in favor of a single comparative object could severly bias a user's decisions towards that object.
-\citet{BondarenkoFKSGBPBSWPH2022} organize the Touché Lab on Argument Retrieval at CLEF to find different promising approaches that tackle the task of retrieving arguents to comparative questions from a web-scale collection of passages.
-The retrieved arguments should be of high rethorical an argumentative quality but also relevant to the query.
-Additionaly, in~2022 the participants of the Touché shared task should also tag their resulting passages with their stance towards the comparative objects.
+%Current information retrieval systems are well able to answer keyword queries or simple questions but answering comparative questions is still a challenging task~\cite{BondarenkoGFBAPBSWPH2021}.
+Argument retrieval is a specific task that not only considers topical relevance of retrieved documents to given queries (usually of controversial, argumentative or opinion nature) but also accounts for argument specific features like argument quality and stance~\cite{BondarenkoFBGAPBSWPH2020, BondarenkoGFBAPBSWPH2021}.  
+Furthermore, it has been shown that current search engines might return biased results~\cite{ShahB2022} and argument retrieval systems return ``unfairelly'' distributed pro / con arguments~\cite{CherumanalSSC2021}. We especially emphasize the importance of retrieving diverse results for comparative questions (e.g., ``Train or plane? Which is the better choice?'') that provide different point of views to mitigate biasing a users' decisions towards one or another comparison option.
+
+\citet{BondarenkoFKSGBPBSWPH2022} organize the Touché Lab on Argument Retrieval at CLEF to find different promising approaches that tackle the task of retrieving arguments to comparative questions from a web-scale collection of passages.
+The retrieved arguments should be of high rhetorical an argumentative quality but also relevant to the query.
+Additionally, in~2022 the participants of the Touché shared task should also tag their resulting passages with their stance towards the comparative objects.
 Answering comparative questions supports users in their everyday lives but users might struggle with converting those natural language questions into keyword queries~\cite{BondarenkoGFBAPBSWPH2021}.
 
 We develop a flexible retrieval pipeline to participate in the Touché shared task on argument retrieval for comparative questions~(c.f. Section~\ref{approach}).
-Our approach is developed with Python and Pyserini~\cite{LinMLYPN2021} as an eaily configurable command line application.
+Our approach is developed with Python and Pyserini~\cite{LinMLYPN2021} as an easily configurable command line application.
 With query reformulation, expansion and combination we relax the initial query and exploit additional topic context such as description and narrative.
 After retrieving candidate passages using query likelihood with Dirichlet smoothing, we tag each passage's argumentative structure, argument quality and the stance towards the comparative objects.
 To improve relevance and quality on high ranks, we then re-rank results axiomatically using specialized argumentative retrieval axioms, incorporating the previously annotated argument quality.
-Two strategies to balance the passages' stances towards the comarative objects showcase fair re-ranking for arguments.
+Two strategies to balance the passages' stances towards the comparative objects showcase fair re-ranking for arguments.
 
 Even though we were unable to transfer enough relevance judgements fro previous editions of the Touché shared tasks, our manual assessment of three topics shows the potential of expanding queries with synonyms and contextual information~(c.f. Section~\ref{evaluation}).
-Different configurations for our submitted runs should pose examples to discuss current doubts about the usefullness of large zero-shot language models like T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} in the field of argumentative information retrieval~\cite{ShahB2022}.
+Different configurations for our submitted runs should pose examples to discuss current doubts about the usefulness of large zero-shot language models like T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} in the field of argumentative information retrieval~\cite{ShahB2022}.

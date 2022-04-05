@@ -2,7 +2,7 @@
 \label{evaluation}
 
 In the Touché Lab on Argument Retrieval, participants submit their retrieval systems as working software via the TIRA platform\footnote{\url{https://tira.io}}~\cite{PotthastGWS2019} instead of just submitting the generated run files~\cite{BondarenkoFKSGBPBSWPH2022}.
-TIRA is a plattform for storing scientific approaches, systems and models as software contained in virtual machines in order to ease reproducing the results based on that software~\cite{PotthastGWS2019}.
+TIRA is a platform for storing scientific approaches, systems and models as software contained in virtual machines in order to ease reproducing the results based on that software~\cite{PotthastGWS2019}.
 The TIRA system automatically evaluates submitted approaches of all shared task participants\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}} and reports a leaderboard of the \nDCG{5} scores.
 \citet{BondarenkoFKSGBPBSWPH2022} use this site to ensure a reproducible leaderboard.
 We submit 5~runs that use different components and strategies of our approach~(Section~\ref{approach}).
@@ -24,21 +24,21 @@ Our third run also uses argumentative re-ranking after the baseline retrieval, l
 \paragraph{All You Need is T0}
 
 With our fourth run, we want to provide an example to the recently criticized trend to use more and more language models in search engines~\cite{ShahB2022}.
-A large language model like T0++~can solve many natural language proessing tasks with high accuracy~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+A large language model like T0++~can solve many natural language processing tasks with high accuracy~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
 It is therefore tempting to use such a large model in many steps in a search engine, but \citet{ShahB2022} highlight conceptual flaws that question if such an extreme usage of models that we do not fully understand is even desirable when answering real-life questions.
-For the Touché Lab on Argument Retrieval we construct a run that makes use of the language model's zero-shot text generation in as many steps of te pipeline as possible.
+For the Touché Lab on Argument Retrieval we construct a run that makes use of the language model's zero-shot text generation in as many steps of the pipeline as possible.
 First, we generate and combine queries by reformulating new queries from the description and narrative using~T0++ and by replacing synonyms of comparative objects as returned by T0++~(c.f. Section~\ref{reformulation}).
 We then retrieve 20~documents by query likelihood, and use T0++ again to tag argument quality and stance~(c.f. Section~\ref{argument-tagging}).
 
 \paragraph{Argumentative Fair Re-ranking with T0}
 
-In our fifth run, we combine many of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query genertion.
+In our fifth run, we combine many of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query generation.
 Here, we also formulate new queries from the description and narrative using~T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by similarity in the fastText embedding space~(c.f. Section~\ref{reformulation}).
 The top-10 results of the 20 passages retrieved using the query likelihood model are then re-ranked based on argumentative axioms and by alternating stance~(c.f. Section~\ref{reranking}).
 
 \subsection{Manual Assessment of Top-5 Results}
 
-We assess the effectiveness of our approach by looking at the top-5 retrieved passages in our baseline run and with query refomulation and expansion for three random topics~2, 37, and~70.
+We assess the effectiveness of our approach by looking at the top-5 retrieved passages in our baseline run and with query reformulation and expansion for three random topics~2, 37, and~70.
 
 \paragraph{Topic~2}
 
@@ -83,7 +83,7 @@ The ranking for this topic has slightly improved compared to the baseline withou
 As a third topic, we discuss result passages retrieved for the topic
 \query{Which technology performs better: Apple's or Google's?}
 \citet{BondarenkoFKSGBPBSWPH2022} require relevant passages to compare both companies in terms of service and products, but relevant passages can also just focus on one company.
-Passages about genric company information are however not relevant.
+Passages about generic company information are however not relevant.
 
 The first passage returned by the baseline is a news site about technology but no arguments are given.
 The second passage talks about the new Google TV while Apple TV has been already released.
@@ -104,7 +104,7 @@ We would rank the second run's top-5 passages as follows: 1-4-5-3-2.
 
 Summarizing our manual assessment of two runs for three exemplary topics does not clearly indicate any preference whether query expansion should be used or not.
 For some topics~(e.g., topic~1) the results without query expansion seem more promising, for others~(e.g., topic~37 or~70) we argue in favor of query expansion.
-We therefore submit runs with and without query reformulation to the Touché shared task in order to be able to compare both based on sufficently many human-annotated relevance judgements.
+We therefore submit runs with and without query reformulation to the Touché shared task in order to be able to compare both based on sufficiently many human-annotated relevance judgements.
 
 \subsection{Transferring Relevance Judgements from Touché~2020--2021}
 \label{transfer-relevance-judgements}

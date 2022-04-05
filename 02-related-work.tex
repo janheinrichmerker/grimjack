@@ -12,7 +12,7 @@ Six teams submitted runs to this task.
 In this year's third edition, instead, the goal is to find argumentative and relevant passages extracted from ClueWeb~12 documents~\cite{BondarenkoFKSGBPBSWPH2022}.
 \citeauthor{BondarenkoFKSGBPBSWPH2022} present 50~new topics with title, description, narrative, and comparative objects and release the focused collection of 868\,655~passages extracted from the ClueWeb~12.
 
-\subsection{Review of Touchè~2020 and~2021 Runs}
+\subsection{Review of Touché~2020 and~2021 Runs}
 
 Even though this edition's task is based on a different corpus, we analyze the two best runs from~2020 and~2021 as per the evaluated \nDCG{5} metric, to follow their best practices.
 
@@ -21,7 +21,7 @@ In their first one, they analyze the query and determine entities that compare.
 Then they expand the queries with synonyms and antonyms of the found entities and send those queries to the ChatNoir search engine~\cite{BevendorffSHP2018} which retrieves documents from the ClueWeb~12 using BM25F scoring~\cite{PotthastHSGMTW2012}.
 In the second step, they conduct argument mining and calculate the document quality by evidence mining and link analysis.
 The third step consists of summing up the collected scores and building relevance, support, and credibility scores.
-In their final step, they build weighting scores and rerank the documents by multiplying the weighting scores with the sum of the aforementioned scores.
+In their final step, they build weighting scores and re-rank the documents by multiplying the weighting scores with the sum of the aforementioned scores.
 Team Bilbo Baggins scored first place in 2020 with an \nDCG{5} score of 0.580~\cite{AbyeST2020}.
 
 Team Inigo Montoya, second place in Touché~2020, queries ChatNoir~\cite{BevendorffSHP2018} with the original queries and processes the first 20 results further~\cite{Huck2020}.
@@ -32,12 +32,12 @@ Team Inigo Montoya scored a \nDCG{5} of 0.567~\cite{Huck2020}.
 
 Team Katana, first place in Touché~2021, queries the search engine ChatNoir~\cite{BevendorffSHP2018} with the provided topics and extracts up to 100 unique documents from the result set~\cite{ChekalinaP2021}.
 Then they clean the documents from HTML and markup.
-After that, they rerank the documents by one of their developed models.
-Their models are feature-based machine learning models with features from PyTerrier, specific comparativetodocite features, and scores from the ChatNoir system. They developed the following ranking models:
+After that, they re-rank the documents by one of their developed models.
+Their models are feature-based machine learning models with features from PyTerrier, specific comparative features, and scores from the ChatNoir system. They developed the following ranking models:
 (1) an XGBoost~\cite{ChenG2016} approach, (2) a LightGBM~\cite{KeMFWCMYL2017} approach, (3) Random Forests, and (4) a \Bert-based~\cite{DevlinCLT2019} ranker.
 Team Katana scored first place with an \nDCG{5} of 0.489~\cite{ChekalinaP2021}.
 
-Team Thor, second place in Touché~2021, queries the search engine ChatNoir with an AND-Operator and removes every punctation from the topics and the documents found~\cite{ShirshakovaW2021}.
+Team Thor, second place in Touché~2021, queries the search engine ChatNoir with an AND-Operator and removes every punctuation from the topics and the documents found~\cite{ShirshakovaW2021}.
 Additionally, they remove all boilerplate from the documents to extract the main content.
 Then they create an index with Elasticsearch of the first 110~documents returned by ChatNoir~\cite{BevendorffSHP2018}.
 After that, they expand the original query with synonyms from WordNet~\cite{Miller1992}.
@@ -49,9 +49,9 @@ Team Thor achieved an \nDCG{5} of 0.478~\cite{ShirshakovaW2021}.
 
 Large language models like T0~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} showcase reasonable zero-shot generalization abilities when training with multitask prompts.
 In many unseen tasks, T0 outperforms even larger models, that have not been trained on different tasks.
-\citet{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} release a pre-trained model,~T0++, that was trained on 62~datasets for 12~tasks, the largest number of datasets of all their released models.
+\citet{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} release a pretrained model,~T0++, that was trained on 62~datasets for 12~tasks, the largest number of datasets of all their released models.
 In their experiments they conclude that training zero-shot models on more and diverse prompts consistently improve generalization on unseen tasks.
-We therefore argue that The T0++~model is the best candidate for the new tasks we encounter in argumentat retrieval and scoring.
+We therefore argue that The T0++~model is the best candidate for the new tasks we encounter in argumentative retrieval and scoring.
 
 \subsection{Axiomatic Information Retrieval}
 
