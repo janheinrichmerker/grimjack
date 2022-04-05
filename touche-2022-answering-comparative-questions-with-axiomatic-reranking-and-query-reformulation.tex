@@ -1,0 +1,106 @@
+\documentclass[]{ceurart}
+
+%%
+%% One can fix some overfulls
+\sloppy
+
+%%
+%% Minted listings support 
+%% Need pygment <http://pygments.org/> <http://pypi.python.org/pypi/Pygments>
+\usepackage{listings}
+%% auto break lines
+\lstset{breaklines=true}
+
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{relsize}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{sourcecodepro}
+
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\todocite}{\todo{[CITE]}\xspace}
+
+\newcommand{\Ni}{(1)~}
+\newcommand{\Nii}{(2)~}
+\newcommand{\Niii}{(3)~}
+\newcommand{\Niv}{(4)~}
+\newcommand{\Nv}{(5)~}
+\newcommand{\Na}{(a)~}
+\newcommand{\Nb}{(b)~}
+\newcommand{\Nc}{(c)~}
+\newcommand{\Nd}{(d)~}
+\newcommand{\Ne}{(e)~}
+
+\newcommand{\textttsmall}[1]{\texttt{\smaller #1}}
+\newcommand{\query}[1]{\textttsmall{#1}}
+\newcommand{\Bert}{\textsc{Bert}\xspace}
+\newcommand{\iraxioms}{\textttsmall{ir\_axioms}\xspace}
+\newcommand{\nDCG}[1]{nDCG\def\tempndcg{#1}\ifx\tempndcg\empty\else{@}\tempndcg\fi}
+\newcommand{\map}{MAP}
+\newcommand{\KwikSort}{\textsc{KwikSort}\xspace}
+
+\begin{document}
+
+\copyrightyear{2022}
+\copyrightclause{%
+  Copyright for this paper by its authors.
+	Use permitted under Creative Commons License Attribution~4.0
+	International~(CC~BY~4.0).%
+}
+\conference{%
+  CLEF~2021 -- 
+  Conference and Labs of the Evaluation Forum, 
+	September~5--8,~2022,
+  Bologna, Italy%
+}
+
+%\title{%
+%  Grimjack at \texorpdfstring{Touché~2022}{Touche 2022}:\texorpdfstring{\\}{ }
+%  Answering Comparative Questions with Axiomatic Reranking and Query Reformulation%
+%}
+\title{%
+  Grimjack at \texorpdfstring{Touch{\'e}~2022}{Touché 2022}:\texorpdfstring{\\}{ }
+  Axiomatic Reranking and Query Reformulation%
+}
+\title[mode=sub]{%
+  Notebook for the Touché Lab on Argument Retrieval at CLEF\ 2022%
+}
+
+\author{Jan Heinrich Reimer}[
+  orcid=0000-0003-1992-8696,
+  email=jan.reimer@student.uni-halle.de,
+  url=https://heinrichreimer.com,
+]
+\author{Johannes Huck}[
+  email=johannes.huck@student.uni-halle.de,
+  url=https://github.com/johannes-huck,
+]
+
+\address{%
+  Martin-Luther-Universität Halle-Wittenberg,
+  06099~Halle~(Saale), Germany
+}
+
+\input{00-abstract.tex}
+
+\maketitle
+
+\input{01-introduction.tex}
+\input{02-related-work.tex}
+\input{03-approach.tex}
+\input{04-evaluation.tex}
+\input{05-conclusion.tex}
+
+\begin{acknowledgments}
+  We thank Huggingface for providing us access to their hosted inference API\footnote{\url{https://api-inference.huggingface.co}} to generate texts with the T0++~model, which would otherwise not have been possible due to hardware constraints. 
+  We are also grateful to the Webis group for hosting the TARGER API and to IBM Research for early access to their Debater APIs.
+\end{acknowledgments}
+
+\bibliography{literature}
+
+\end{document}

@@ -1,0 +1,117 @@
+\section{Evaluation}
+\label{evaluation}
+
+In the Touché Lab on Argument Retrieval, participants submit their retrieval systems as working software via the TIRA platform\footnote{\url{https://tira.io}}~\cite{PotthastGWS2019} instead of just submitting the generated run files~\cite{BondarenkoFKSGBPBSWPH2022}.
+TIRA is a plattform for storing scientific approaches, systems and models as software contained in virtual machines in order to ease reproducing the results based on that software~\cite{PotthastGWS2019}.
+The TIRA system automatically evaluates submitted approaches of all shared task participants\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}} and reports a leaderboard of the \nDCG{5} scores.
+\citet{BondarenkoFKSGBPBSWPH2022} use this site to ensure a reproducible leaderboard.
+We submit 5~runs that use different components and strategies of our approach~(Section~\ref{approach}).
+
+\paragraph{Query Likelihood Baseline}
+
+For our first run, we retrieve 20~passages ranked by query likelihood with Dirichlet smoothing for the original, unmodified query. We then use the IBM fastText TARGER model to tag argument structure,
+the IBM Debater API to tag argument quality.
+We tag argument stance by comparing sentiments for each object using the IBM Debater API, treating a stance under a threshold of~0.125 as neutral.
+
+\paragraph{Argumentative Axioms}
+
+To generate our second run, we retrieve 20~passages in the same way as for the query likelihood baseline run. Then we re-rank the top-10 passages from the baseline result using \KwikSort based on preferences from the argumentative axioms as described in Section~\ref{reranking}.
+
+\paragraph{Fair Re-ranking and Argumentative Axioms}
+
+Our third run also uses argumentative re-ranking after the baseline retrieval, like with the previous run. But to ensure that both comparative objects are fairly represented in the resulting ranking, we apply fairness re-ranking with the alternating stance strategy as described in Section~\ref{reranking}.
+
+\paragraph{All You Need is T0}
+
+With our fourth run, we want to provide an example to the recently criticized trend to use more and more language models in search engines~\cite{ShahB2022}.
+A large language model like T0++~can solve many natural language proessing tasks with high accuracy~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+It is therefore tempting to use such a large model in many steps in a search engine, but \citet{ShahB2022} highlight conceptual flaws that question if such an extreme usage of models that we do not fully understand is even desirable when answering real-life questions.
+For the Touché Lab on Argument Retrieval we construct a run that makes use of the language model's zero-shot text generation in as many steps of te pipeline as possible.
+First, we generate and combine queries by reformulating new queries from the description and narrative using~T0++ and by replacing synonyms of comparative objects as returned by T0++~(c.f. Section~\ref{reformulation}).
+We then retrieve 20~documents by query likelihood, and use T0++ again to tag argument quality and stance~(c.f. Section~\ref{argument-tagging}).
+
+\paragraph{Argumentative Fair Re-ranking with T0}
+
+In our fifth run, we combine many of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query genertion.
+Here, we also formulate new queries from the description and narrative using~T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by similarity in the fastText embedding space~(c.f. Section~\ref{reformulation}).
+The top-10 results of the 20 passages retrieved using the query likelihood model are then re-ranked based on argumentative axioms and by alternating stance~(c.f. Section~\ref{reranking}).
+
+\subsection{Manual Assessment of Top-5 Results}
+
+We assess the effectiveness of our approach by looking at the top-5 retrieved passages in our baseline run and with query refomulation and expansion for three random topics~2, 37, and~70.
+
+\paragraph{Topic~2}
+
+First, we evaluate the topic \query{Which is better, a laptop or a desktop?}
+\citet{BondarenkoFKSGBPBSWPH2022} require relevant passages to contain major similarities and dissimilarities of laptops and desktops or at least advantages and disadvantages of specific usage scenarios.
+
+The first returned passage contains arguments for laptops and also for desktops while being subjective and non-biased.
+Our second and fifth results are product descriptions of laptops and do not deliver arguments for or against laptops or desktops.
+The third returned passage lists results for laptops from an online shop.
+Our fourth result gives five arguments why laptops would be better.
+Thus, we would manually change the ranking as follows: 1-4-2-5-3
+
+The second evaluated run retrieves passages on the first three ranks about different laptops.
+The three websites give a detailed overview of the laptops they are talking about but no argument for or against laptops or desktops in general.
+On the fourth rank, a review for a network switch is returned.
+The fifth passage is an online shop for electronic products.
+Admittedly, none of the first five results are relevant or provide argumentative support to the user.
+The passage that was ranked first in our first run is now on rank~34.
+An explanation might be that using synonyms, in this case, leads to inaccurate search queries which did not capture the topic's information need.
+
+\paragraph{Topic~37}
+
+Next we asses results for the topic
+\query{Is OpenGL better than Direct3D in terms of portability to different platforms?}
+Relevant passages should contain information about the portability of OpenGL/Direct3D across different operation systems but should not include ads or simple tutorials for either OpenGL or Direct3D, according to the topic's narrative by \citet{BondarenkoFKSGBPBSWPH2022}.
+
+The first result of the first run talks about 3D-rendering in the Opera browser but does not provide any arguments.
+The second passage is a gaming-related blog post again without arguments.
+The third and fourth results are near-duplicates about a gaming developer converting their game from OpenGL to Direct3D, including problems, tips, and anti-patterns in 3D game development.
+On the fifth rank, the passage informs that Direct3D is now supported on Linux.
+The only passages that are arguably relevant are the third and fourth.
+All other of the first five passages are not relevant.
+
+For the second run, the results are the same passages returned by the baseline but in a different order.
+The first two passages are the duplicate passages about game development and migrating from OpenGL to Direct3D.
+The next passage is about Direct3D support on Linux.
+On the fourth rank, we observe the passage talking about 3D-rendering in Opera and the last result is the gaming blog post.
+The ranking for this topic has slightly improved compared to the baseline without query expansion because the most relevant passages are now on the first two ranks, other less relevant passages are now further behind in the ranking.
+
+\paragraph{Topic~70}
+
+As a third topic, we discuss result passages retrieved for the topic
+\query{Which technology performs better: Apple's or Google's?}
+\citet{BondarenkoFKSGBPBSWPH2022} require relevant passages to compare both companies in terms of service and products, but relevant passages can also just focus on one company.
+Passages about genric company information are however not relevant.
+
+The first passage returned by the baseline is a news site about technology but no arguments are given.
+The second passage talks about the new Google TV while Apple TV has been already released.
+On the third rank, there is a passage that talks about how Apple and Google both signed a privacy accord.
+The fourth result is about Facebook buying Instagram.
+And the last result is about Google being caught violating users' privacy while Apple has already been caught violating users' privacy.
+Arguably, all but the first and fourth passage are relevant.
+We would manually rank the passages as follows: 3-5-2-4-1.
+In general, the top-5 ranking of the baseline is not very good.
+
+From the second run, the first passage is a news site about Apple's products.
+The second passage provides information about selling numbers and stock prices, that are not relevant according to the narrative provided by \citet{BondarenkoFKSGBPBSWPH2022}.
+The next passage is a news article about how Google and Motorola have to hand over Android information to Apple but no arguments are given in this passage.
+The fourth result is claiming that Apple could only have success because of Google.
+And the last passage talks about five reasons why the comparison of iPhone vs Android is not the same as Mac vs Windows.
+For this topic the passages retrieved by the first run without query expansion and the second run with query expansion are different.
+We would rank the second run's top-5 passages as follows: 1-4-5-3-2.
+
+Summarizing our manual assessment of two runs for three exemplary topics does not clearly indicate any preference whether query expansion should be used or not.
+For some topics~(e.g., topic~1) the results without query expansion seem more promising, for others~(e.g., topic~37 or~70) we argue in favor of query expansion.
+We therefore submit runs with and without query reformulation to the Touché shared task in order to be able to compare both based on sufficently many human-annotated relevance judgements.
+
+\subsection{Transferring Relevance Judgements from Touché~2020--2021}
+\label{transfer-relevance-judgements}
+
+For a systematic evaluation of all runs with different metrices for effectiveness following the Cranfield paradigm, we also experiment with transferring the relevance judgements from previous editions of the Touché shared task~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
+In~2020 and~2021, however, the results were judged on the document level.
+Therefore, we using the topics and relevance judgements from Touché~2020--2021, but retrieve passages from the extracted passages in this year's collection~\cite{BondarenkoFKSGBPBSWPH2022}.
+Then we assume that if a document was relevant all passages extracted from that document are relevant as well, that is, the passages inherit their containing document's relevance label.
+Unfortunately, we could only match 16.76\,\% of the passages retrieved by our baseline with document relevance labels from Touché~2020--2021.
+Therefore we do not include a more detailed evaluation of effectiveness using previous editions' judgements.
