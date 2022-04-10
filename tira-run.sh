@@ -24,7 +24,9 @@ output_run_file="$output_dir/$run_file_name"
 mkdir -p "$output_dir"
 
 # List input and output files.
-ls -l "$input_topic_file" "$input_documents_file" "$output_run_file"
+echo "$input_topic_file"
+echo "$input_documents_file"
+echo "$output_run_file"
 
 # Generate internal run file.
 pipenv run python -m grimjack \
