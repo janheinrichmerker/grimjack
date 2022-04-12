@@ -191,8 +191,6 @@ pipenv run python -m grimjack \
   data/runs/grimjack-fair-argumentative-reranking-with-t0.txt
 ```
 
-### 6. Fine tune based on Touché 2020/2021 qrels
-
 ## Testing
 
 After [installing](#installation) all dependencies, you can run all unit tests:
@@ -221,3 +219,7 @@ docker container run -v "$(pwd)"/data:/workspace/data grimjack run data/run.txt
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).
+
+## Ideas
+- Fairness
+- Submit to ArgMining workshop at 

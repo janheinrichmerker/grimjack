@@ -29,7 +29,7 @@ echo "$input_documents_file"
 echo "$output_run_file"
 
 # Generate internal run file.
-pipenv run python -m grimjack \
+/home/grimjack/.local/bin/pipenv run python -m grimjack \
   --topics-path "$input_topic_file" \
   --documents-path "$input_documents_file" \
   "$@" \
