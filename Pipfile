@@ -30,6 +30,7 @@ pillow = ">=9.0.0"
 targer-api = "*"
 spacy = ">=2.3,==2.*"
 ir-axioms = "*"
+urllib3 = "*"
 
 [dev-packages]
 
