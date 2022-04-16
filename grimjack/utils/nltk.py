@@ -1,5 +1,6 @@
 from nltk.downloader import Downloader
 from requests import head
+from urllib3.exceptions import HTTPError
 
 from grimjack import logger
 
@@ -9,7 +10,7 @@ def download_nltk_dependencies(*dependencies: str):
 
     try:
         head(Downloader.DEFAULT_URL, timeout=1)
-    except ConnectionError:
+    except HTTPError:
         logger.warning(
             "Could not connect to NLTK servers. "
             "Skipping NLTK download."
