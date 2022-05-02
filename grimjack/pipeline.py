@@ -1,4 +1,5 @@
 from pathlib import Path
+from random import Random
 from tempfile import TemporaryDirectory
 from typing import Optional, List, Set, Union
 
@@ -106,6 +107,7 @@ def _reranker(
         rerank_hits: int,
         index: Index,
         axioms: List[Axiom],
+        random: Random = Random(),
 ) -> Reranker:
     reranking_context = IndexRerankingContext(index)
     reranker_cascade = [OriginalReranker()]
@@ -118,6 +120,7 @@ def _reranker(
                         OriginalAxiom() * len(axioms),
                         *axioms,
                     ]).normalized().cached(),
+                    random,
                 )
             )
         elif reranker == RerankerType.FAIRNESS_ALTERNATING_STANCE:
@@ -223,6 +226,7 @@ class Pipeline:
             stance_tagger: StanceTaggerType,
             stance_threshold: Optional[float],
             num_hits: int,
+            random: Random = Random(),
     ):
         if cache_path is not None:
             cache_path.mkdir(exist_ok=True)
@@ -241,7 +245,13 @@ class Pipeline:
             cache_path
         )
         self.searcher = AnseriniSearcher(self.index, retrieval_model, num_hits)
-        self.reranker = _reranker(rerankers, rerank_hits, self.index, axioms)
+        self.reranker = _reranker(
+            rerankers,
+            rerank_hits,
+            self.index,
+            axioms,
+            random,
+                                  )
         self.argument_tagger = TargerArgumentTagger(
             targer_api_url,
             targer_models,

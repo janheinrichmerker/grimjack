@@ -2,6 +2,7 @@ from argparse import ArgumentParser, Namespace, ArgumentTypeError
 from logging import INFO, WARNING, ERROR
 from os import getcwd
 from pathlib import Path
+from random import Random
 from typing import Optional, Union, Set, List, Dict, Callable
 
 from grimjack import logger
@@ -336,6 +337,12 @@ def _prepare_parser(parser: ArgumentParser) -> ArgumentParser:
         type=positive(int),
         default=100,
     )
+    parser.add_argument(
+        "--random-seed", "--random", "-s",
+        dest="random",
+        type=Random,
+        default=Random(),
+    )
 
     parsers = parser.add_subparsers(title="subcommands", dest="command")
     _prepare_parser_print_search(parsers.add_parser("search"))
@@ -539,6 +546,7 @@ def main():
     verbose: bool = args.verbose
     quiet: bool = args.quiet
     num_hits: int = args.num_hits
+    random: Random = Random()
     documents_source: Union[Path, str] = args.documents_source
     topics_source: Union[Path, str] = args.topics_source
     stopwords_file: Optional[Path] = args.stopwords_file
@@ -552,6 +560,8 @@ def main():
     )
     rerankers: List[RerankerType] = _parse_rerankers(args.rerankers)
     rerank_hits: Optional[int] = args.rerank_hits
+    if rerank_hits is None:
+        rerank_hits = num_hits
     if rerank_hits > num_hits:
         logger.warning(
             f"Cannot rerank {rerank_hits} hits "
@@ -611,6 +621,7 @@ def main():
         stance_tagger=stance_tagger,
         stance_threshold=stance_threshold,
         num_hits=num_hits,
+        random=random,
     )
 
     if args.command == "search":

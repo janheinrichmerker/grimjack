@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from random import randint
+from random import Random
 from typing import List
 
 from grimjack import logger
@@ -43,6 +43,7 @@ def _reset_score(
 class AxiomaticReranker(Reranker):
     context: RerankingContext
     axiom: Axiom
+    random: Random = Random()
 
     def kwiksort(
             self,
@@ -58,7 +59,7 @@ class AxiomaticReranker(Reranker):
 
         # Select random pivot.
         logger.debug("Selecting reranking pivot.")
-        pivot = vertices[randint(0, len(vertices) - 1)]
+        pivot = vertices[self.random.randint(0, len(vertices) - 1)]
 
         for vertex in vertices:
             if vertex == pivot:
