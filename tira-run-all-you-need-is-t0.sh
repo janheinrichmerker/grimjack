@@ -8,4 +8,4 @@
   --quality-tagger t0pp \
   --stance-tagger t0pp \
   --stance-threshold 0.125 \
-  --num-hits 20
+  --num-hits 100

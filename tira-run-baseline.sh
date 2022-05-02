@@ -6,4 +6,4 @@
   --quality-tagger debater \
   --stance-tagger debater-sentiment \
   --stance-threshold 0.125 \
-  --num-hits 20
+  --num-hits 100

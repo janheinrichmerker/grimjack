@@ -92,7 +92,7 @@ pipenv run python -m grimjack \
   --quality-tagger debater \
   --stance-tagger debater-sentiment \
   --stance-threshold 0.125 \
-  --num-hits 20 \
+  --num-hits 100 \
   run \
   data/runs/grimjack-baseline.txt
 ```
@@ -109,7 +109,7 @@ pipenv run python -m grimjack \
   --quality-tagger debater \
   --stance-tagger debater-sentiment \
   --stance-threshold 0.125 \
-  --num-hits 20 \
+  --num-hits 100 \
   --rerank-hits 10 \
   --reranker axiomatic \
   --argumentative-axioms \
@@ -130,7 +130,7 @@ pipenv run python -m grimjack \
   --quality-tagger debater \
   --stance-tagger debater-sentiment \
   --stance-threshold 0.125 \
-  --num-hits 20 \
+  --num-hits 100 \
   --rerank-hits 10 \
   --reranker axiomatic \
   --argumentative-axioms \
@@ -156,7 +156,7 @@ pipenv run python -m grimjack \
   --quality-tagger t0pp \
   --stance-tagger t0pp \
   --stance-threshold 0.125 \
-  --num-hits 20 \
+  --num-hits 100 \
   run \
   data/runs/grimjack-all-you-need-is-t0.txt
 ```
@@ -181,7 +181,7 @@ pipenv run python -m grimjack \
   --quality-tagger debater \
   --stance-tagger debater-sentiment \
   --stance-threshold 0.125 \
-  --num-hits 20 \
+  --num-hits 100 \
   --rerank-hits 10 \
   --reranker axiomatic \
   --argumentative-axioms \
