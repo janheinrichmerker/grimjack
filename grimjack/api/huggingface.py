@@ -104,7 +104,7 @@ class CachedHuggingfaceTextGenerator(ContextManager):
                 logger.info("Retrying in 1h.")
                 _sleep_with_progress(1 * 60 * 60)
                 return self._fetch_single_request(text)
-            elif response.status_code == 429:
+            elif response.status_code // 100 == 5:
                 logger.warning("Huggingface server error.")
                 logger.info("Retrying in 1m.")
                 _sleep_with_progress(1 * 60)
