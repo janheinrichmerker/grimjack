@@ -119,7 +119,7 @@ This argumentativeness, however, is most important for finding relevant and usef
 Also, passages in our pipeline are already annotated with argumentative quality and stance.
 Recent approaches for the TREC Common Core and Decision tracks exploit task-specific, argumentative retrieval axioms to ensure argumentativeness in their results~\cite{BondarenkoHVSPB2018,BondarenkoFKHVS2019}.
 Axioms are constraints that define pairwise preferences between documents or passages.
-Because of the promising development in the field of axiomatic information retrieval\footnote{The \iraxioms Python framework was only released shortly before our submission: \url{https://github.com/webis-de/ir_axioms/}}, we re-rank the top-10 passages with the \KwikSort algorithm~\cite{HagenVGS2016}.
+Because of the promising development in the field of axiomatic information retrieval~\cite{BondarenkoFRSVH2022}, we re-rank the top-10 passages with the \KwikSort algorithm~\cite{HagenVGS2016}.
 For axiomatic re-ranking, we compute preferences for 7~argumentative axioms listed in Table~\ref{table-axioms}.
 The axioms cover general argumentativeness~(ArgUC), argumentative relevance~(QTArg, QTPArg), comparative relevance~(CompArg, CompPArg), and rhetorical and argumentative quality~(aSLDoc, ArgQ).
 We then combine the axioms in a majority voting scheme, i.e., we only keep preferences where at least~50\,\% of the 7~axioms agree, and fall back to the original ranking order if less than~50\,\% of all axioms agree.
