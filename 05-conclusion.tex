@@ -1,19 +1,17 @@
 \section{Conclusion}
 
-We propose a flexible approach to tackle the task of answering comparative questions and detecting the stance of the returned passages with respect to the comparative objects.
-Our approach combines query reformulation and expansion techniques with axiomatic re-ranking exploiting argumentative structure, quality, and stance.
-To determine argument quality and stance we showcase two state-of-the-art approaches using the IBM Debater API and the T0++~language model.
-Our work builds on approaches from earlier years of the Touché shared task by using different techniques to expand the original queries and also incorporates the contextual information provided in topic descriptions and narratives.
-Furthermore, we propose two simple strategies to balance the exposure of conflicting argument stances on top-\(k\) ranks.
+% We propose a flexible approach to tackle the task of answering comparative questions and detecting the stance of the returned passages with respect to the comparative objects.
+To retrieve relevant argumentative passages, we combine query reformulation and expansion techniques with axiomatic re-ranking exploiting argumentative structure, quality, and stance.
+Using the IBM Debater API and the T0++~language model, we showcase two state-of-the-art approaches for argument quality tagging.
+We extend previous query expansion approaches from the Touché shared tasks by incorporating the contextual information provided in topic descriptions and narratives.
+To attain fair exposure in the final ranking, we balance the pro and con arguments on top-10 ranks.
 
-Our experiments from Section~\ref{evaluation} show that query expansion and reformulation using additional information from descriptions and narratives can provide better search results for some topics, but can also decrease effectiveness for others.
-A subsequent axiomatic re-ranking step can improve the system's precision but we do not include a systematic evaluation of the re-ranker.
+Our experiments indicate that query expansion and reformulation can provide better search results for some topics, but can also decrease effectiveness for others.
+A subsequent axiomatic re-ranking step can improve the system's precision but we do not include a systematic evaluation of the re-ranker. \todo{Evaluate axiomatic re-ranking.}
 
-Since we solely rely on external APIs for stance classification that only provide a single-target stance, computing the multi-target stance from a single-target stance proved to be challenging.
-Second, our current approach is unable to distinguish neutral arguments from arguments with no stance at all.
-We argue that fine-tuning a neural network like \Bert on the stance dataset provided by \citeauthor{BondarenkoFKSGBPBSWPH2022} could improve classification performance by directly predicting the multi-target stance.
+Because our approach for stance classification depends on an API for single-target stance classification, aggregating the objects' single-target stances to form a multi-target stance is not straight-forward.
+We did not find a natural way to distinguish neutral arguments from arguments with no stance.
+Arguably, fine-tuning a multi-class neural classifier like \Bert on the stance dataset provided by \citeauthor{BondarenkoFKSGBPBSWPH2022} could improve classification performance by directly predicting the multi-target stance.
 
-Another interesting question that arose during our research is if it would be possible to mainly use large language models to develop an argumentative information retrieval pipeline.
-Given the recent controversy of using large language models in information retrieval, we look forward to evaluate this question in more detail with relevance judgements for the Touché 2022 shared task.
-
-Our approach showcases several possible solutions to the diverse and challenging problems in answering comparative questions and highlights limitations and caveats.
+Our runs featuring text generation with the T0++ languge model motivate the controversial question whether we could effectively retrieve arguments while using large language models in every step of the retrieval pipeline.
+Given the recent doubts about the explainability of such models, we look forward to evaluate this question in more detail with relevance judgements for the Touché 2022 shared task.
