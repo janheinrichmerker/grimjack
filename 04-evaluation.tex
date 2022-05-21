@@ -9,7 +9,7 @@ We submit 5~runs that use different components and strategies of our approach~(S
 
 \paragraph{Query Likelihood Baseline}
 
-For our first run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-03-16-21-30}}, we retrieve 20~passages ranked by query likelihood with Dirichlet smoothing for the original, unmodified query. We then use the IBM fastText TARGER model to tag argument structure,
+For our first run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-03-16-21-30}}, we retrieve 100~passages ranked by query likelihood with Dirichlet smoothing~(\(\mu = 1000\)) for the original, unmodified query. We then use the IBM fastText TARGER model to tag argument structure,
 the IBM Debater API to tag argument quality.
 We tag argument stance by comparing sentiments for each object using the IBM Debater API, treating a stance under a threshold of~0.125 as neutral.
 

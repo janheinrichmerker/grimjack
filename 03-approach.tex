@@ -2,7 +2,7 @@
 
 \input{figure-pipeline.tex}
 
-We design the architecture of our argumentative retrieval system as a pipeline of multiple steps that subsequently (re-)rank, annotate, or modify the documents or queries given as inputs. This pipeline is shown in Figure~\ref{figure-pipeline}.
+We design the architecture of our argumentative retrieval system as a pipeline of multiple steps that subsequently (re-)rank, annotate, or modify the documents retrieved for each query by query likelihood with Dirichlet smoothing~(\(\mu = 1000\)). Our modular pipeline is shown in Figure~\ref{figure-pipeline}.
 We identify four core steps as most important to our approach:
 \Ni query expansion, reformulation, and combination,
 \Nii first-stage retrieval,
@@ -70,7 +70,7 @@ From this first-stage ranker, we retrieve 100~candidate passages for each query.
 After retrieving candidate passages, we tag the argumentative structure, argumentative quality and argument stance.
 Argument structure, quality, and stance are required for later steps in our retrieval pipeline to re-rank the passages~(c.f. Section~\ref{reranking}).
 Also, the task organizers ask the participants to optionally return a stance for each retrieved document as a sub-task in the Touché Lab on Argument Retrieval.
-We tag each passage's argumentative structure with the TARGER API\footnote{\url{https://demo.webis.de/targer/}} using the \textttsmall{targer-api} Python package\footnote{\url{https://github.com/webis-de/targer-api}}.
+We tag each passage's argumentative structure with the TARGER argument tagger~\cite{ChernodubOHBHBP2019} using the \textttsmall{targer-api} Python package\footnote{\url{https://github.com/webis-de/targer-api}}.
 In order to tag each passage's quality and stance we first split each retrieved passage into sentences using the NLTK library~\cite{BirdLK2009}.
 Then each sentence is treated as one potential argument and tagged with its argumentative quality and stance.
 To find the quality score and stance for the whole passage, we average the quality or stance scores respectively of all sentences in the passage.
