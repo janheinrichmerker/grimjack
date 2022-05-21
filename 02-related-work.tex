@@ -26,3 +26,7 @@ On many tasks, T0 outperforms larger models, that have not been trained on diffe
 Axioms in information retrieval are constraints that ideal retrieval systems should comply to, e.g., documents with more query term occurrences should be ranked higher~\citet{FangTZ2004}.
 Complementing such universal retrieval axioms, \citet{BondarenkoHVSPB2018} introduce argumentative axioms based on claims and premises annotated with the TARGER argument tagger~\cite{ChernodubOHBHBP2019}.
 The \iraxioms\footnote{\url{https://github.com/webis-de/ir_axioms/}} Python framework facilitates defining own task-specific axioms, combining multiple axioms, and using axioms for re-ranking using the \KwikSort algorithm~\cite{BondarenkoFRSVH2022,HagenVGS2016} and thus opens the opportunity to propse new argumentative axioms that exploit a document's ``comparativeness'' or argumentative quality.
+
+At the Touché shared tasks, living and reproducable software is favored over generated run files.
+Using the TIRA platform\footnote{\url{https://tira.io}}~\cite{PotthastGWS2019}, scientific approaches, systems and models can be deployed in virtual machines in order to ease reproducing their results~\cite{PotthastGWS2019}.
+Additionally, the TIRA system automatically evaluates submitted approaches of shared task participants and reports a reproducible leaderboard of the \nDCG{5} scores.\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}}
