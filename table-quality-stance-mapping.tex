@@ -1,0 +1,40 @@
+\begin{table}
+    \caption{Argument quaity label and argument stance label mapping from textual labels returned by the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.}
+    \label{table-quality-stance-mapping}
+    \begin{subcaptionblock}[t]{0.49\linewidth}
+        \caption{Argument quaity label mapping for the prompt \query{How would you rate the readability and consistency in this sentence?}.}
+        \label{table-quality-mapping}
+        \centering
+        \vspace{1ex}
+        \begin{tabular}{lc}
+            \toprule
+            \textbf{Text Label} & \textbf{Value} \\
+            \midrule
+            \query{very good} & 1.00 \\
+            \query{good} & 0.75 \\
+            \query{bad} & 0.25 \\
+            \query{very bad} & 0.00 \\
+            other & 0.50 \\
+            \bottomrule
+        \end{tabular}
+    \end{subcaptionblock}
+    \hfill
+    \begin{subcaptionblock}[t]{0.49\linewidth}
+        \caption{Argument stance label mapping for the prompts \query{Is this sentence pro <object>?}~(Pro) and \query{Is this sentence against <object>?}~(Con) given a single comparative object \query{<object>}.}
+        \label{table-stance-mapping}
+        \centering
+        \vspace{1ex}
+        \begin{tabular}{llc}
+            \toprule
+            \multicolumn{2}{c}{\textbf{Text Label}} & \textbf{Value} \\
+            Pro & Con & \\
+            \midrule
+            \query{yes} / \query{pro} & \query{yes} / \query{con} & \phantom{-}0 \\
+            \query{yes} / \query{pro} & \query{no} & +1 \\
+            \query{no} & \query{yes} / \query{con} & -1 \\
+            \query{no} & \query{no} & \phantom{-}0 \\
+            other & other & \phantom{-}0 \\
+            \bottomrule
+        \end{tabular}
+    \end{subcaptionblock}
+\end{table}

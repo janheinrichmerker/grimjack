@@ -73,7 +73,7 @@ Then each sentence is treated as one potential argument and tagged with its argu
 To find the quality score and stance for the whole passage, we average the quality or stance scores respectively of all sentences in the passage.
 
 \paragraph{Argument Quality Tagging}
-\input{table-quality-mapping.tex}
+\input{table-quality-stance-mapping.tex}
 
 We implement two different methods for quality tagging:
 Our first method is based on the IBM Debater API~\footnote{\url{https://early-access-program.debater.res.ibm.com}}~\cite{ToledoGCFVLJAS2019}.
@@ -86,7 +86,6 @@ This results in an output of either \query{very good}, \query{good}, \query{bad}
 We then map this textual output labels to numeric values as per the mapping shown in Table~\ref{table-quality-mapping}.
 
 \paragraph{Argument Stance Tagging}
-\input{table-stance-mapping.tex}
 
 Stance detection for each sentence uses the same conceptual approaches but with different inputs and outputs.
 Since both the IBM Debater API~\cite{BarHaimBDSS2017} and our T0++~approach~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} are only capable of calculating a single-target stance~(i.e., for one of the two comparative objects), we combine the two single-target stances into a multi-target stance by taking the difference between the stance towards the first comparative object and the stance towards the second comparative object.
