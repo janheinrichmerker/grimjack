@@ -1,8 +1,8 @@
 \begin{table}
-    \caption{Argument quaity label and argument stance label mapping from textual labels returned by the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.}
+    \caption{Argument quality label and argument stance label mapping from textual labels returned by the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.}
     \label{table-quality-stance-mapping}
-    \begin{subcaptionblock}[t]{0.49\linewidth}
-        \caption{Argument quaity label mapping for the prompt \query{How would you rate the readability and consistency in this sentence?}.}
+    \begin{subfigure}[t]{0.49\linewidth}
+        \caption{Argument quality label mapping for the prompt \query{How would you rate the readability and consistency in this sentence?}.}
         \label{table-quality-mapping}
         \centering
         \vspace{1ex}
@@ -17,9 +17,9 @@
             other & 0.50 \\
             \bottomrule
         \end{tabular}
-    \end{subcaptionblock}
+    \end{subfigure}
     \hfill
-    \begin{subcaptionblock}[t]{0.49\linewidth}
+    \begin{subfigure}[t]{0.49\linewidth}
         \caption{Argument stance label mapping for the prompts \query{Is this sentence pro <object>?}~(Pro) and \query{Is this sentence against <object>?}~(Con) given a single comparative object \query{<object>}.}
         \label{table-stance-mapping}
         \centering
@@ -36,5 +36,5 @@
             other & other & \phantom{-}0 \\
             \bottomrule
         \end{tabular}
-    \end{subcaptionblock}
+    \end{subfigure}
 \end{table}
