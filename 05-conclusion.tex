@@ -7,7 +7,7 @@ We extend previous query expansion approaches from the Touché shared tasks by i
 To attain fair exposure in the final ranking, we balance the pro and con arguments on top-10 ranks.
 
 Our experiments indicate that query expansion and reformulation can provide better search results for some topics, but can also decrease effectiveness for others.
-A subsequent axiomatic re-ranking step can improve the system's precision but we do not include a systematic evaluation of the re-ranker. \todo{Evaluate axiomatic re-ranking.}
+A subsequent axiomatic re-ranking step can improve the system's precision on some queries compared to our T0-based run, but with our limited manual relevance judgments, we could not include a systematic evaluation of each re-ranking variant.
 
 Because our approach for stance classification depends on an API for single-target stance classification, aggregating the objects' single-target stances to form a multi-target stance is not straight-forward.
 We did not find a natural way to distinguish neutral arguments from arguments with no stance.
