@@ -307,6 +307,7 @@ class Pipeline:
 
     def run_search_all(self, path: Path, tag: Optional[str]):
         tag: str = tag if tag is not None else path.stem
+        path.parent.mkdir(exist_ok=True, parents=True)
         with path.open("w") as file:
             topics = tqdm(
                 self.topics_store.topics,
