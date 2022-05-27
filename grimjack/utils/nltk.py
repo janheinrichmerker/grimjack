@@ -9,6 +9,9 @@ SKIPPED_NLTK_DOWNLOAD = False
 
 def download_nltk_dependencies(*dependencies: str):
     global SKIPPED_NLTK_DOWNLOAD
+    if SKIPPED_NLTK_DOWNLOAD:
+        return
+
     try:
         head(Downloader.DEFAULT_URL, timeout=1)
     except ConnectionError:
