@@ -2,11 +2,10 @@
 
 \input{figure-pipeline.tex}
 
-We design the architecture of our argumentative retrieval system as a pipeline of multiple steps that subsequently (re-)rank, annotate, or modify the documents retrieved for each query by query likelihood with Dirichlet smoothing~(\(\mu = 1000\)). Our modular pipeline is shown in Figure~\ref{figure-pipeline}.
-We identify four core steps as most important to our approach:
+We design the architecture of our argumentative retrieval system as a multi-step pipeline that subsequently (re-)ranks, annotates, or modifies documents retrieved for each query with the query likelihood with Dirichlet smoothing~(\(\mu = 1\;000\)). As shown in Figure~\ref{figure-pipeline}, our proposed pipeline consists of four main steps:
 \Ni query expansion, reformulation, and combination,
 \Nii first-stage retrieval,
-\Niii argument quality and stance tagging,
+\Niii argument quality estimation and stance detection,
 and \Niv axiomatic re-ranking and fairness re-ranking.
 
 \subsection{Query Expansion, Reformulation, and Combination}
@@ -119,7 +118,8 @@ Because of the promising development in the field of axiomatic information retri
 For axiomatic re-ranking, we compute preferences for 7~argumentative axioms listed in Table~\ref{table-axioms}.
 The axioms cover general argumentativeness~(ArgUC), argumentative relevance~(QTArg, QTPArg), comparative relevance~(CompArg, CompPArg), and rhetorical and argumentative quality~(aSLDoc, ArgQ).
 We then combine the axioms in a majority voting scheme, i.e., we only keep preferences where at least~50\,\% of the 7~axioms agree, and fall back to the original ranking order if less than~50\,\% of all axioms agree.
-Using the \iraxioms library, we then re-rank with the combined axiom.
+Using the \iraxioms framework~\cite{BondarenkoFRSVH2022},%
+\footnote{\url{https://github.com/webis-de/ir_axioms/}} we then re-rank with the combined axiom.
 
 \paragraph{Fairness Re-ranking}
 
