@@ -1,24 +1,25 @@
 \section{Related Work}
 
-Comparative questions commonly help to support personal decisions we routinely face in everyday life~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021,BondarenkoFKSGBPBSWPH2022} by answering questions like \query{Is X better than Y with respect to Z?}.
-However, such questions cannot usually be concluded with one single (potentially biased) direct answer~\cite{PotthastHS2020}, but instead require diverse opinions to give a sufficient, fair, and argumentative overview~\cite{BondarenkoFBGAPBSWPH2020}.
-The Touché shared task on Argument Retrieval for Comparative Questions is held to evaluate comparative argument search engines on the large-scale the ClueWeb~12 corpus with respect to relevance and rhetorical quality~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021,BondarenkoFKSGBPBSWPH2022}.
+Personal decision making often starts with formulating comparative questions like ``Should I major in philosophy or psychology?''~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021,BondarenkoFKSGBPBSWPH2022}. Short direct answers (potentially biased)~\cite{PotthastHS2020} to such questions might be insufficient; instead, they require diverse opinions to provide a sufficient, fair, and argumentative overview~\cite{BondarenkoFBGAPBSWPH2020}.
+The Touch{\'e} shared task on Argument Retrieval for Comparative Questions was proposed to evaluate retrieval approaches on the large corpus with respect to relevance and rhetorical quality of potential answers to comparative questions that also may represent different standpoints~\cite{BondarenkoADHBH22}.
 
-In~2020, five teams submitted eleven runs to 50~comparative topics.
-For the best approach in 2020, Team Bilbo Baggins, \citet{AbyeST2020} expand queries with synonyms and antonyms of comparative entities and retrieve candidate documents from the ClueWeb~12 using ChatNoir with BM25F scoring~\cite{PotthastHSGMTW2012,BevendorffSHP2018}, compute argument quality scores from parsed arguments by evidence mining and link analysis, collect relevance, support, and credibility scores, and re-rank the documents by a weighted combination of the aforementioned scores.
-The second best approach, Team Inigo Montoya, retrieves 20~documents from ChatNoir~\cite{BevendorffSHP2018} using the original queries~\cite{Huck2020}. \citeauthor{Huck2020} analyze the argumentative structure
-with TARGER~\cite{ChernodubOHBHBP2019} index premises and claims and retrieve 20 results by BM25.
+The most effective approaches at previous Touch{\'e} editions~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021} successfully used query expansion with synonyms and antonyms~\cite{AbyeST2020}, identified argumentative units (premises and claims) in retrieved documents~\cite{Huck2020, ShirshakovaW2021}, estimated argument quality~\cite{AbyeST2020}, and re-ranked initially retrieved documents based on argument quality and document ``comparativeness'', e.g., a ratio of comparative adjectives~\cite{ChekalinaP2021}. Inspired by the participant approaches from the previous Touch{\'e} editions, we also include the components of argument mining and argument quality estimation in retrieval pipeline.
 
-For the 2021 shared task, \citeauthor{BondarenkoGFBAPBSWPH2021} introduced 50~new comparative topics and released the relevance labels from~2020 to train subsequent learning-to-rank steps or to tune model hyperparameters.
-Six teams submitted runs to this task.
-For the best-scoring approach from 2021, Team Katana, the top-100 documents were retrieved from the ClueWeb~12 using ChatNoir~\cite{BevendorffSHP2018}. \citet{ChekalinaP2021} then remove HTML markup, extract 8~features~(based on term occurrence and comparative structure) using PyTerrier, and then train gradient descent re-rankers (i.e. XGBoost~\cite{ChenG2016} and LightGBM~\cite{KeMFWCMYL2017}) on relevance judgments from 2020~\cite{ChekalinaP2021}.
-Team Thor, second place in Touché~2021, similarly remove punctuation from the top-110 documents retrieved by ChatNoir~\cite{BevendorffSHP2018} and extract the main content~\cite{ShirshakovaW2021}. The resulting documents are then indexed with Elasticsearch and documents are retrieved for the the expanded query (query expansion using WordNet synonyms~\cite{Miller1992}) with BM25~(\( b = 0.68;~k_1 = 1.2 \)).
+%In~2020, five teams submitted eleven runs to 50~comparative topics.
+%For the best approach in 2020, Team Bilbo Baggins, \citet{AbyeST2020} expand queries with synonyms and antonyms of comparative entities and retrieve candidate documents from the ClueWeb~12 using ChatNoir with BM25F scoring~\cite{PotthastHSGMTW2012,BevendorffSHP2018}, compute argument quality scores from parsed arguments by evidence mining and link analysis, collect relevance, support, and credibility scores, and re-rank the documents by a weighted combination of the aforementioned scores.
+%The second best approach, Team Inigo Montoya, retrieves 20~documents from ChatNoir~\cite{BevendorffSHP2018} using the original queries~\cite{Huck2020}. \citeauthor{Huck2020} analyze the argumentative structure
+%with TARGER~\cite{ChernodubOHBHBP2019} index premises and claims and retrieve 20 results by BM25.
 
-In this year's third edition, instead, the goal is to find argumentative and relevant passages from a focused collection of 868\,655~passages extracted from ClueWeb~12 documents~\cite{BondarenkoFKSGBPBSWPH2022}.
-\citeauthor{BondarenkoFKSGBPBSWPH2022} present 50~topics sampled from the 2020~and 2021~shared tasks. 
-For each topic, the task organizers provide a title, description, narrative, and the names of the two objects to be compared
-Even though this edition's task is based on a slightly different corpus, the best-performing runs from previous Touché shared tasks can act as best practices to new passage retrieval approaches.
-However, we also see large potential in exploring recent advances in large language models and axiomatic information retrieval.
+%For the 2021 shared task, \citeauthor{BondarenkoGFBAPBSWPH2021} introduced 50~new comparative topics and released the relevance labels from~2020 to train subsequent learning-to-rank steps or to tune model hyperparameters.
+%Six teams submitted runs to this task.
+%For the best-scoring approach from 2021, Team Katana, the top-100 documents were retrieved from the ClueWeb~12 using ChatNoir~\cite{BevendorffSHP2018}. \citet{ChekalinaP2021} then remove HTML markup, extract 8~features~(based on term occurrence and comparative structure) using PyTerrier, and then train gradient descent re-rankers (i.e. XGBoost~\cite{ChenG2016} and LightGBM~\cite{KeMFWCMYL2017}) on relevance judgments from 2020~\cite{ChekalinaP2021}.
+%Team Thor, second place in Touché~2021, similarly remove punctuation from the top-110 documents retrieved by ChatNoir~\cite{BevendorffSHP2018} and extract the main content~\cite{ShirshakovaW2021}. The resulting documents are then indexed with Elasticsearch and documents are retrieved for the the expanded query (query expansion using WordNet synonyms~\cite{Miller1992}) with BM25~(\( b = 0.68;~k_1 = 1.2 \)).
+
+%In this year's third edition, instead, the goal is to find argumentative and relevant passages from a focused collection of 868\,655~passages extracted from ClueWeb~12 documents~\cite{BondarenkoFKSGBPBSWPH2022}.
+%\citeauthor{BondarenkoFKSGBPBSWPH2022} present 50~topics sampled from the 2020~and 2021~shared tasks. 
+%For each topic, the task organizers provide a title, description, narrative, and the names of the two objects to be compared
+%Even though this edition's task is based on a slightly different corpus, the best-performing runs from previous Touché shared tasks can act as best practices to new passage retrieval approaches.
+%However, we also see large potential in exploring recent advances in large language models and axiomatic information retrieval.
 
 Large language models like T0++ trained with multitask prompts claim reasonable zero-shot generalization abilities~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
 On many tasks, T0 outperforms larger models, that have not been trained on different tasks. The largest pretrained model,~T0++, was trained on 62~datasets for 12~task-specific prompts and thus seems promising to be applied to new tasks.
