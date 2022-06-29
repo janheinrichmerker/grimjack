@@ -35,7 +35,7 @@ With the synonyms returned by either strategy, we replace the comparative object
 
 We complement the queries expanded by replacing synonyms with newly generated queries that incorporate the contextual information provided in description narrative fields from the shared task's topics.
 The description contains important details about the actual information need and the narrative clearly defines which passages are relevant for the query.
-We use this valuable information about which passages to retrieve by generating new queries with the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and providing it with a topic's description or narrative.
+We use this valuable information about which passages to retrieve by generating new queries with the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} using the Huggingface Inference API~\cite{WolfDSCDMCRLFDSPMJPXSGDLR2020} and providing it with a topic's description or narrative.
 
 We challenge the T0++~model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
 The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
