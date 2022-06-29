@@ -11,80 +11,77 @@ and \Niv axiomatic re-ranking and fairness re-ranking.
 \subsection{Query Expansion, Reformulation, and Combination}
 \label{reformulation}
 
-In order to increase recall of our first-stage ranker and to include results for very similar yet differently named objects, we first expand and reformulate the original search query.
-Our approaches use two different strategies: \Ni we replace the comparative objects with their synonyms and \Nii we generate additional, new queries using the additional description and narrative information provided by the shared task organizers~\cite{BondarenkoFKSGBPBSWPH2022}.
-Expanding the original query with synonyms of comparative objects is motivated by the fact that documents often contain more specific comparisons~(e.g., Ubuntu vs Windows) instead of more broad comparisons~(e.g., Linux vs Windows).
-Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
-We might therefore find relevant documents that would otherwise not match any original query term.
-It is however important to note that increasing recall can result in an decrease in precision which is undesirable in the precision-oriented setting of the shared task.
-However, we later apply re-ranking steps that improve precision by moving irrelevent documents further down the ranking~(c.f. Section~\ref{reranking}).
+The first step of our retrieval pipeline is original query (task's topic titles) reformulation and expansion that aims for increasing a recall.
+For that, we use two different strategies: \Ni replacing the comparison objects with their synonyms (e.g., Ubuntu vs.\ Windows $\rightarrow$ Linux vs.\ Windows) and \Nii generating additional, new queries exploiting the topics' description and narrative provided by the task organizers~\cite{BondarenkoFKSGBPBSWPH2022}.
+%Expanding the original query with synonyms of comparative objects is motivated by the fact that documents often contain more specific comparisons~(e.g., Ubuntu vs Windows) instead of more broad comparisons~(e.g., Linux vs Windows).
+%Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
+%We might therefore find relevant documents that would otherwise not match any original query term.
+We then address the precision-recall by later deploying re-ranking steps by moving more relevant documents at the top of the ranking~(cf.\ Section~\ref{reranking}).
 
-\paragraph{Query Expansion with Synonyms}
+\paragraph{Query \redtext{Expansion} with Synonyms.}
 
-We use two different strategies to find synonyms: \Ni word embeddings and \Nii a zero-shot language model.
-In our first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} to find words with the highest cosine similarity to the given comparative objects in the embedding space.
-We manually examine synonyms from fastText embeddings using different domains~(i.e., Wikipedia and Twitter) and find that fastText embeddings trained on the Twitter corpus result in the best synonyms.
+To find synonyms of comparison objects mentioned in questions (search queries), we use two different strategies: \Ni word embeddings and \Nii a zero-shot generation with pre-trained large language models.
+For the first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} \redtext{what python lib.?} to find words with the highest cosine similarity to the given comparison objects in the embedding space.
+We manually examine \redtext{how many} synonyms from the fastText embeddings pre-trained on different corpora (e.g., Wikipedia and Twitter) and find that the Twitter-based embeddings provide more accurate synonyms.
 
-Our second strategy to obtain synonyms is based on the T0++~zero-shot language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the model to generate an answer to the following task: \query{What are synonyms of the word~<token>?} where \query{<token>}~is one of the two comparative objects.
-From the text returned by the language model, we then parse synonyms by splitting at commas and remove duplicate synonyms.
-With the synonyms returned by either strategy, we replace the comparative objects to form new queries. All alternative queries and the original query are then combined.
+Our second strategy is based on the T0++~zero-shot language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
+We prompt the model to generate an answer to the following question: \query{What are synonyms of the word~<token>?}, where \query{<token>}~is one of the two original comparison objects. \redtext{how many?}
+We then process the output by splitting by commas and removing duplicated terms.
+With the synonyms returned by either strategy, we replace the comparison objects to formulate new question queries.
 
-\paragraph{Query Reformulation with Topic Context}
+\paragraph{Query Reformulation with Topic Context.}
 \input{table-generated-queries.tex}
 
-We complement the queries expanded by replacing synonyms with newly generated queries that incorporate the contextual information provided in description narrative fields from the shared task's topics.
-The description contains important details about the actual information need and the narrative clearly defines which passages are relevant for the query.
-We use this valuable information about which passages to retrieve by generating new queries with the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} using the Huggingface Inference API~\cite{WolfDSCDMCRLFDSPMJPXSGDLR2020} and providing it with a topic's description or narrative.
+In the next step, we complement the expanded queries with newly generated ones taking into account the contextual information from the topic's descriptions and narratives that
+contain important details on the actual information.
+Using the Hugging Face Inference API~\cite{WolfDSCDMCRLFDSPMJPXSGDLR2020}, we prompt T0++ with the following task: \query{<text>. Extract a natural search query from this description.}, where \query{<text>}~is either the topic's narrative or description. \redtext{always two queries per topic?}
+In Table~\ref{table-generated-queries}, we show the examples of generated queries.
+Albeit some of the generated queries (e.g., topic~53) are just reformulations of the original one, the T0++~model also generates some interesting new queries (e.g., topic~12).
 
-We challenge the T0++~model with the following task: \query{<text>. Extract a natural search query from this description.} where \query{<text>}~is either the topic's narrative or description.
-The string returned by the language model is then used as is as the new query for the topic and combined with the previous queries.
-In Table~\ref{table-generated-queries}, we show examples of generated queries.
-Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original query, the T0++~language model generates some interesting new queries for other topics~(e.g., topic~12).
+\paragraph{Disjunctive Query Combination.}
 
-\paragraph{Disjunctive Query Combination}
-After the query expansion and query reformulation steps, we need to combine all computed queries and the original query.
-We decide to combine all queries in a single query in a logical disjunction, that is by using Pyserini's OR operator.
-Two reasons influence this decision:
-Firstly, retrieving results for just one query is conceptually easier as we don't need to interleave multiple result sets after the retrieval step.
-Interleaving is not trivial and it is often challenging to find an interleaving strategy without many caveats.
-Secondly, the logical disjunction increases the system's recall and decrease the chance of empty result sets in the case that a term is not present in the corpus.
-Although, the query reformulation, expansion and combination steps are optional, meaning that we use these steps only in some runs. In most of our submitted runs, we just use the original query, because the increase in recall might result in a decrease query in precision that is hard to offset in subsequent re-ranking steps.
+Finally, we combine a total of \redtext{XX}~question queries (reformulated with synonyms, generated, and the original one) using a logical disjunction (Pyserini's \texttt{OR} operator).
+%Two reasons influence this decision:
+%Firstly, retrieving results for just one query is conceptually easier as we don't need to interleave multiple result sets after the retrieval step.
+%Interleaving is not trivial and it is often challenging to find an interleaving strategy without many caveats.
+We choose the logical disjunction with the outlook on increasing the system's recall and decreasing the chance of empty result sets in the case that search terms are not present in the corpus.
+%Although, the query reformulation, expansion and combination steps are optional, meaning that we use these steps only in some runs.
 
-\subsection{Passages Retrieval}\label{retrieval}
+In total we submitted 5~runs (retrieval results;  cf.\ Section~\ref{runs}) to the task, in some of which we use only the original query, and the expanded queries in the others to test the influence of the query expansion and reformulation on the final ranking results.
 
-To retrieve passages from the set of passages extracted from ClueWeb~12 by \citet{BondarenkoFKSGBPBSWPH2022}, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
-Pyserini allows for experimenting with multiple steps of a retrieval system including indexing and simple retrieval models like Okapi~BM25 or the query likelihood model.
+\subsection{Passage Retrieval}\label{retrieval}
+
+To retrieve passages from the task's corpus, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
+%Pyserini allows for experimenting with multiple steps of a retrieval system including indexing and simple retrieval models like Okapi~BM25 or the query likelihood model.
 In the index, we store index term positions, passage vectors, and raw passage contents.
 Index terms are stemmed using the Porter stemmer~\cite{Porter1980} and stop words are removed as per the default Pyserini stopword list~\cite{LinMLYPN2021}.
-We then retrieve passages for the previously combined query~(c.f. Section~\ref{reformulation}) using the query likelihood model with Dirichlet smoothing~(\( \mu = 1000 \)) in Pyserini.
+We then retrieve passages for the previously combined query~(cf.\ Section~\ref{reformulation}) using the query likelihood model with Dirichlet smoothing~(\( \mu = 1000 \)).
 From this first-stage ranker, we retrieve 100~candidate passages for each query.
 
-\subsection{Argument Quality and Stance Tagging}
+\subsection{Argument Tagging, Argument Quality and Stance Classification}
 \label{argument-tagging}
 
-After retrieving candidate passages, we tag the argumentative structure, argumentative quality and argument stance.
-Argument structure, quality, and stance are required for later steps in our retrieval pipeline to re-rank the passages~(c.f. Section~\ref{reranking}).
-Also, the task organizers ask the participants to optionally return a stance for each retrieved document as a sub-task in the Touché Lab on Argument Retrieval.
+After retrieving candidate passages, we tag the argumentative structure (premises and claims), estimate argument quality, and detect the stance (whether the passage is pro first comparison object, pro second, has neutral, or no stance.).
+This information is used in later steps of our retrieval pipeline for re-ranking (cf.\ Section~\ref{reranking}).
+%Also, the task organizers ask the participants to optionally return a stance for each retrieved document as a sub-task in the Touché Lab on Argument Retrieval.
 We tag each passage's argumentative structure with the TARGER argument tagger~\cite{ChernodubOHBHBP2019} using the \textttsmall{targer-api} Python package\footnote{\url{https://github.com/webis-de/targer-api}}.
-In order to tag each passage's quality and stance we first split each retrieved passage into sentences using the NLTK library~\cite{BirdLK2009}.
-Then each sentence is treated as one potential argument and tagged with its argumentative quality and stance.
-To find the quality score and stance for the whole passage, we average the quality or stance scores respectively of all sentences in the passage.
+
+To estimate the passage's argument quality and detect the stance, we first split each passage into sentences using the NLTK library~\cite{BirdLK2009}.
+Then each sentence is treated as one potential argument; the quality score and stance for the whole passage is calculated by averaging the quality or stance scores for all sentences in the passage.
 
 \paragraph{Argument Quality Tagging}
 \input{table-quality-stance-mapping.tex}
 
-We implement two different methods for quality tagging:
-Our first method is based on the IBM Debater API~\footnote{\url{https://early-access-program.debater.res.ibm.com}}~\cite{ToledoGCFVLJAS2019}.
-Here we send each sentence from one passage and the original query as the topic to the IBM Debater API for argument quality assessment. of Passages
-The API then determines how good the quality of each argument with regards to the topic is with a \Bert-based~\cite{DevlinCLT2019} regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The model and therefore the API then returns a quality score ranging from 0 to 1 where a classified score of~0 means very poor argument quality and a score of~1 means very good argument quality~\cite{ToledoGCFVLJAS2019}.
+We use two different methods for assessing the argument quality.
+Our first method is based on the IBM Debater API~\cite{ToledoGCFVLJAS2019}.%
+\footnote{\url{https://early-access-program.debater.res.ibm.com}}
+The API then determines how good the quality of each argument with regard to the topic is with a \Bert-based~\cite{DevlinCLT2019} regression classifier model trained on the IBM-ArgQ-6.3kArgs dataset. The API returns a quality score ranging from~0 (low quality) to~1 (high quality).
 
-As a second method to obtain the argument quality we also use the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We ask the zero-shot language model to generate a text the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence?}\hspace{1.5em} \query{very good, good, bad, very bad} where \query{<sentence>}~is one sentence of a passage.
-This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++~model interprets the sentence's argument quality.
-We then map this textual output labels to numeric values as per the mapping shown in Table~\ref{table-quality-mapping}.
+As a second method to obtain the argument quality we also use the T0++ model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} and prompt it to generate a text to the following task: \query{<sentence>. How would you rate the readability and consistency in this sentence?}\hspace{.5em} \query{very good, good, bad, very bad}, where \query{<sentence>}~is one of the passage sentences.
+%This results in an output of either \query{very good}, \query{good}, \query{bad}, or \query{very bad} depending on how the pretrained T0++~model interprets the sentence's argument quality.
+We then map the models textual outputs to numeric values using the mapping shown in Table~\ref{table-quality-mapping}. \redtext{weird it refers to Table 2!}
 
-\paragraph{Argument Stance Tagging}
+\paragraph{Stance Detection}
 
 Stance detection for each sentence uses the same conceptual approaches but with different inputs and outputs.
 Since both the IBM Debater API~\cite{BarHaimBDSS2017} and our T0++~approach~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} are only capable of calculating a single-target stance~(i.e., for one of the two comparative objects), we combine the two single-target stances into a multi-target stance by taking the difference between the stance towards the first comparative object and the stance towards the second comparative object.

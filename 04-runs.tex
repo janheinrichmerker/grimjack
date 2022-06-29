@@ -1,5 +1,5 @@
-\section{Evaluation}
-\label{evaluation}
+\section{Submitted Runs}
+\label{runs}
 
 For fast development and evaluation of different parameter settings, we complement our modular retrieval pipeline~(c.f., Section~\refname{approach}) with an evaluation component. Our evaluation module automatically loads relevance judgments from previous editions of the Touché shared tasks on Argument Retrieval~(c.f. Section~\ref{transfer-relevance-judgements}) and transfers the document-level relevance judgments from~2020 and~2021 to the passages from the 2022 dataset.
 
@@ -33,27 +33,3 @@ We then retrieve 20~documents by query likelihood, and use T0++ again to tag arg
 In our fifth run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-05-23-53-26}}, we combine most of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query reformulation and expansion.
 Here, we also formulate new queries from the description and narrative using~T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by fastText~\cite{BojanowskiGJM2017} embedding similarity~(c.f. Section~\ref{reformulation}).
 The top-10 results of the 100 passages retrieved using the query likelihood model for the expanded query are then re-ranked based on argumentative axioms and by alternating stance~(c.f. Section~\ref{reranking}).
-
-% \subsection{T0++ Stance Classification}
-
-% \todo{In camera ready, maybe evaluate T0 stance on the stance dataset provided by the organizers? We could reference this in the description of the T0-run above.}
-
-\subsection{Manual Assessment of Top-5 Results}
-% \input{table-judgments}
-\input{table-effectiveness}
-
-We assess the effectiveness of our approach by looking at the top-10 retrieved passages in the \emph{Fair Re-ranking and Argumentative Axioms}~(Fair) and \emph{All You Need is T0}~(T0) runs for the three topics~36~(\textquote{What IDE is better for Java: NetBeans or Eclipse?}), 48~(\textquote{Is pasta healthier than pizza?}), and~69~(\textquote{Who was a better boxer, Muhammad Ali or Joe Frazier?}).
-We manually judge relevance and stance for the 35~documents pooled from our \emph{Fair Re-ranking and Argumentative Axioms} and \emph{All You Need is T0} runs up to depth~10 for the three topics before the official results are made available by the organizers.
-Table~\ref{table-effectiveness} shows the normalized discounted cumulative gain, precision, and mean average precision for the top-10 documents from based on our manual judgments.
-Our results indicate that the T0-based approach is slightly better at comparing opinionated queries like topic~69 while the axiomatic and fairness re-ranking approach might improve the effectiveness for more fact-based queries.
-We look forward to further investigate this finding when deeper relevance judgments are made available by the organizers.
-
-\subsection{Transferring Relevance Judgements from Touché~2020--2021}
-\label{transfer-relevance-judgements}
-
-For a systematic evaluation of all runs with different metrics for effectiveness following the Cranfield paradigm, we also experiment with transferring the relevance judgements from previous editions of the Touché shared task~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
-In~2020 and~2021, however, the results were judged on the document level.
-Therefore, we using the topics and relevance judgements from Touché~2020--2021, but retrieve passages from the extracted passages in this year's collection~\cite{BondarenkoFKSGBPBSWPH2022}.
-Then we assume that if a document was relevant all passages extracted from that document are relevant as well, that is, the passages inherit their containing document's relevance label.
-Unfortunately, we could only match 16.76\,\% of the passages retrieved by our baseline with document relevance labels from Touché~2020--2021.
-Because of the insufficient label coverage we do not include a more detailed evaluation of effectiveness using previous editions' judgements.

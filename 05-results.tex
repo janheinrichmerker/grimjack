@@ -1,0 +1,24 @@
+\section{Results}
+\label{results}
+
+\redtext{NEEDS ACTUAL RESULTS}
+
+\subsection{Manual Assessment of Top-5 Results}
+% \input{table-judgments}
+\input{table-effectiveness}
+
+We assess the effectiveness of our approach by looking at the top-10 retrieved passages in the \emph{Fair Re-ranking and Argumentative Axioms}~(Fair) and \emph{All You Need is T0}~(T0) runs for the three topics~36~(\textquote{What IDE is better for Java: NetBeans or Eclipse?}), 48~(\textquote{Is pasta healthier than pizza?}), and~69~(\textquote{Who was a better boxer, Muhammad Ali or Joe Frazier?}).
+We manually judge relevance and stance for the 35~documents pooled from our \emph{Fair Re-ranking and Argumentative Axioms} and \emph{All You Need is T0} runs up to depth~10 for the three topics before the official results are made available by the organizers.
+Table~\ref{table-effectiveness} shows the normalized discounted cumulative gain, precision, and mean average precision for the top-10 documents from based on our manual judgments.
+Our results indicate that the T0-based approach is slightly better at comparing opinionated queries like topic~69 while the axiomatic and fairness re-ranking approach might improve the effectiveness for more fact-based queries.
+We look forward to further investigate this finding when deeper relevance judgments are made available by the organizers.
+
+\subsection{Transferring Relevance Judgements from Touché~2020--2021}
+\label{transfer-relevance-judgements}
+
+For a systematic evaluation of all runs with different metrics for effectiveness following the Cranfield paradigm, we also experiment with transferring the relevance judgements from previous editions of the Touché shared task~\cite{BondarenkoFBGAPBSWPH2020,BondarenkoGFBAPBSWPH2021}.
+In~2020 and~2021, however, the results were judged on the document level.
+Therefore, we using the topics and relevance judgements from Touché~2020--2021, but retrieve passages from the extracted passages in this year's collection~\cite{BondarenkoFKSGBPBSWPH2022}.
+Then we assume that if a document was relevant all passages extracted from that document are relevant as well, that is, the passages inherit their containing document's relevance label.
+Unfortunately, we could only match 16.76\,\% of the passages retrieved by our baseline with document relevance labels from Touché~2020--2021.
+Because of the insufficient label coverage we do not include a more detailed evaluation of effectiveness using previous editions' judgements.
