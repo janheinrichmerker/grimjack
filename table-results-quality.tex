@@ -1,8 +1,8 @@
 \begin{table}[t]
 \centering
-\footnotesize
-\renewcommand{\tabcolsep}{5pt}
-\caption{Quality results of all runs submitted to Task~2: Argument Retrieval for Comparative Questions. Reported are the mean nDCG@5 and the 95\% confidence intervals for our runs, the best run from competing teams~(Aldo Nadi), and the baseline~(Puss in Boots, in italics).}
+\small
+\renewcommand{\tabcolsep}{12.5pt}
+\caption{Quality results of all runs submitted to Task~2: Argument Retrieval for Comparative Questions. Reported are the mean nDCG@5 and the 95\% confidence intervals for our runs, the best task's run result (team Aldo Nadi), and the official task baseline~(Puss in Boots, in italics).}
 \label{table-results-quality}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -10,13 +10,13 @@
 \cmidrule(l@{\tabcolsep}){3-5}
 &  & \textbf{Mean} & \textbf{Low} & \textbf{High} \\
 \midrule
-Aldo Nadi~\cite{AbaAGMPVF2022} & seupd2122-kueri\_RF\_reranked & 0.774 & 0.719 & 0.828 \\
+Aldo Nadi~\cite{AbaAGMPVF2022} & RF\_reranked & 0.774 & 0.719 & 0.828 \\
 \textit{Puss in Boots}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{BM25-Baseline} & \textit{0.476} & \textit{0.400} & \textit{0.553} \\
-Grimjack & grimjack-fair-reranking-argumentative-axioms & 0.403 & 0.331 & 0.478 \\
-Grimjack & grimjack-fair-argumentative-reranking-with-t0 & 0.365 & 0.290 & 0.445 \\
-Grimjack & grimjack-argumentative-axioms & 0.363 & 0.289 & 0.442 \\
-Grimjack & grimjack-baseline & 0.363 & 0.287 & 0.443 \\
-Grimjack & grimjack-all-you-need-is-t0 & 0.344 & 0.266 & 0.428 \\
+Grimjack & Run 3 & 0.403 & 0.331 & 0.478 \\
+Grimjack & Run 5 & 0.365 & 0.290 & 0.445 \\
+Grimjack & Run 2 & 0.363 & 0.289 & 0.442 \\
+Grimjack & Run 1 & 0.363 & 0.287 & 0.443 \\
+Grimjack & Run 4 & 0.344 & 0.266 & 0.428 \\
 \bottomrule
 \end{tabular}
 \end{table}

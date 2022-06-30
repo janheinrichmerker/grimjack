@@ -1,8 +1,8 @@
 \begin{table}[t]
 \centering
-\footnotesize
-\renewcommand{\tabcolsep}{5pt}
-\caption{Relevance results of all runs submitted to Task~2: Argument Retrieval for Comparative Questions. Reported are the mean nDCG@5 and the 95\% confidence intervals for our runs, the best run from competing teams~(Captain Levi), and the baseline~(Puss in Boots, in italics).}
+\small
+\renewcommand{\tabcolsep}{10pt}
+\caption{Relevance results of all runs submitted to Task~2: Argument Retrieval for Comparative Questions. Reported are the mean nDCG@5 and the 95\% confidence intervals for our runs, the best task's run result (team Captain Levi), and the official task baseline~(Puss in Boots, in italics).}
 \label{table-results-relevance}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -10,13 +10,13 @@
 \cmidrule(l@{\tabcolsep}){3-5}
 & & \textbf{Mean} & \textbf{Low} & \textbf{High} \\
 \midrule
-Captain Levi~\cite{RanaGJCEHP2022} & levirank\_dense\_initial\_retrieval & 0.758 & 0.708 & 0.810 \\
+Captain Levi~\cite{RanaGJCEHP2022} & dense\_initial\_retr. & 0.758 & 0.708 & 0.810 \\
 \textit{Puss in Boots}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{BM25-Baseline} & \textit{0.469} & \textit{0.403} & \textit{0.535} \\
-Grimjack & grimjack-fair-reranking-argumentative-axioms & 0.422 & 0.349 & 0.500 \\
-Grimjack & grimjack-argumentative-axioms & 0.376 & 0.299 & 0.455 \\
-Grimjack & grimjack-baseline & 0.376 & 0.301 & 0.459 \\
-Grimjack & grimjack-fair-argumentative-reranking-with-t0 & 0.349 & 0.270 & 0.425 \\
-Grimjack & grimjack-all-you-need-is-t0 & 0.345 & 0.273 & 0.425 \\
+Grimjack & Run 3 & 0.422 & 0.349 & 0.500 \\
+Grimjack & Run 2 & 0.376 & 0.299 & 0.455 \\
+Grimjack & Run 1 & 0.376 & 0.301 & 0.459 \\
+Grimjack & Run 5 & 0.349 & 0.270 & 0.425 \\
+Grimjack & Run 4 & 0.345 & 0.273 & 0.425 \\
 \bottomrule
 \end{tabular}
 \end{table}
