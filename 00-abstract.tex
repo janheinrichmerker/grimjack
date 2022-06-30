@@ -1,12 +1,7 @@
 \begin{abstract}
-%  We, Team Grimjack, present our approach for answering comparative questions, submitted in five runs to the Touché Lab on Argument Retrieval.
-%  Our approach follows two objectives: ranking argumentative and high-quality documents first, and exposing arguments of different stances towards the compared objects fairly in high ranking positions.
-%  We therefore propose a multi-stage retrieval pipeline with query reformulation and combination, baseline retrieval, quality and stance tagging, and different task-specific re-ranking steps.
-%  First, we re-rank axiomatically based on argumentative retrieval axioms.
-%  Second, we re-rank to ensure fair exposure across argument stances.
-%  In all retrieval steps, we use the T0 language model to evaluate whether zero-shot language models can successfully answer comparative questions.
-In this paper, we present the Team's Grimjack retrieval approaches for the Touché shared task on Argument Retrieval for Comparative Questions. In total, we submit five runs that pursue the two main objectives: favoring argumentative and high argument quality documents in the final ranking and addressing a retrieval ``fairness'' by ensuring an even ratio of pro and con arguments at top ranks.
-%proposed alternative that might be enough for now. Once we have official evaluation results, we can add a sentence or two on that.
+In this paper, we present the Team's Grimjack retrieval approaches for the Touché shared task on Argument Retrieval for Comparative Questions. In total, we submit five runs that pursue the two main objectives: favoring argumentative and high argument quality documents in the final ranking and balancing stance-based exposure by ensuring an even ratio of pro and con arguments at top ranks.
+Our results indicate that BM25 outperforms query likelihood ranking for initial passage retrieval and that stance-based re-ranking can slightly improve a ranking's effectiveness.
+Stance classification by prompting the T0 zero-shot language model is the best-performing approach in the shared task's leaderboard.
 \end{abstract}
 
 \begin{keywords}

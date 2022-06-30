@@ -1,35 +1,32 @@
 \section{Submitted Runs}
 \label{runs}
 
-For fast development and evaluation of different parameter settings, we complement our modular retrieval pipeline~(c.f., Section~\refname{approach}) with an evaluation component. Our evaluation module automatically loads relevance judgments from previous editions of the Touché shared tasks on Argument Retrieval~(c.f. Section~\ref{transfer-relevance-judgements}) and transfers the document-level relevance judgments from~2020 and~2021 to the passages from the 2022 dataset.
+%For fast development and evaluation of different parameter settings, we complement our modular retrieval pipeline~(cf., Section~\refname{approach}) with an evaluation component. Our evaluation module automatically loads relevance judgments from previous editions of the Touché shared tasks on Argument Retrieval~(c.f. Section~\ref{transfer-relevance-judgements}) and transfers the document-level relevance judgments from~2020 and~2021 to the passages from the 2022 dataset.
 
-We submit five runs that use different components and strategies of our approach~(Section~\ref{approach}) to the Touché shared task.
-Instead of uploading generated run files, we deploy our retrieval system as a working software via the TIRA platform~\cite{PotthastGWS2019}, as is encouraged by the task organizers~\cite{BondarenkoFKSGBPBSWPH2022}.
+We submit five runs that use different components and strategies of our pipeline~(cf.\ Section~\ref{approach}) to the Touch{\'e} second task.
+Instead of uploading generated run files, we deploy our retrieval system as a working software on the TIRA platform~\cite{PotthastGWS2019}.
 
-\paragraph{Query Likelihood Baseline}
+\paragraph{Query Likelihood Baseline.}
 
-For our first run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-03-16-21-30}}, we retrieve 100~passages ranked by query likelihood with Dirichlet smoothing~(\(\mu = 1000\)) for the original, unmodified query~\cite{ZhaiL2001}. We then use the IBM fastText TARGER model~\cite{ChernodubOHBHBP2019} to tag argument structure,
-the IBM Debater API~\cite{ToledoGCFVLJAS2019} to tag argument quality.
-We tag argument stance by comparing sentiments for each object using the IBM Debater API, treating a stance under a threshold of~0.125 as neutral.
+For our first run, we simply retrieve top-100 passages ranked by query likelihood with Dirichlet smoothing~\cite{ZhaiL2001} (\(\mu = 1000\)) for the original, unmodified queries (topic titles) and tag argument stance by comparing sentiments for each object using the IBM Debater API, treating a stance under a threshold of~0.125 as neutral.
 
-\paragraph{Argumentative Axioms}
+\paragraph{Argument Axioms.}
 
-To generate our second run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-03-16-56-13}}, we retrieve 100~passages in the same way as for the query likelihood baseline run. Then we re-rank the top-10 passages from the baseline result using \KwikSort~\cite{BondarenkoFRSVH2022,HagenVGS2016} based on preferences from the argumentative axioms as described in Section~\ref{reranking}.
+To produce our second run, we re-rank the top-10 passages from the baseline result using \KwikSort~\cite{BondarenkoFRSVH2022,HagenVGS2016} based on preferences from the argument axioms as described in Section~\ref{reranking}.
 
-\paragraph{Fair Re-ranking and Argumentative Axioms}
+\paragraph{Stance-based Re-ranking with Argumentative Axioms.}
 
-Our third run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-03-23-52-55}} also uses argumentative axiomatic re-ranking after the baseline retrieval. But to ensure that both comparative objects are fairly represented in the resulting ranking, we apply fairness re-ranking with the alternating stance strategy as described in Section~\ref{reranking}.
+Our third run also uses argument axiomatic re-ranking after the baseline retrieval. However to ensure that the stances towards both comparison objects are nearly equally represented in the result ranking, we apply stance-based re-ranking with the alternating stance strategy as described in Section~\ref{reranking}.
 
-\paragraph{All You Need is T0}
+\paragraph{All You Need is T0.}
 
-With our fourth run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-05-19-04-26}}, we want to provide a practical example to the recently criticized trend to use more and more language models in search engines~\cite{ShahB2022}.
-It is tempting to use a large language model like~T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}, that can solve many natural language processing tasks with high accuracy, in many steps of a search pipeline. But \citet{ShahB2022} highlight conceptual flaws that question if such an extreme usage of not fully understood models is desirable when answering real-life questions.
-We construct a run that uses the language model's zero-shot text generation abilities in as many steps of the pipeline as possible.
-First, we generate and combine queries by reformulating new queries from the description and narrative using~T0++ and by replacing synonyms of comparative objects as returned by T0++~(c.f. Section~\ref{reformulation}).
-We then retrieve 20~documents by query likelihood, and use T0++ again to tag argument quality and stance~(c.f. Section~\ref{argument-tagging}).
+Large language models have recently found application in many natural language processing tasks, web search, or retrieval. The trend of using large language models for solving almost any task has also been criticized. For instance, \citet{ShahB2022} highlights conceptual flaws that question if such an extreme usage of not fully understood models is desirable when implementing search for answers to real-life questions~(e.g., in search engines).
 
-\paragraph{Argumentative Fair Re-ranking with T0}
+In our fourth submitted run, we want test a language model's T0++ zero-shot classification abilities. First, we reformulate and generate and combine queries; final queries are an expansion of the topic titles~(cf.\ Section~\ref{reformulation}).
+We then retrieve 100~documents using query likelihood, and use T0++ again to estimate argument quality and stance~(cf.\ Section~\ref{argument-tagging}).
 
-In our fifth run\footnote{\url{https://tira.io/task/touche-task-2/user/grimjack/dataset/touche-2022-task2/run/2022-05-05-23-53-26}}, we combine most of the approaches introduced in Section~\ref{approach} to generate a ranking that is both as argumentative and fair as possible but also uses T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} for query reformulation and expansion.
-Here, we also formulate new queries from the description and narrative using~T0++ and expand queries by replacing synonyms returned by T0++. But we also include synonyms by fastText~\cite{BojanowskiGJM2017} embedding similarity~(c.f. Section~\ref{reformulation}).
-The top-10 results of the 100 passages retrieved using the query likelihood model for the expanded query are then re-ranked based on argumentative axioms and by alternating stance~(c.f. Section~\ref{reranking}).
+\paragraph{Argumentative Stance-based Re-ranking with T0.}
+
+In our last run, we combine most of the methods introduced in Section~\ref{approach} to generate a ranking that is both as argumentative as possible and equally represents argument stances, but also uses T0++ for query reformulation and expansion.
+Here, we combine new queries generated by T0++ and reformulate queries by replacing synonyms returned by T0++. However, we also use synonyms from the fastText~\cite{BojanowskiGJM2017} embedding similarity method~(cf.\ Section~\ref{reformulation}); final queries are an expansion of the topic titles.
+The top-10 results of the 100 passages retrieved using query likelihood for the expanded queries are then re-ranked based on argumentative axioms and by alternating stance~(cf.\ Section~\ref{reranking}).

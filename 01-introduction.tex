@@ -6,7 +6,7 @@
 \section{Introduction}\label{intro}
 
 Argument retrieval is a specific task that not only considers topical relevance of retrieved documents to given queries (usually of controversial, argumentative or opinion nature) but also accounts for argument specific features like argument quality and stance~\cite{BondarenkoFBGAPBSWPH2020, BondarenkoGFBAPBSWPH2021}.  
-Furthermore, it has been shown that current search engines might return biased results~\cite{ShahB2022} and argument retrieval systems return ``unfairelly'' distributed pro / con arguments~\cite{CherumanalSSC2021}.
+Furthermore, it has been shown that current search engines might return biased results~\cite{ShahB2022} and argument retrieval systems return imbalanced pro / con arguments~\cite{CherumanalSSC2021}.
 We especially emphasize the importance of retrieving diverse results for comparative questions (e.g., ``Train or plane? Which is the better choice?'') that provide different point of views to mitigate biasing users' decisions towards one or the other comparison option.
 
 Our Team Grimjack participated in the Touch{\'e} shared task on Argument Retrieval for Comparative Questions which goals are: \Ni To retrieve relevant and high quality argumentative passages from a collection of 868\,655~text passages to a set of 50~search topics and \Nii to classify the stance of the retrieved passages towards the comparison objects in search topics~\cite{BondarenkoFKSGBPBSWPH2022}.
@@ -15,9 +15,6 @@ In the first step, our approach uses query (comparative questions from topics' t
 Finally, the pro and con argumentative passages towards the comparative objects are balanced in the final ranking by alternating documents of different stance (cf.\ Section~\ref{approach} for more details on the approach and submitted runs). We also submitted our software using the TIRA platform~\cite{PotthastGWS2019},%
 \footnote{\url{https://tira.io}} automatically evaluates submitted approaches and presents the results on a leaderboard.%\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}}
 
-%Additionally, we manually labeled the relevance and stance of 35~documents for three topics returned by our system (before the official results are made available by the organizers). Our manual assessment shows that depending on the query our T0-based query expansion or applying argumentative axioms and fair re-ranking can improve the effectiveness for different queries~(cf.\ Section~\ref{evaluation}).
-
 {\color{red} ADD official results}
 
-%% The last statement could fit in the CR version depending on the final evaluation: good or bad
-%Different configurations for our submitted runs should pose examples to discuss current doubts about the usefulness of large zero-shot language models like T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} in the field of argumentative information retrieval~\cite{ShahB2022}.
+Our runs using query expansion using the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} should pose examples to discuss current doubts about the usefulness of large zero-shot language models in the field of argumentative information retrieval~\cite{ShahB2022}.

@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\footnotesize
+\renewcommand{\tabcolsep}{5pt}
+\caption{Stance detection results of all runs submitted to Task~2: Argument Retrieval for Comparative Questions. Reported are a macro-averaged $F_1$ and number of documents~$N$ for which the stance was predicted for our runs, the best run from competing teams~(Captain Levi), and the baseline~(Puss in Boots, in italics).}
+\label{table-results-stance}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+\textbf{Team} & \textbf{Tag} & \textbf{$\bm{F_1}$ run} & \textbf{$\bm{N}$ run} & \textbf{$\bm{F_1}$ team} & \textbf{$\bm{N}$ team} \\
+\midrule
+Grimjack & grimjack-all-you-need-is-t0 & 0.313 & 1208 & 0.235 & 1386 \\
+Captain Levi~\cite{RanaGJCEHP2022} & levirank\_dense\_initial\_retrieval & 0.301 & 1688 & 0.261 & 2020 \\
+Grimjack & grimjack-argumentative-axioms & 0.207 & 1282 & 0.235 & 1386 \\
+Grimjack & grimjack-baseline & 0.207 & 1282 & 0.235 & 1386 \\
+Grimjack & grimjack-fair-reranking-argumentative-axioms & 0.207 & 1282 & 0.235 & 1386 \\
+Grimjack & grimjack-fair-argumentative-reranking-with-t0 & 0.199 & 1180 & 0.235 & 1386 \\
+\textit{Puss In Boots}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{Always-NO-Baseline} & \textit{0.158} & \textit{1328} & \textit{0.158} & \textit{1328} \\
+\bottomrule
+\end{tabular}
+\end{table}

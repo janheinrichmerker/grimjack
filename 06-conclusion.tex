@@ -1,17 +1,12 @@
 \section{Conclusion}
 
-% We propose a flexible approach to tackle the task of answering comparative questions and detecting the stance of the returned passages with respect to the comparative objects.
 To retrieve relevant argumentative passages, we combine query reformulation and expansion techniques with axiomatic re-ranking exploiting argumentative structure, quality, and stance.
 Using the IBM Debater API and the T0++~language model, we showcase two state-of-the-art approaches for argument quality tagging.
 We extend previous query expansion approaches from the Touché shared tasks by incorporating the contextual information provided in topic descriptions and narratives.
-To attain fair exposure in the final ranking, we balance the pro and con arguments on top-10 ranks.
+To attain nearly equal exposure across argument stances in the final ranking, we balance the pro and con arguments on top-10 ranks.
 
-Our experiments indicate that query expansion and reformulation can provide better search results for some topics, but can also decrease effectiveness for others.
-A subsequent axiomatic re-ranking step can improve the system's precision on some queries compared to our T0-based run, but with our limited manual relevance judgments, we could not include a systematic evaluation of each re-ranking variant.
+While none of our runs can outperform the BM25 baseline in terms of nDCG@5 on relevance and quality judgments, we find that axiomatic re-ranking and stance-based re-ranking for comparative arguments can slightly increase nDCG@5 effectiveness compared to our query likelihood baseline ranking. This poses an interesting direction of future research: Can retrieval effectiveness in comparative question answering be improved by alternating or balancing object stances~(e.g., in the BM25 baseline or other participant approaches)?
+Because our run featuring query expansion with generated texts by the T0++ language model is the worst-performing of all our submitted runs in terms of relevance and rhetorical quality, we also question the usefulness of large language models in early retrieval stages. Our results represent additional motivation to investigate the effect of explainability on retrieval performance, as recently questioned in the community.
 
-Because our approach for stance classification depends on an API for single-target stance classification, aggregating the objects' single-target stances to form a multi-target stance is not straight-forward.
-We did not find a natural way to distinguish neutral arguments from arguments with no stance.
-Arguably, fine-tuning a multi-class neural classifier like \Bert on the stance dataset provided by \citeauthor{BondarenkoFKSGBPBSWPH2022} could improve classification performance by directly predicting the multi-target stance.
-
-Our runs featuring text generation with the T0++ language model motivate the controversial question whether we could effectively retrieve arguments while using large language models in every step of the retrieval pipeline.
-Given the recent doubts about the explainability of such models, we look forward to evaluate this question in more detail with relevance judgements for the Touché 2022 shared task.
+Our approach for stance classification is based on single-target stance classification, and we did not find a natural way to distinguish neutral arguments from arguments without stance while aggregating the objects' single-target stances to form a multi-target stance.
+Arguably, fine-tuning a multi-class neural classifier like \Bert on the stance dataset provided by \citeauthor{BondarenkoFKSGBPBSWPH2022} could possibly improve classification performance by directly predicting the multi-target stance.
