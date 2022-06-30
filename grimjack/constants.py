@@ -31,6 +31,18 @@ DEFAULT_TOUCHE_2020_QRELS_URL = (
 DEFAULT_TOUCHE_2021_QRELS_URL = (
     "https://webis.de/events/touche-21/touche-task2-51-100-relevance.qrels"
 )
+DEFAULT_TOUCHE_2022_RELEVANCE_QRELS_URL = (
+    "https://files.webis.de/corpora/corpora-webis/corpus-touche-task2-22/"
+    "touche-task2-2022-relevance.qrels"
+)
+DEFAULT_TOUCHE_2022_QUALITY_QRELS_URL = (
+    "https://files.webis.de/corpora/corpora-webis/corpus-touche-task2-22/"
+    "touche-task2-2022-quality.qrels"
+)
+DEFAULT_TOUCHE_2022_STANCE_QRELS_URL = (
+    "https://files.webis.de/corpora/corpora-webis/corpus-touche-task2-22/"
+    "touche-task2-2022-stance.qrels"
+)
 DEFAULT_TARGER_API_URL = "https://demo.webis.de/targer-api/"
 DEFAULT_HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/"
 DEFAULT_HUGGINGFACE_API_TOKEN_PATH = PROJECT_DIR / ".huggingface.txt"

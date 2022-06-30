@@ -10,7 +10,8 @@ from grimjack.constants import (
     DEFAULT_DOCUMENTS_URL, DEFAULT_TOPICS_URL,
     DEFAULT_HUGGINGFACE_API_TOKEN_PATH, DEFAULT_DEBATER_API_TOKEN_PATH,
     DEFAULT_CACHE_DIR, DEFAULT_TOUCHE_2020_QRELS_URL,
-    DEFAULT_TOUCHE_2021_QRELS_URL
+    DEFAULT_TOUCHE_2021_QRELS_URL, DEFAULT_TOUCHE_2022_RELEVANCE_QRELS_URL,
+    DEFAULT_TOUCHE_2022_QUALITY_QRELS_URL, DEFAULT_TOUCHE_2022_STANCE_QRELS_URL
 )
 from grimjack.model.axiom import Axiom
 from grimjack.model.axiom.argumentative import (
@@ -421,6 +422,27 @@ def _prepare_parser_evaluate_all(parser: ArgumentParser):
         dest="qrels_source",
         action="store_const",
         const=DEFAULT_TOUCHE_2021_QRELS_URL
+    )
+    parser.add_argument(
+        "--touche-2022-relevance", "--touche22-relevance", "--2022-relevance",
+        "--22r",
+        dest="qrels_source",
+        action="store_const",
+        const=DEFAULT_TOUCHE_2022_RELEVANCE_QRELS_URL
+    )
+    parser.add_argument(
+        "--touche-2022-quality", "--touche22-quality", "--2022-quality",
+        "--22q",
+        dest="qrels_source",
+        action="store_const",
+        const=DEFAULT_TOUCHE_2022_QUALITY_QRELS_URL
+    )
+    parser.add_argument(
+        "--touche-2022-stance", "--touche22-stance", "--2022-stance",
+        "--22s",
+        dest="qrels_source",
+        action="store_const",
+        const=DEFAULT_TOUCHE_2022_STANCE_QRELS_URL
     )
     parser.add_argument(
         "--per-query",
