@@ -45,7 +45,7 @@ def _download_decompress_if_needed(
                 download_dir,
                 name,
             )
-        return source
+        return source_path
     elif download_dir.exists():
         # Already downloaded, return first (and only) file.
         assert sum(1 for _ in download_dir.iterdir()) == 1
