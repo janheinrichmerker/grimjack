@@ -16,43 +16,38 @@ For that, we use two different strategies: \Ni replacing the comparison objects 
 %Expanding the original query with synonyms of comparative objects is motivated by the fact that documents often contain more specific comparisons~(e.g., Ubuntu vs Windows) instead of more broad comparisons~(e.g., Linux vs Windows).
 %Yet, specific examples of a more general class of objects are useful to answer comparative questions about their object class.
 %We might therefore find relevant documents that would otherwise not match any original query term.
-We then address the precision-recall by later deploying re-ranking steps by moving more relevant documents at the top of the ranking~(cf.\ Section~\ref{reranking}).
+We then address the precision-recall trade-off by deploying re-ranking steps by moving more relevant documents at the top of the ranking~(cf.\ Section~\ref{reranking}).
 
 \paragraph{Query Reformulation with Synonyms.}
 
 To find synonyms of comparison objects mentioned in questions (search queries), we use two different strategies: \Ni word embeddings and \Nii a zero-shot generation with pre-trained large language models.
-For the first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} \redtext{what python lib.?} to find words with the highest cosine similarity to the given comparison objects in the embedding space.
-We manually examine \redtext{how many} synonyms from the fastText embeddings pre-trained on different corpora (e.g., Wikipedia and Twitter) and find that the Twitter-based embeddings provide more accurate synonyms.
+For the first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} from PyMagnitude\footnote{\url{https://gitlab.com/Plasticity/magnitude}} to find words with the highest cosine similarity to the given comparison objects in the embedding space.
+We manually examine synonyms from the fastText embeddings pre-trained on different corpora (e.g., Wikipedia and Twitter) and find that the Twitter-based embeddings provide more accurate synonyms.
 
 Our second strategy is based on the T0++~zero-shot language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-We prompt the model to generate an answer to the following question: \query{What are synonyms of the word~<token>?}, where \query{<token>}~is one of the two original comparison objects. \redtext{how many?}
-We then process the output by splitting by commas and removing duplicated terms.
+We prompt the model to generate an answer to the following question: \query{What are synonyms of the word~<token>?}, where \query{<token>}~is one of the two original comparison objects.
+We then process the output by splitting by commas and select the first term that is different from the original query term.
 With the synonyms returned by either strategy, we replace the comparison objects to formulate new question queries.
 
 \paragraph{Query Reformulation with Topic Context.}
 \input{table-generated-queries.tex}
 
-In the next step, we complement the expanded queries with newly generated ones taking into account the contextual information from the topic's descriptions and narratives that
+In the next step, we complement the expanded queries with two newly generated ones per topic taking into account the contextual information from the topic's descriptions and narratives that
 contain important details on the actual information.
-Using the Hugging Face Inference API~\cite{WolfDSCDMCRLFDSPMJPXSGDLR2020}, we prompt T0++ with the following task: \query{<text>. Extract a natural search query from this description.}, where \query{<text>}~is either the topic's narrative or description. \redtext{always two queries per topic?}
+Using the Hugging Face Inference API~\cite{WolfDSCDMCRLFDSPMJPXSGDLR2020}, we prompt T0++ with the following task: \query{<text>. Extract a natural search query from this description.}, where \query{<text>}~is either the topic's narrative or description.
 In Table~\ref{table-generated-queries}, we show the examples of generated queries.
-Albeit some of the generated queries (e.g., topic~53) are just reformulations of the original one, the T0++~model also generates some interesting new queries (e.g., topic~12).
+Albeit some of the generated queries~(e.g., topic~53) are just reformulations of the original one, T0++ also generates potentially useful meaningful new queries~(e.g., topic~12).
 
 \paragraph{Query Combination and Expansion.}
 
-Finally, we combine a total of \redtext{XX}~question queries (reformulated with synonyms, generated, and the original one) using a logical disjunction (Pyserini's \texttt{OR} operator).
-%Two reasons influence this decision:
-%Firstly, retrieving results for just one query is conceptually easier as we don't need to interleave multiple result sets after the retrieval step.
-%Interleaving is not trivial and it is often challenging to find an interleaving strategy without many caveats.
+Finally, we combine up to 5~question queries~(reformulated with synonyms, generated, and the original one, depending on the submitted run; cf.\ Section~\ref{runs}) using a logical disjunction~(Pyserini's \texttt{OR} operator).
 We choose the logical disjunction with the outlook on increasing the system's recall and decreasing the chance of empty result sets in the case that search terms are not present in the corpus.
-%Although, the query reformulation, expansion and combination steps are optional, meaning that we use these steps only in some runs.
 
 In total we submitted 5~runs (retrieval results;  cf.\ Section~\ref{runs}) to the task, in some of which we use only the original query, and the expanded queries in the others to test the influence of the query expansion and reformulation on the final ranking results.
 
 \subsection{Passage Retrieval}\label{retrieval}
 
 To retrieve passages from the task's corpus, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
-%Pyserini allows for experimenting with multiple steps of a retrieval system including indexing and simple retrieval models like Okapi~BM25 or the query likelihood model.
 In the index, we store index term positions, passage vectors, and raw passage contents.
 Index terms are stemmed using the Porter stemmer~\cite{Porter1980} and stop words are removed as per the default Pyserini stopword list~\cite{LinMLYPN2021}.
 We then retrieve passages for the previously combined query~(cf.\ Section~\ref{reformulation}) using the query likelihood model with Dirichlet smoothing~(\( \mu = 1000 \)).
@@ -101,15 +96,15 @@ This results in two answers~(\query{yes} or~\query{no}) for the positive and neg
 \label{reranking}
 \input{table-axioms.tex}
 
-Since recall of our retrieval system is increased by expanding and reformulating queries~(cf.\ Section~\ref{reformulation}), we seek to improve precision by re-ranking the top-10 passages from the first-stage retrieval~(cf.\ Section~\ref{retrieval}) using two different strategies that should rank more argumentative and of higher quality passages also ensuring a balanced overview of the two comparison objects. \Ni We re-rank based on argument retrieval axioms, and \Nii we re-rank based on the passages' stances towards the comparison objects.
+Since recall of our retrieval system is increased by expanding and reformulating queries~(cf.\ Section~\ref{reformulation}), we seek to improve precision by re-ranking the top-10 passages from the first-stage retrieval~(cf.\ Section~\ref{retrieval}) using two different strategies that should rank more argumentative and of higher quality passages also ensuring a balanced overview of the two comparison objects. \Ni We re-rank based on argumentativeness axioms, and \Nii we re-rank based on the passages' stances towards the comparison objects.
 
 \paragraph{Argumentative Axiomatic Re-ranking.}
 
 Ranking methods such as BM25 or query likelihood with Dirichlet smoothing do not capture the ``argumentativeness'' in text that is important for argument retrieval~\cite{BondarenkoFKSGBPBSWPH2022}.
-Some approaches for at the TREC Common Core and Decision tracks exploit task-specific, argument retrieval axioms to address the document argumentativeness~\cite{BondarenkoHVSPB2018,BondarenkoFKHVS2019}.
+Some approaches for at the TREC Common Core and Decision tracks exploit task-specific, argumentativeness axioms to address the document argumentativeness~\cite{BondarenkoHVSPB2018,BondarenkoFKHVS2019}.
 Axioms are constraints that define pairwise ranking preferences between documents or passages.
 Because of the promising development in the field of axiomatic information retrieval~\cite{BondarenkoFRSVH2022}, we re-rank the top-10 initially retrieved passages with the \KwikSort algorithm~\cite{HagenVGS2016}.
-For axiomatic re-ranking, we compute preferences for 7~argumentative axioms specified in Table~\ref{table-axioms}.
+For axiomatic re-ranking, we compute preferences for 7~argumentativeness axioms specified in Table~\ref{table-axioms}.
 The axioms cover general argumentativeness~(ArgUC), argumentative relevance~(QTArg, QTPArg), comparative relevance~(CompArg, CompPArg), and rhetorical and argumentative quality~(aSLDoc, ArgQ).
 We then combine the axioms in a majority voting scheme, i.e., we only keep preferences where at least~50\,\% of the 7~axioms agree, and fall back to the original ranking order if less than~50\,\% of all axioms agree.
 Using the \iraxioms framework~\cite{BondarenkoFRSVH2022},%

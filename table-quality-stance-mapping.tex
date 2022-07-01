@@ -1,13 +1,14 @@
 \begin{table}
-    \caption{Argument quality label and argument stance label mapping from textual labels returned by the T0++~language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.}
+    \caption{Argument quality label and argument stance label mapping from textual tokens returned T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.}
     \label{table-quality-stance-mapping}
     \addtocounter{table}{-1} % Prevent a weird bug where otherwise the subcaptions would increment the caption counter too often.
+    \renewcommand{\tabcolsep}{10pt}
     \begin{subtable}[t]{0.49\linewidth}
         \caption{Argument quality label mapping for the prompt \query{How would you rate the readability and consistency in this sentence?}.}
         \label{table-quality-mapping}
         \centering
-        \vspace{1ex}
-        \begin{tabular}{lc}
+        \vspace{4ex}
+        \begin{tabular}{@{}lc@{}}
             \toprule
             \textbf{Text Label} & \textbf{Value} \\
             \midrule
@@ -25,7 +26,7 @@
         \label{table-stance-mapping}
         \centering
         \vspace{1ex}
-        \begin{tabular}{llc}
+        \begin{tabular}{@{}llc@{}}
             \toprule
             \multicolumn{2}{c}{\textbf{Text Label}} & \textbf{Value} \\
             Pro & Con & \\

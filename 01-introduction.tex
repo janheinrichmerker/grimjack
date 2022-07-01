@@ -5,16 +5,14 @@
 
 \section{Introduction}\label{intro}
 
-Argument retrieval is a specific task that not only considers topical relevance of retrieved documents to given queries (usually of controversial, argumentative or opinion nature) but also accounts for argument specific features like argument quality and stance~\cite{BondarenkoFBGAPBSWPH2020, BondarenkoGFBAPBSWPH2021}.  
+Argument retrieval is a specific task that not only considers topical relevance of retrieved documents to given queries (usually of controversial, argumentative, or opinion nature) but also accounts for argument specific features like argument quality and stance~\cite{BondarenkoFBGAPBSWPH2020, BondarenkoGFBAPBSWPH2021}.  
 Furthermore, it has been shown that current search engines might return biased results~\cite{ShahB2022} and argument retrieval systems return imbalanced pro / con arguments~\cite{CherumanalSSC2021}.
 We especially emphasize the importance of retrieving diverse results for comparative questions (e.g., ``Train or plane? Which is the better choice?'') that provide different point of views to mitigate biasing users' decisions towards one or the other comparison option.
 
 Our Team Grimjack participated in the Touch{\'e} shared task on Argument Retrieval for Comparative Questions which goals are: \Ni To retrieve relevant and high quality argumentative passages from a collection of 868\,655~text passages to a set of 50~search topics and \Nii to classify the stance of the retrieved passages towards the comparison objects in search topics~\cite{BondarenkoFKSGBPBSWPH2022}.
 As part of our participation in the task, we have developed a flexible retrieval pipeline in Python based on Pyserini~\cite{LinMLYPN2021} as an easily configurable command line application.
 In the first step, our approach uses query (comparative questions from topics' titles) reformulation and expansion by important terms from topics' descriptions and narratives. Then the top-10 initially retrieved passages using query likelihood with Dirichlet smoothing~\cite{ZhaiL2001} are axiomatically re-ranked based on the number and position of premises, claims (identified with TARGER~\cite{ChernodubOHBHBP2019}), and comparison objects, and argument quality predictions by the IBM Debater API~\cite{ToledoGCFVLJAS2019} and T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
-Finally, the pro and con argumentative passages towards the comparative objects are balanced in the final ranking by alternating documents of different stance (cf.\ Section~\ref{approach} for more details on the approach and submitted runs). We also submitted our software using the TIRA platform~\cite{PotthastGWS2019},%
-\footnote{\url{https://tira.io}} automatically evaluates submitted approaches and presents the results on a leaderboard.%\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}}
+Finally, the pro and con argumentative passages towards the compared objects are balanced in the final ranking by alternating documents of different stance (cf.\ Section~\ref{approach} for more details on the approach and submitted runs). We also submitted our software using the TIRA platform~\cite{PotthastGWS2019}%
+\footnote{\url{https://tira.io}} that automatically evaluates submitted approaches and presents the results on a leaderboard.%\footnote{\url{https://tira.io/task/touche-task-2/dataset/touche-2022-task2}}
 
-{\color{red} ADD official results}
-
-Our runs using query expansion using the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} should pose examples to discuss current doubts about the usefulness of large zero-shot language models in the field of argumentative information retrieval~\cite{ShahB2022}.
+Our runs using query expansion using the T0++ language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021} should pose examples to discuss current doubts about the usefulness of large zero-shot language models in the field of search and information retrieval~\cite{ShahB2022}.
