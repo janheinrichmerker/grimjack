@@ -21,7 +21,7 @@ We then address the precision-recall trade-off by deploying re-ranking steps by 
 \paragraph{Query Reformulation with Synonyms.}
 
 To find synonyms of comparison objects mentioned in questions (search queries), we use two different strategies: \Ni word embeddings and \Nii a zero-shot generation with pre-trained large language models.
-For the first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} from PyMagnitude\footnote{\url{https://gitlab.com/Plasticity/magnitude}} to find words with the highest cosine similarity to the given comparison objects in the embedding space.
+For the first strategy, we use fastText word embeddings~\cite{BojanowskiGJM2017} from PyMagnitude\footnote{\url{https://gitlab.com/Plasticity/magnitude}} to find the word with the highest cosine similarity to the given comparison objects in the embedding space.
 We manually examine synonyms from the fastText embeddings pre-trained on different corpora (e.g., Wikipedia and Twitter) and find that the Twitter-based embeddings provide more accurate synonyms.
 
 Our second strategy is based on the T0++~zero-shot language model~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}.
@@ -50,7 +50,7 @@ In total we submitted 5~runs (retrieval results;  cf.\ Section~\ref{runs}) to th
 To retrieve passages from the task's corpus, we first build an inverted index using the Pyserini framework~\cite{LinMLYPN2021}.
 In the index, we store index term positions, passage vectors, and raw passage contents.
 Index terms are stemmed using the Porter stemmer~\cite{Porter1980} and stop words are removed as per the default Pyserini stopword list~\cite{LinMLYPN2021}.
-We then retrieve passages for the previously combined query~(cf.\ Section~\ref{reformulation}) using the query likelihood model with Dirichlet smoothing~(\( \mu = 1000 \)).
+We then retrieve passages for the previously combined query~(cf.\ Section~\ref{reformulation}) using the query likelihood model with Dirichlet smoothing~(\( \mu = 1\,000 \)).
 From this first-stage ranker, we retrieve 100~candidate passages for each query.
 
 \subsection{Argument Tagging, Argument Quality and Stance Classification}
@@ -88,11 +88,10 @@ The API then returns a score from from~-1 (against the comparison object) to~+1 
 By classifying different topics for each object~(i.e., \query{<object>~is good} and \query{<object>~is the best}), we determine an averaged single-target stance for each comparison object.
 
 When using the T0++ for the stance detection, we first experiment with directly prompting the model to output `pro', `con',  or `neutral' labels for the comparison objects.
-%However, we found that the T0++~model would not be able to reliably distinguish between a positive and negative stance towards the comparative object.
 We formulate the task as two simple questions passed to the model, one to determine whether the sentence has a positive stance towards the comparison object and one to determine whether it has a negative stance: \query{<sentence> Is this sentence pro <object>? yes or no} and \query{<sentence> Is this sentence against <object>? yes or no}, where \query{<sentence>}~is one sentence of the passage and \query{<object>}~is one of the comparative objects.
 This results in two answers~(\query{yes} or~\query{no}) for the positive and negative stance respectively. We combine the two textual answers using the mapping shown in Table~\ref{table-stance-mapping}.
 
-\subsection{Axiomatic Re-ranker}
+\subsection{Axiomatic and Stance-based Re-rankers}
 \label{reranking}
 \input{table-axioms.tex}
 

@@ -10,3 +10,5 @@ Since our run featuring query expansion with generated texts by T0++ is the wors
 
 Our approach to stance classification heuristically maps single-target stance classification results to multi-target, and we were not able to find a satisfactory strategy to distinguish neutral stance from passages without stance.
 Arguably, fine-tuning a multi-class neural classifier like \Bert on the stance dataset provided by Touch{\'e} could possibly improve classification performance by directly predicting the multi-target stance.
+Our evaluation of F$_1$ stance prediction performance yields no clear winner as the participating teams predicted stance labels for different, potentially biased sub-sets of the document collection resulting in different test set coverage.
+We encourage future work to reproduce and evaluate stance prediction approaches of all participating teams on an independent test dataset.
