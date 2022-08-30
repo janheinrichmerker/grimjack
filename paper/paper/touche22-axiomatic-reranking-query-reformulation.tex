@@ -1,0 +1,108 @@
+\documentclass{ceurart}
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{relsize}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{sourcecodepro}
+\usepackage{csquotes}
+\usepackage{bm}
+
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
+
+\lstset{breaklines=true}
+
+\newcommand{\todo}[1]{\textcolor{blue}{#1}}
+\newcommand{\todocite}{\todo{[CITE]}\xspace}
+
+\newcommand{\Ni}{(1)~}
+\newcommand{\Nii}{(2)~}
+\newcommand{\Niii}{(3)~}
+\newcommand{\Niv}{(4)~}
+\newcommand{\Nv}{(5)~}
+\newcommand{\Na}{(a)~}
+\newcommand{\Nb}{(b)~}
+\newcommand{\Nc}{(c)~}
+\newcommand{\Nd}{(d)~}
+\newcommand{\Ne}{(e)~}
+
+\newcommand{\textttsmall}[1]{\texttt{\smaller #1}}
+\newcommand{\query}[1]{\textttsmall{#1}}
+\newcommand{\Bert}{\textsc{Bert}\xspace}
+\newcommand{\iraxioms}{\textttsmall{ir\_axioms}\xspace}
+\newcommand{\nDCG}[1]{nDCG\def\tempndcg{#1}\ifx\tempndcg\empty\else{@}\tempndcg\fi}
+\newcommand{\map}{MAP}
+\newcommand{\KwikSort}{\textsc{KwikSort}\xspace}
+\newcommand{\redtext}[1]{{\color{red} (#1)}}
+
+\begin{document}
+
+\copyrightyear{2022}
+\copyrightclause{%
+  Copyright for this paper by its authors.
+	Use permitted under Creative Commons License Attribution~4.0
+	International~(CC~BY~4.0).%
+}
+\conference{%
+  CLEF~2022: 
+  Conference and Labs of the Evaluation Forum, 
+	September~5--8,~2022,
+  Bologna, Italy%
+}
+
+\title{%
+  Grimjack at \texorpdfstring{Touch{\'e}~2022}{Touch{\'e} 2022}:\texorpdfstring{\\}{ }
+  Axiomatic Re-ranking and Query Reformulation%
+}
+%\title{%
+%  Grimjack at Touch{\'e} 2022:\texorpdfstring{\\}{ }
+%  Axiomatic Re-ranking and Query Reformulation%
+%}
+\title[mode=sub]{%
+  Notebook for the Touché Lab on Argument Retrieval at CLEF\ 2022%
+}
+
+\author{Jan Heinrich Reimer}[
+  orcid=0000-0003-1992-8696,
+  email=jan.reimer@student.uni-halle.de,
+  url=https://heinrich.reimer.family,
+]
+\author{Johannes Huck}[
+  email=johannes.huck@student.uni-halle.de,
+  url=https://github.com/johannes-huck,
+]
+\author{Alexander Bondarenko}[
+  orcid=0000-0002-1678-0094,
+  email=alexander.bondarenko@informatik.uni-halle.de,
+  url=https://sites.google.com/view/alexanderbondarenko,
+]
+
+\address{%
+  Martin-Luther-Universität Halle-Wittenberg,
+  06099~Halle~(Saale), Germany
+}
+
+\input{00-abstract.tex}
+
+\maketitle
+
+\input{01-introduction.tex}
+\input{02-related-work.tex}
+\input{03-approach.tex}
+\input{04-runs.tex}
+\input{05-results.tex}
+\input{06-conclusion.tex}
+
+\begin{acknowledgments}
+This work was partially supported by the Deutsche Forschungsgemeinschaft (DFG) through the project ``ACQuA~2.0'' (Answering Comparative Questions with Arguments; project number 376430233).
+\end{acknowledgments}
+
+\bibliography{literature}
+
+\end{document}

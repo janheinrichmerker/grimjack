@@ -1,0 +1,14 @@
+\section{Conclusion}
+
+In our approaches to retrieve relevant and high-quality argumentative passages that help answer comparative questions, we combine query reformulation and expansion techniques with axiomatic re-ranking exploiting argumentative structure and argument quality and stance.
+Using the IBM Debater API and the T0++~language model, we showcase two state-of-the-art approaches for argument quality estimation.
+We extend previous query expansion approaches used in the Touch{\'e} shared tasks by incorporating the contextual information provided in topics' descriptions and narratives.
+To attain nearly equal exposure across argument stances in the final ranking, we balance the pro and con arguments on top-10 ranks.
+
+While none of our runs outperform the BM25 baseline in terms of nDCG@5 on relevance and quality judgments, we find that axiomatic re-ranking and stance-based re-ranking can slightly increase the effectiveness of the first-stage query likelihood ranking. This poses an interesting direction for future work: applying our proposed re-ranking strategies to results of other retrieval models, e.g., BM25.
+Since our run featuring query expansion with generated texts by T0++ is the worst-performing in terms of relevance and rhetorical quality, we also question the usefulness of large language models in early retrieval stages. Our results represent additional motivation to investigate the effect of explainability on retrieval performance, as recently questioned in the community.
+
+Our approach to stance classification heuristically maps single-target stance classification results to multi-target, and we were not able to find a satisfactory strategy to distinguish neutral stance from passages without stance.
+Arguably, fine-tuning a multi-class neural classifier like \Bert on the stance dataset provided by Touch{\'e} could possibly improve classification performance by directly predicting the multi-target stance.
+Our evaluation of F$_1$ stance prediction performance yields no clear winner as the participating teams predicted stance labels for different, potentially biased sub-sets of the document collection resulting in different test set coverage.
+We encourage future work to reproduce and evaluate stance prediction approaches of all participating teams on an independent test dataset.
