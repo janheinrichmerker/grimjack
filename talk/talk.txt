@@ -1,0 +1,62 @@
+Hello and a warm welcome from Team Grimjack at Touché 2022.
+I'm Jan Heinrich Reimer and I'd like to introduce you to the argument retrieval approaches I developed with my colleagues Johannes Huck and Sascha Bondarenko from Halle University.
+
+---
+
+First of all, let's do a quick recap of the task at hand:
+Our task is to retrieve relevant and high-quality argument passages to answer comparative questions, that is, to help people decide between two objects.
+We also need to decide for each retrieved passage whether it is in favor of the first or second object. A passage can also be neutral or contain no stance at all.
+
+Challenged with this task, we came up with some ideas and questions we wanted to integrate in our approaches:
+Recent work suggests that we can exploit a passage's argumentativeness by re-ranking using retrieval axioms, that are, simple pairwise constraints that induce preferences between pairs of passages.
+Second, often the result pages of web search engines can be biased towards one of the compared objects. We want to explore whether we can balance stances of the retrieved passages to mitigate that bias.
+And third, recently the large T0 language model was released, that allows for zero-shot prompting. Naturally, we want to explore ways to use this new model in argument retrieval.
+
+---
+
+For our experiments, we developed a Python search pipeline based on Pyserini, as you can see on the right-hand side of this slide.
+Different runs use different configrations based on the same general structure; for the various stages of our pipeline, we combine existing approaches and models.
+
+To expand the query, for example, we use synonyms from fastText word embeddings and by prompting T0.
+Similarily, we formulate new queries by prompting T0 with topic descriptions and narratives.
+After combining the expanded queries, we retrieve candidate passages by query likelihood scoring with Dirichlet smoothing.
+To detect each passage's argument quality and stance, again, we have multiple approaches: first by querying the IBM Debater API and second by prompting T0.
+Subsequently, the top-10 candidate passages are re-ranked using the KwikSort algrithm, based on seven argumentative axioms.
+Finally, we balance the argument stances by alternating top documents that are either in favor of the first or second object.
+
+---
+
+I'd now like to shortly summarize the five runs we submitted to the shared task:
+
+Our first run, the query likelihood baseline just retrieves 100 documents with Dirichlet smoothing and then detects stance using IBM Debater, treating an absolute stance value below 0.125 as neutral.
+
+The second run, "Argument Axioms", is based on our first run and we apply KwikSort re-ranking with seven argumentative IR axioms.
+
+The third run, "Stance-based Re-ranking with Argument Axioms", does the same but we alternate the stance of the top-10 documents to balance exposure across stances.
+
+In our "All You Need is T0" run, we use T0 prompting in each step of the pipeline: to expand the query with synonyms, to generate new queries from description and narrative, to estimate the argument quality and stance.
+
+The last run combines most of the previous approaches. We expand and generate queries with T0 and fastText embeddings but get the stance and argument quality from the IBM Debater API. Then we apply axiomatic and stance-based re-ranking.
+
+---
+
+With the official judgments from the Touché organizers, we looked at the retrieval effectiveness and stance detection performance for our runs.
+
+First, we find that our Dirichlet baseline performs worse than the organizers' BM25 baseline.
+Expanding and reformulating queries with T0 also decreases nDCG@5.
+Our stance-based re-ranking slightly increases nDCG, though not significantly.
+None of our re-ranking approaches can compensate for the bad Dirichlet retrieval effectiveness.
+
+With respect to stance detection, T0 achieves the highest macro-averaged F1-score of all submitted runs.
+But because of the depth-5 pooling, not all teams can be compared against the same number of ground-truth labels.
+If we only take into account the top-5 passages of each submitted run (in which case all evaluated passages have ground-truth labels), T0 falls behind Team Levi's best performing approaches.
+Altogether, it is unclear how to best account for the sampling bias when evaluating the submitted stance detection approaches.
+
+---
+
+In conclusion, our T0 approaches were unsuccessfull in the retrieval task but work well for stance detection.
+Balancing exposure across passages pro the first and second object can help improve retrieval effectiveness.
+An interesting direction of future work might be whether stance-based re-ranking works better if we could distinguish neutral from no stance.
+We could also swap the initial candidate retrieval for BM25 or, to improve the comparability, evaluate the submitted stance detection approaches on an independent test dataset.
+
+Thank you all for listening!
