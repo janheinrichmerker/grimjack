@@ -31,6 +31,7 @@ spacy = ">=2.3,==2.*"
 ir-axioms = "*"
 urllib3 = "*"
 pillow = ">=9.1.1"
+lxml = "*"
 
 [dev-packages]
 
