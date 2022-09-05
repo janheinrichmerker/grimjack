@@ -24,7 +24,7 @@ Similarily, we formulate new queries by prompting T0 with topic descriptions and
 After combining the expanded queries, we retrieve candidate passages by query likelihood scoring with Dirichlet smoothing.
 To detect each passage's argument quality and stance, again, we have multiple approaches: first by querying the IBM Debater API and second by prompting T0.
 Subsequently, the top-10 candidate passages are re-ranked using the KwikSort algorithm, based on seven argumentative axioms.
-Finally, we balance the argument stances by alternating top documents that are either in favor of the first or second object.
+Finally, we balance the argument stances by alternating top passages that are either in favor of the first or second object.
 
 ---
 
