@@ -63,7 +63,7 @@
       \item Pyserini pipeline~\cite{LinMLYPN2021}
       \item Query expansion with synonyms: fastText, T0++
       \item Query reformulation: T0++~\cite{SanhWRBSACSLRDBXTSSKCNDCJWMSYPBWNRSSFFTBGBWR2021}
-      \item Candidate retrieval: Dirichlet~LM
+      \item Candidate retrieval: query likelihood (Dirichlet)
       \item Argument quality \& stance:
       IBM Debater~\cite{ToledoGCFVLJAS2019} or T0++~prompting
       \item Axiomatic re-ranking:
@@ -129,33 +129,96 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Results \& Conclusion}
-  \begin{block}{Retrieval}
-    \begin{itemize}
-      \item Dirichlet baseline worse than BM25 baseline~\cite{BondarenkoFKSGBPBSWPH2022}
-      \item T0++ query expansion decreases nDCG@5
-      \item stance-based re-ranking (balancing) can slightly increase nDCG@5
-      \item re-ranking can't compensate the bad Dirichlet retrieval performance
-    \end{itemize}
-  \end{block}
-  \begin{block}{Stance detection}
-    \begin{itemize}
-      \item T0++ stance prediction achieves highest macro-averaged F$_1$-score
-      \item different number of ground-truth labels per team limits comparability
-      \item with only top-5 (i.e., all approaches have ground-truth labels up to that depth): T0++ falls behind Team Levi's approaches
-      \item unclear how to account for sampling bias
-    \end{itemize}
-  \end{block}
+\begin{frame}{Results}
+  \framesubtitle{Retrieval}
+  \begin{itemize}
+    \item Dirichlet baseline worse than BM25 baseline~\cite{BondarenkoFKSGBPBSWPH2022}
+    \item T0++ query expansion decreases nDCG@5
+    \item stance-based re-ranking (balancing) can slightly increase nDCG@5
+    \item re-ranking can't compensate the bad Dirichlet retrieval performance
+  \end{itemize}
+  \begin{minipage}{0.49\linewidth}
+    \begin{table}[t]
+      \centering
+      \scriptsize
+      \caption{Relevance}
+      \renewcommand{\tabcolsep}{5pt}
+      \begin{tabular}{@{}lc@{}}
+      \toprule
+      \textbf{Run} & \textbf{nDCG@5} \\
+      \midrule
+      Captain Levi best~\cite{RanaGJCEHP2022} & 0.758 \\
+      \textit{Puss in Boots BM25}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{0.469} \\
+      Grimjack stance + axiom. re-rank & 0.422 \\
+      Grimjack axiom.  re-rank & 0.376 \\
+      Grimjack baseline & 0.376 \\
+      Grimjack stance + axiom + T0 & 0.349 \\
+      Grimjack T0 & 0.345 \\
+      \bottomrule
+      \end{tabular}
+    \end{table}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.49\linewidth}
+    \begin{table}[t]
+      \centering
+      \scriptsize
+      \caption{Quality}
+      \renewcommand{\tabcolsep}{5pt}
+      \begin{tabular}{@{}lc@{}}
+      \toprule
+      \textbf{Run} & \textbf{nDCG@5} \\
+      \midrule
+      Aldo Nadi best~\cite{AbaAGMPVF2022} & 0.774 \\
+      \textit{Puss in Boots BM25}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{0.476} \\
+      Grimjack stance + axiom. re-rank & 0.403 \\
+      Grimjack stance + axiom + T0 & 0.365 \\
+      Grimjack axioms & 0.363 \\
+      Grimjack baseline & 0.363 \\
+      Grimjack T0 & 0.344 \\
+      \bottomrule
+      \end{tabular}
+    \end{table}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}{Results}
+  \framesubtitle{Stance Detection}
+  \begin{itemize}
+    \item T0++ stance prediction achieves highest macro-averaged F$_1$-score
+    \item different number of ground-truth labels per team limits comparability
+    \item with only top-5 (i.e., all approaches have ground-truth labels up to that depth): T0++ falls behind Team Levi's approaches
+    \item unclear how to account for sampling bias
+  \end{itemize}
+  \begin{table}[t]
+    \centering
+    \scriptsize
+    \renewcommand{\tabcolsep}{5pt}
+    \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    \textbf{Run} & \multicolumn{2}{c}{\textbf{All}} & \multicolumn{2}{c}{\textbf{Top-5}} \\
+    & \textbf{F$_1$} & \textbf{N} & \textbf{F$_1$} & \textbf{N} \\
+    \midrule
+    Grimjack T0 & 0.313 & 1208 & 0.235 & 250 \\
+    Captain Levi best~\cite{RanaGJCEHP2022} & 0.301 & 1688 & 0.359 & 250 \\
+    Grimjack axioms & 0.207 & 1282 & 0.180 & 250 \\
+    Grimjack baseline & 0.207 & 1282 & 0.180 & 250 \\
+    Grimjack stance + axiom. re-rank & 0.207 & 1282 & 0.175 & 250 \\
+    Grimjack stance + axiom + T0 & 0.199 & 1180 & 0.168 & 250 \\
+    \textit{Puss In Boots always NO}~\cite{BondarenkoFKSGBPBSWPH2022} & \textit{0.158} & \textit{1328} & \textit{0.159} & \textit{250} \\
+    \bottomrule
+    \end{tabular}
+  \end{table}
 \end{frame}
 
 \begin{frame}{Conclusion}
   \begin{itemize}
     \setlength{\itemsep}{2ex}
     \item[\faIcon{github}] \href{https://github.com/heinrichreimer/grimjack}{\texttt{heinrichreimer/grimjack}}
-    \item T0 approaches rather unsuccessful
+    \item T0 approaches rather unsuccessful for retrieval
+    \item unclear evaluation wrt. stance classification
     \item balancing pro A and pro B arguments helps
     \item can't distinguish neutral from no stance
-    \item unclear evaluation wrt. stance classification
   \end{itemize}
   \vspace{2ex}
   \begin{block}{Future Work}
@@ -168,7 +231,7 @@
   \only<1>{\color{white}}\only<2->{}%
   \begin{flushright}
     \thankyou \\
-    {\itshape\scriptsize Thanks to the Friends of SIGIR for waiving my registration fee.}
+    {\itshape\scriptsize Thanks to the SIGIR for waiving my registration fee.}
   \end{flushright}
 \end{frame}
 

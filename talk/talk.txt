@@ -1,10 +1,8 @@
-Hello and welcome from Team Grimjack at Touché 2022.
-I'm Jan Heinrich Reimer and I'd like to introduce you to the argument retrieval approaches I developed with my colleagues Johannes Huck and Sascha Bondarenko from Halle University.
+Hi everyone, I'm Heinrich Reimer and I'm happy to introduce you to the argument retrieval approaches of Team Grimjack, my colleagues Johannes Huck and Sascha Bondarenko and I developed at Halle University.
 
 ---
 
-First of all, let's do a quick recap of the task at hand:
-Our task is to retrieve relevant and high-quality argument passages to answer comparative questions, that is, to help people decide between two objects.
+Just to recap the task, we should retrieve relevant and high-quality argument passages to answer comparative questions, that is, to help people decide between two objects.
 We also need to decide for each retrieved passage whether it is in favor of the first or second object. A passage can also be neutral or contain no stance at all.
 
 ---
