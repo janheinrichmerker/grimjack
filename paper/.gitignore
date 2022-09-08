@@ -317,3 +317,5 @@ TSWLatexianTemp*
 *.abs
 *.xmpdata
 touche22-*.pdf
+!cc-by.pdf
+!ceur-ws-logo.pdf
