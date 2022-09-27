@@ -9,7 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.idea/ZeppelinRemoteNotebooks" />
       <excludeFolder url="file://$MODULE_DIR$/data" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (grimjack) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (grimjack)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Pipenv (pretix-export) interpreter library" level="application" />
   </component>
