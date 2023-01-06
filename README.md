@@ -1,4 +1,4 @@
-[![CI](https://img.shields.io/github/workflow/status/heinrichreimer/grimjack/CI?style=flat-square)](https://github.com/heinrichreimer/grimjack/actions?query=workflow%3A"CI")
+[![CI](https://img.shields.io/github/actions/workflow/status/heinrichreimer/grimjack/ci.yml?branch=main&style=flat-square)](https://github.com/heinrichreimer/grimjack/actions/workflows/ci.yml)
 [![Code coverage](https://img.shields.io/codecov/c/github/heinrichreimer/grimjack?style=flat-square)](https://codecov.io/github/heinrichreimer/grimjack/)
 [![Issues](https://img.shields.io/github/issues/heinrichreimer/grimjack?style=flat-square)](https://github.com/heinrichreimer/grimjack/issues)
 [![Commit activity](https://img.shields.io/github/commit-activity/m/heinrichreimer/grimjack?style=flat-square)](https://github.com/heinrichreimer/grimjack/commits)
