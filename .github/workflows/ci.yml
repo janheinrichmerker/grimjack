@@ -168,7 +168,7 @@ jobs:
       - latex-talk
       - python-code-format
       - python-lint
-      - python-tests
+      - python-test
       - docker-build
     runs-on: ubuntu-latest
     steps:
