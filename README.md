@@ -19,13 +19,18 @@ See the [Docker section](#docker) for instructions on how to use Grimjack inside
 
 ### Installation
 
-First, install [Python 3](https://python.org/downloads/),
-[pipx](https://pipxproject.github.io/pipx/installation/#install-pipx), and
-[Pipenv](https://pipenv.pypa.io/en/latest/install/#isolated-installation-of-pipenv-with-pipx).
-Then install dependencies (this may take a while):
+First, install [Python 3.9](https://python.org/downloads/) or higher and then clone this repository.
+From inside the repository directory, create a virtual environment and activate it:
 
-```shell script
-pipenv install
+```shell
+python3.9 -m venv venv/
+source venv/bin/activate
+```
+
+Then, install the test dependencies:
+
+```shell
+pip install -e .
 ```
 
 ### Run the search pipeline
@@ -33,7 +38,7 @@ pipenv install
 To test the search pipeline, run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
+python -m grimjack search "Which is better, a laptop or a desktop?"
 ```
 
 ### Generate a run file for all topics
@@ -41,7 +46,7 @@ pipenv run python -m grimjack search "Which is better, a laptop or a desktop?"
 To search all topics and generate a run file (top-5 per query), run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack --num-hits 5 run data/run.txt
+python -m grimjack --num-hits 5 run data/run.txt
 ```
 
 This will save a run file at `data/run.txt` with the format described in
@@ -52,7 +57,7 @@ the [shared task description](https://webis.de/events/touche-22/shared-task-2.ht
 To evaluate the search pipeline for all topics, run the `grimjack` CLI like this:
 
 ```shell script
-pipenv run python -m grimjack evaluate
+python -m grimjack evaluate
 ```
 
 This will print the evaluation metric (default: nDCG@10) to the console.
@@ -63,13 +68,13 @@ The search pipeline can be configured with the options listed in the help comman
 subcommands.
 
 ```shell script
-pipenv run python -m grimjack --help
+python -m grimjack --help
 ```
 
 Each subcommand's extra options can be listed, e.g.:
 
 ```shell script
-pipenv run python -m grimjack search --help
+python -m grimjack search --help
 ```
 
 ### Examples / Touché 2022 Runs
@@ -86,7 +91,7 @@ tag argument stance by comparing sentiments for each object using the IBM Debate
 treating stance as neutral if under a threshold of 0.125.
 
 ```shell
-pipenv run python -m grimjack \
+python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --targer-model tag-ibm-fasttext \
   --quality-tagger debater \
@@ -103,7 +108,7 @@ Rerank top-10 documents from the baseline result
 based on preferences from argumentative axioms.
 
 ```shell
-pipenv run python -m grimjack \
+python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --targer-model tag-ibm-fasttext \
   --quality-tagger debater \
@@ -124,7 +129,7 @@ move subjective documents (non-neutral stance) to the top,
 and then ensure that document's stances alternate.
 
 ```shell
-pipenv run python -m grimjack \
+python -m grimjack \
   --retrieval-model query-likelihood-dirichlet \
   --targer-model tag-ibm-fasttext \
   --quality-tagger debater \
@@ -148,7 +153,7 @@ then retrieve like with the baseline,
 tag argument quality using T0, tag argument stance using T0.
 
 ```shell
-pipenv run python -m grimjack \
+python -m grimjack \
   --query-expander t0pp-description-narrative \
   --query-expander t0pp-comparative-synonyms \
   --retrieval-model query-likelihood-dirichlet \
@@ -172,7 +177,7 @@ move subjective documents (non-neutral stance) to the top,
 and then ensure that document's stances alternate.
 
 ```shell
-pipenv run python -m grimjack \
+python -m grimjack \
   --query-expander t0pp-description-narrative \
   --query-expander t0pp-synonyms \
   --query-expander fast-text-wiki-news-synonyms \
@@ -196,9 +201,9 @@ pipenv run python -m grimjack \
 After [installing](#installation) all dependencies, you can run all unit tests:
 
 ```shell script
-pipenv run flake8 grimjack
-pipenv run pylint -E grimjack
-pipenv run pytest grimjack
+flake8 grimjack
+pylint -E grimjack
+pytest grimjack
 ```
 
 ## Docker
@@ -221,5 +226,6 @@ docker container run -v "$(pwd)"/data:/workspace/data grimjack run data/run.txt
 This repository is licensed under the [MIT License](LICENSE).
 
 ## Ideas
+
 - Fairness
-- Submit to ArgMining workshop at 
+- Submit to ArgMining workshop

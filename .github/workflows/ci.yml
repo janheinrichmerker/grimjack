@@ -36,70 +36,91 @@ jobs:
         with:
           path: talk/talk.pdf
           name: latex-talk
+  python-build:
+    name: "🏗️ Build Python wheels"
+    runs-on: ubuntu-latest
+    env:
+      SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+    steps:
+    - name: "📥 Check-out"
+      uses: actions/checkout@v4
+    - name: "🧰 Install Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: pip
+        cache-dependency-path: pyproject.toml
+    - name: "🧰 Install dependencies"
+      run: pip install build twine
+    - name: "🏗️ Build Python wheels"
+      run: python -m build
+    - name: "🧪 Check package bundles"
+      run: twine check dist/*
+    - name: "📤 Upload Python wheels"
+      uses: actions/upload-artifact@v4
+      with:
+        name: wheels
+        path: dist
   python-code-format:
-    name: "🔍 Python code format"
+    name: "🔍 Check Python code format"
     runs-on: ubuntu-latest
+    env:
+      SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
     steps:
-      - name: "📥 Check-out"
-        uses: actions/checkout@v2
-      - name: "🧰 Install Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-          cache: pipenv
-      - name: "🧰 Install pipx"
-        run: pip install --user pipx
-      - name: "🧰 Install Pipenv"
-        run: pipx install pipenv
-      - name: "🧰 Install dependencies"
-        run: pipenv install --deploy
-      - name: "🔍 Check Python code format"
-        run: pipenv run flake8 grimjack
+    - name: "📥 Check-out"
+      uses: actions/checkout@v4
+    - name: "🧰 Install Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: pip
+        cache-dependency-path: pyproject.toml
+    - name: "🧰 Install dependencies"
+      run: pip install .[tests]
+    - name: "🔍 Check Python code format"
+      run: flake8 --exclude=./modern_talking/evaluation/track_1_kp_matching.py
   python-lint:
-    name: "🔍 Python lint"
+    name: "🔍 Lint Python code"
     runs-on: ubuntu-latest
+    env:
+      SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
     steps:
-      - name: "📥 Check-out"
-        uses: actions/checkout@v2
-      - name: "🧰 Install Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-          cache: pipenv
-      - name: "🧰 Install pipx"
-        run: pip install --user pipx
-      - name: "🧰 Install Pipenv"
-        run: pipx install pipenv
-      - name: "🧰 Install dependencies"
-        run: pipenv install --deploy
-      - name: "🔍 Lint Python code"
-        run: pipenv run pylint -E grimjack
-  python-unit-tests:
-    name: "🧪 Python tests"
+    - name: "📥 Check-out"
+      uses: actions/checkout@v4
+    - name: "🧰 Install Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: pip
+        cache-dependency-path: pyproject.toml
+    - name: "🧰 Install dependencies"
+      run: pip install .[tests]
+    - name: "🔍 Lint Python code"
+      run: pylint -E modern_talking
+  python-test:
+    name: "🧪 Test Python code"
     runs-on: ubuntu-latest
+    env:
+      SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
     steps:
-      - name: "📥 Check-out"
-        uses: actions/checkout@v2
-      - name: "🧰 Install Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-          cache: pipenv
-      - name: "🧰 Install pipx"
-        run: pip install --user pipx
-      - name: "🧰 Install Pipenv"
-        run: pipx install pipenv
-      - name: "🧰 Install dependencies"
-        run: pipenv install --deploy
-      - name: "🧪 Test Python code"
-        run: pipenv run pytest grimjack --cov --cov-report=term --cov-report=xml
-      - name: "📤 Upload test coverage"
-        uses: actions/upload-artifact@v2
-        with:
-          path: coverage.xml
-          name: python-test-coverage
-      - name: "📤 Publish test coverage"
-        uses: codecov/codecov-action@v1
+    - name: "📥 Check-out"
+      uses: actions/checkout@v4
+    - name: "🧰 Install Protoc"
+      run: sudo apt install protobuf-compiler
+    - name: "🧰 Install Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: pip
+        cache-dependency-path: pyproject.toml
+    - name: "🧰 Install dependencies"
+      run: pip install .[tests]
+    - name: "🧪 Test Python code"
+      run: pytest --cov --cov-report=term --cov-report=xml
+    - name: "📤 Upload coverage to Codecov"
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
   docker-build:
     name: "🏗️ Docker build"
     runs-on: ubuntu-latest
@@ -185,5 +206,3 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-        
- 
