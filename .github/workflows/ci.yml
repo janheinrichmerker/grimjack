@@ -15,11 +15,6 @@ jobs:
         with:
           working_directory: paper
           root_file: touche22-axiomatic-reranking-query-reformulation.tex
-      - name: 📤 Upload paper
-        uses: actions/upload-artifact@v2
-        with:
-          path: paper/touche22-axiomatic-reranking-query-reformulation.pdf
-          name: latex-paper
   latex-talk:
     name: 📄 LaTeX talk
     runs-on: ubuntu-latest
@@ -31,11 +26,6 @@ jobs:
         with:
           working_directory: talk
           root_file: talk.tex
-      - name: 📤 Upload talk
-        uses: actions/upload-artifact@v2
-        with:
-          path: talk/talk.pdf
-          name: latex-talk
   python-build:
     name: 🏗️ Build Python wheels
     runs-on: ubuntu-latest
@@ -56,11 +46,6 @@ jobs:
       run: python -m build
     - name: 🧪 Check package bundles
       run: twine check dist/*
-    - name: 📤 Upload Python wheels
-      uses: actions/upload-artifact@v4
-      with:
-        name: wheels
-        path: dist
   python-code-format:
     name: 🔍 Check Python code format
     runs-on: ubuntu-latest
@@ -131,78 +116,10 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: 🧰 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: 📄 Parse Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ github.repository }}
       - name: 🏗️ Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-      - name: 🏗️ Save Docker image
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=image.tar
-      - name: 📤 Upload Docker image
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-        uses: actions/upload-artifact@v2
-        with:
-          path: image.tar
-          name: docker-image
-  release:
-    name: 🚀 Create GitHub release
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    needs:
-      - latex-paper
-      - latex-talk
-      - python-code-format
-      - python-lint
-      - python-test
-      - docker-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Check-out
-        uses: actions/checkout@v2
-      - name: 📥 Download paper
-        uses: actions/download-artifact@v2
-        with:
-          path: touche22-axiomatic-reranking-query-reformulation.pdf
-          name: latex-paper
-      - name: 📥 Download talk
-        uses: actions/download-artifact@v2
-        with:
-          path: talk.pdf
-          name: latex-talk
-      - name: 📥 Download test coverage
-        uses: actions/download-artifact@v2
-        with:
-          path: coverage.xml
-          name: python-test-coverage
-      - name: 📥 Download Docker image
-        uses: actions/download-artifact@v2
-        with:
-          path: image.tar
-          name: docker-image
-      - name: 🚀 Create GitHub release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release ${{ steps.get-version.outputs.tag }}
-          files: |
-            touche22-axiomatic-reranking-query-reformulation.pdf
-            talk.pdf
-            coverage.xml
-          fail_on_unmatched_files: true
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

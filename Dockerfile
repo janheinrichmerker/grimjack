@@ -27,7 +27,8 @@ ARG PSEUDO_VERSION=1
 RUN --mount=type=cache,target=/root/.cache/pip \
     SETUPTOOLS_SCM_PRETEND_VERSION=${PSEUDO_VERSION} \
     /venv/bin/pip install -e .
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=source=.git,target=.git,type=bind \
+    --mount=type=cache,target=/root/.cache/pip \
     /venv/bin/pip install -e .
 
 # Copy source code.
