@@ -7,10 +7,10 @@ COPY --from=openjdk-11 /usr/local/openjdk-11 /usr/local/openjdk
 ENV JAVA_HOME /usr/local/openjdk
 RUN update-alternatives --install /usr/bin/java java /usr/local/openjdk/bin/java 1
 
-# Install Git.
+# Install Git and GCC.
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update -y && \
-    apt-get install -y git
+    apt-get install -y git build-essential
 
 # Install Pip.
 RUN --mount=type=cache,target=/root/.cache/pip \
