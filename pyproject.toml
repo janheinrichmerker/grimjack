@@ -24,7 +24,7 @@ dependencies = [
     "faiss-cpu~=1.7",  # Needed for pyserini >= 0.14.0
     "torch~=2.2",  # Needed for pyserini >= 0.14.0
     "debater-python-api~=3.5",
-    "dataclasses-json~=0.5.7",
+    "dataclasses-json~=0.6.4",
     "pandas~=1.5",
     "pymagnitude~=0.1.143",
     "annoy~=1.17",  # Needed for pymagnitude
