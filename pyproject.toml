@@ -25,7 +25,7 @@ dependencies = [
     "torch~=2.2",  # Needed for pyserini >= 0.14.0
     "debater-python-api~=3.5",
     "dataclasses-json~=0.6.4",
-    "pandas~=1.5",
+    "pandas~=2.2",
     "pymagnitude~=0.1.143",
     "annoy~=1.17",  # Needed for pymagnitude
     "diskcache~=5.4",
