@@ -11,7 +11,7 @@ jobs:
       - name: 📥 Check-out
         uses: actions/checkout@v4
       - name: 🏗️ Compile paper
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v3
         with:
           working_directory: paper
           root_file: touche22-axiomatic-reranking-query-reformulation.tex
@@ -22,7 +22,7 @@ jobs:
       - name: 📥 Check-out
         uses: actions/checkout@v4
       - name: 🏗️ Compile talk
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v3
         with:
           working_directory: talk
           root_file: talk.tex
