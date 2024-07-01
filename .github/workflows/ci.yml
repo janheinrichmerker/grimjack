@@ -4,28 +4,28 @@ on:
   push:
 
 jobs:
-  latex-paper:
-    name: 📄 LaTeX paper
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Check-out
-        uses: actions/checkout@v4
-      - name: 🏗️ Compile paper
-        uses: xu-cheng/latex-action@v3
-        with:
-          working_directory: paper
-          root_file: touche22-axiomatic-reranking-query-reformulation.tex
-  latex-talk:
-    name: 📄 LaTeX talk
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Check-out
-        uses: actions/checkout@v4
-      - name: 🏗️ Compile talk
-        uses: xu-cheng/latex-action@v3
-        with:
-          working_directory: talk
-          root_file: talk.tex
+  # latex-paper:
+  #   name: 📄 LaTeX paper
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: 📥 Check-out
+  #       uses: actions/checkout@v4
+  #     - name: 🏗️ Compile paper
+  #       uses: xu-cheng/latex-action@v3
+  #       with:
+  #         working_directory: paper
+  #         root_file: touche22-axiomatic-reranking-query-reformulation.tex
+  # latex-talk:
+  #   name: 📄 LaTeX talk
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: 📥 Check-out
+  #       uses: actions/checkout@v4
+  #     - name: 🏗️ Compile talk
+  #       uses: xu-cheng/latex-action@v3
+  #       with:
+  #         working_directory: talk
+  #         root_file: talk.tex
   python-build:
     name: 🏗️ Build Python wheels
     runs-on: ubuntu-latest
