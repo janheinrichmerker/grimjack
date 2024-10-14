@@ -40,8 +40,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-"Homepage" = "https://github.com/heinrichreimer/grimjack"
-"Bug Tracker" = "https://github.com/heinrichreimer/grimjack/issues"
+"Homepage" = "https://github.com/janheinrichmerker/grimjack"
+"Bug Tracker" = "https://github.com/janheinrichmerker/grimjack/issues"
 
 [build-system]
 requires = ["setuptools>=50", "setuptools_scm[toml]>=6.2", "wheel"]

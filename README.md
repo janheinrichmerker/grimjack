@@ -1,8 +1,8 @@
-[![CI](https://img.shields.io/github/actions/workflow/status/heinrichreimer/grimjack/ci.yml?branch=main&style=flat-square)](https://github.com/heinrichreimer/grimjack/actions/workflows/ci.yml)
-[![Code coverage](https://img.shields.io/codecov/c/github/heinrichreimer/grimjack?style=flat-square)](https://codecov.io/github/heinrichreimer/grimjack/)
-[![Issues](https://img.shields.io/github/issues/heinrichreimer/grimjack?style=flat-square)](https://github.com/heinrichreimer/grimjack/issues)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/heinrichreimer/grimjack?style=flat-square)](https://github.com/heinrichreimer/grimjack/commits)
-[![License](https://img.shields.io/github/license/heinrichreimer/grimjack?style=flat-square)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/janheinrichmerker/grimjack/ci.yml?branch=main&style=flat-square)](https://github.com/janheinrichmerker/grimjack/actions/workflows/ci.yml)
+[![Code coverage](https://img.shields.io/codecov/c/github/janheinrichmerker/grimjack?style=flat-square)](https://codecov.io/github/janheinrichmerker/grimjack/)
+[![Issues](https://img.shields.io/github/issues/janheinrichmerker/grimjack?style=flat-square)](https://github.com/janheinrichmerker/grimjack/issues)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/janheinrichmerker/grimjack?style=flat-square)](https://github.com/janheinrichmerker/grimjack/commits)
+[![License](https://img.shields.io/github/license/janheinrichmerker/grimjack?style=flat-square)](LICENSE)
 
 # 🤺 grimjack
 
